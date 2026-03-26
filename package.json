@@ -9,26 +9,27 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/nextjs": "latest",
+    "@react-three/drei": "latest",
+    "@react-three/fiber": "latest",
+    "@supabase/supabase-js": "latest",
+    "@tailwindcss/postcss": "^4.2.2",
+    "clsx": "latest",
+    "framer-motion": "latest",
+    "lucide-react": "latest",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "@clerk/nextjs": "latest",
-    "@supabase/supabase-js": "latest",
-    "three": "latest",
-    "@react-three/fiber": "latest",
-    "@react-three/drei": "latest",
-    "framer-motion": "latest",
-    "lucide-react": "latest",
-    "clsx": "latest",
     "tailwind-merge": "latest",
-    "tailwindcss-animate": "latest"
+    "tailwindcss-animate": "latest",
+    "three": "latest"
   },
   "devDependencies": {
-    "typescript": "latest",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "postcss": "latest",
-    "tailwindcss": "latest"
+    "tailwindcss": "latest",
+    "typescript": "latest"
   }
 }
