@@ -43,7 +43,7 @@ export default function LandingPage() {
           </h1>
           
           <p className="text-gray-300 text-lg md:text-2xl font-medium max-w-2xl mx-auto leading-relaxed">
-            The future of freelancing in <span className="text-white border-b-2 border-[#00f2ff]">Kenya</span>. 
+            The future of freelancing <span className="text-white border-b-2 border-[#00f2ff]">globally</span>. 
             Immersive. Secure. Decentralized.
           </p>
 
@@ -72,7 +72,7 @@ export default function LandingPage() {
       {/* 4. Footer Branding */}
       <div className="absolute bottom-8 w-full text-center z-50">
         <p className="text-[10px] tracking-[0.4em] text-gray-500 uppercase font-black">
-          Built for Kenyatta University • 2026
+          Built for competent
         </p>
       </div>
       
