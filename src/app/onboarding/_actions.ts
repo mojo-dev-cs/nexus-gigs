@@ -2,31 +2,25 @@
 
 import { auth, currentUser, clerkClient } from "@clerk/nextjs/server";
 import mongoose from "mongoose";
-import User from "../../models/User"; // Ensure this path is correct to your User model
+import User from "../../models/User";
 import { revalidatePath } from "next/cache";
 
 const MONGODB_URI = process.env.MONGODB_URI;
-
-async function connectDirect() {
-  if (mongoose.connection.readyState >= 1) return;
-  if (!MONGODB_URI) throw new Error("MONGODB_URI is missing from Env Variables");
-  return mongoose.connect(MONGODB_URI);
-}
 
 export async function completeOnboarding(role: "freelancer" | "client") {
   const { userId } = await auth();
   const user = await currentUser();
 
-  if (!userId || !user) {
-    return { error: "No logged in user" };
-  }
+  if (!userId || !user) return { error: "User session not found" };
 
   try {
-    console.log("Attempting DB Connection...");
-    await connectDirect();
-    console.log("DB Connected. Syncing User...");
+    // 1. Direct Connection with a 5-second timeout
+    if (mongoose.connection.readyState !== 1) {
+      if (!MONGODB_URI) throw new Error("URI Missing");
+      await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 5000 });
+    }
 
-    // 1. Sync user to MongoDB
+    // 2. Sync to MongoDB
     await User.findOneAndUpdate(
       { clerkId: userId },
       {
@@ -40,7 +34,7 @@ export async function completeOnboarding(role: "freelancer" | "client") {
       { upsert: true, new: true }
     );
 
-    // 2. Update Clerk Metadata
+    // 3. Update Clerk Metadata
     const client = await clerkClient();
     await client.users.updateUserMetadata(userId, {
       publicMetadata: {
@@ -49,12 +43,10 @@ export async function completeOnboarding(role: "freelancer" | "client") {
       },
     });
 
-    revalidatePath("/");
     revalidatePath("/dashboard");
-    
     return { message: "Onboarding completed" };
-  } catch (err) {
-    console.error("Onboarding Error:", err);
-    return { error: "There was an error updating your profile." };
+  } catch (err: any) {
+    console.error("Critical Onboarding Error:", err.message);
+    return { error: err.message || "Connection failed" };
   }
 }
