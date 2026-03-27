@@ -8,20 +8,19 @@ export default function OnboardingPage() {
   const [loading, setLoading] = useState(false);
   const { session } = useSession();
 
-  const handleSelection = async (role: "freelancer" | "client") => {
+const handleSelection = async (role: "freelancer" | "client") => {
     setLoading(true);
     const res = await completeOnboarding(role);
     
     if (res.success) {
-      // Refresh session so the new role is visible to the app
       await session?.reload();
-      window.location.href = "/dashboard";
+      // This sends them to the dashboard immediately after the choice
+      window.location.assign("/dashboard");
     } else {
       alert("Error: " + res.error);
       setLoading(false);
     }
   };
-
   return (
     <main className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-6 text-white text-center">
       <h1 className="text-4xl font-black uppercase italic mb-2 tracking-tighter">Choose Your <span className="text-[#00f2ff]">Path</span></h1>
