@@ -16,3 +16,5 @@ body {
 button {
   cursor: pointer;
 }
+/* Tighter font control for the Home Tab */
+.home-text-sm { font-size: 16px !important; }
