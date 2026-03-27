@@ -19,17 +19,21 @@ const handleSelection = async (selectedRole: "freelancer" | "client") => {
     try {
       const res = await completeOnboarding(selectedRole);
 
+      // We check for the specific success message from your _actions.ts
       if (res?.message === "Onboarding completed") {
-        // Force a window-level redirect to bypass any Next.js caching
+        console.log("Onboarding successful! Forcing redirect...");
+        
+        // SLEDGEHAMMER: Force a full browser reload to /dashboard
         window.location.href = "/dashboard";
       } else {
-        console.error("Onboarding failed:", res?.error);
         setLoading(false);
-        alert("Setup failed. Please try again.");
+        console.error("Onboarding failed:", res?.error);
+        alert(`Error: ${res?.error || "Unknown error occurred"}`);
       }
     } catch (error) {
-      console.error("Network error:", error);
       setLoading(false);
+      console.error("Network crash:", error);
+      alert("Network connection lost. Check your internet or MongoDB whitelist.");
     }
   };
   return (

@@ -13,18 +13,12 @@ export default clerkMiddleware(async (auth, request) => {
 
   // 2. If logged in, check if they have a role in their metadata
 const role = (sessionClaims?.metadata as { role?: string })?.role;
-  // 3. If they are logged in but haven't finished onboarding, force them to /onboarding
-  // (But don't redirect if they are already ON the onboarding page!)
-  if (
-    userId && 
-    !role && 
-    request.nextUrl.pathname !== "/onboarding" &&
-    !isPublicRoute(request)
-  ) {
-    return NextResponse.redirect(new URL("/onboarding", request.url));
-  }
-// If they are on the landing page '/' but are logged in...
-if (userId && request.nextUrl.pathname === "/") {
+const onboardingComplete = (sessionClaims?.metadata as { onboardingComplete?: boolean })?.onboardingComplete;
+
+// Update the logic: ONLY redirect to onboarding if NOT complete
+if (userId && !onboardingComplete && request.nextUrl.pathname !== "/onboarding" && !isPublicRoute(request)) {
+  return NextResponse.redirect(new URL("/onboarding", request.url));
+}if (userId && request.nextUrl.pathname === "/") {
   // ...and they have a role, send to dashboard
   if (role) return NextResponse.redirect(new URL("/dashboard", request.url));
   // ...and they DON'T have a role, send to onboarding
