@@ -18,20 +18,20 @@ const handleSelection = async (selectedRole: "freelancer" | "client") => {
 
     try {
       const res = await completeOnboarding(selectedRole);
-
-      // If success OR if the error is "already exists", redirect anyway!
-      if (res?.success || !res?.error) {
-        console.log("Success! Moving to dashboard...");
-        window.location.assign("/dashboard");
+      
+      if (res?.success) {
+        alert("Success! Redirecting now...");
+        window.location.href = "/dashboard";
       } else {
         setLoading(false);
-        alert(`Issue: ${res.error}`);
+        alert("Server said: " + res?.error);
       }
-    } catch (e) {
-      // If the server action crashes but we clicked, just TRY to go to dashboard
-      window.location.assign("/dashboard");
+    } catch (error) {
+      setLoading(false);
+      alert("Browser Crash: " + error);
     }
-  };  return (
+  };
+    return (
     <main className="min-h-screen bg-[#020617] text-white flex flex-col items-center justify-center p-6 font-sans">
       <div className="max-w-4xl w-full space-y-12 text-center">
         <div className="space-y-4">
