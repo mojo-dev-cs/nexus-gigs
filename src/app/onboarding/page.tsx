@@ -12,25 +12,25 @@ export default function OnboardingPage() {
   const router = useRouter();
   const { user } = useUser();
 
-  const handleSelection = async (selectedRole: "freelancer" | "client") => {
-    setRole(selectedRole);
-    setLoading(true);
+ const handleSelection = async (selectedRole: "freelancer" | "client") => {
+  setRole(selectedRole);
+  setLoading(true);
 
-    try {
-      const res = await completeOnboarding(selectedRole);
+  try {
+    const res = await completeOnboarding(selectedRole);
 
-      if (res?.message === "Onboarding completed") {
-        router.push("/dashboard");
-        router.refresh(); 
-      } else {
-        console.error("Save failed:", res?.error);
-        setLoading(false);
-      }
-    } catch (error) {
-      console.error("Connection error:", error);
-      setLoading(false);
+    if (res?.message === "Onboarding completed") {
+      // THIS IS THE KEY: Tell Clerk to refresh the user data locally
+      await user?.reload(); 
+      
+      router.push("/dashboard");
+      router.refresh(); 
     }
-  };
+  } catch (error) {
+    console.error(error);
+    setLoading(false);
+  }
+};
 
   return (
     <main className="min-h-screen bg-[#020617] text-white flex flex-col items-center justify-center p-6 font-sans">

@@ -23,7 +23,13 @@ const role = (sessionClaims?.metadata as { role?: string })?.role;
   ) {
     return NextResponse.redirect(new URL("/onboarding", request.url));
   }
-
+// If they are on the landing page '/' but are logged in...
+if (userId && request.nextUrl.pathname === "/") {
+  // ...and they have a role, send to dashboard
+  if (role) return NextResponse.redirect(new URL("/dashboard", request.url));
+  // ...and they DON'T have a role, send to onboarding
+  return NextResponse.redirect(new URL("/onboarding", request.url));
+}
   // 4. If they HAVE a role and try to go back to onboarding, send them to dashboard
   if (userId && role && request.nextUrl.pathname === "/onboarding") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
