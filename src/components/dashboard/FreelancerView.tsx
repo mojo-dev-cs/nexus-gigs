@@ -3,95 +3,120 @@
 import { useState } from "react";
 
 export const FreelancerView = ({ jobs }: { jobs: any[] }) => {
-  const [earnings, setEarnings] = useState(1250); // Simulated existing earnings
-
-  const handleWithdraw = () => {
-    const amount = prompt("Enter amount to withdraw (USD):", "100");
-    if (amount && parseFloat(amount) <= earnings) {
-      setEarnings(prev => prev - parseFloat(amount));
-      alert(`Withdrawal of $${amount} initiated to your linked account.`);
-    } else {
-      alert("Insufficient funds or invalid amount.");
-    }
-  };
+  const [activeTab, setActiveTab] = useState("home");
+  const [bids, setBids] = useState(5);
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-700">
+    <div className="pb-24"> {/* Space for bottom nav */}
       
-      {/* 💳 FINANCIAL OVERVIEW */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="p-8 bg-linear-to-br from-[#00f2ff]/10 to-transparent border border-[#00f2ff]/20 rounded-[40px] backdrop-blur-xl">
-          <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#00f2ff] mb-2">Available Balance</p>
-          <div className="flex items-end justify-between">
-            <h3 className="text-4xl font-black italic tracking-tighter text-white">${earnings}</h3>
-            <button 
-              onClick={handleWithdraw}
-              className="px-6 py-2 bg-[#00f2ff] text-black font-black text-[10px] rounded-full uppercase hover:scale-105 transition-all"
-            >
-              Withdraw
-            </button>
-          </div>
-        </div>
-
-        <div className="p-8 bg-white/5 border border-white/10 rounded-[40px]">
-          <p className="text-[9px] font-black uppercase tracking-[0.4em] text-gray-500 mb-2">Active Gigs</p>
-          <h3 className="text-4xl font-black italic tracking-tighter text-white">2</h3>
-        </div>
-
-        <div className="p-8 bg-white/5 border border-white/10 rounded-[40px]">
-          <p className="text-[9px] font-black uppercase tracking-[0.4em] text-gray-500 mb-2">Reputation Score</p>
-          <div className="flex items-center gap-3">
-            <h3 className="text-4xl font-black italic tracking-tighter text-emerald-500">98%</h3>
-            <span className="text-[8px] font-black bg-emerald-500/10 text-emerald-500 px-2 py-1 rounded border border-emerald-500/20">TOP RATED</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 📂 MISSION CONTROL */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-4">
-        <div>
-          <h2 className="text-4xl font-black uppercase italic tracking-tighter">Mission <span className="text-[#00f2ff]">Feed</span></h2>
-          <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.4em] mt-1">Available Global Contracts</p>
-        </div>
-        
-        <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
-          <button className="px-6 py-3 bg-[#00f2ff] text-black text-[10px] font-black rounded-xl uppercase">Browse</button>
-          <button className="px-6 py-3 text-gray-500 text-[10px] font-black rounded-xl uppercase hover:text-white transition-colors">My Proposals</button>
-        </div>
-      </div>
-
-      {/* 🛰️ JOB GRID */}
-      {jobs.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {jobs.map((job) => (
-            <div key={job._id} className="group p-8 bg-white/3 border border-white/10 rounded-[48px] hover:border-[#00f2ff]/40 transition-all">
-              <div className="flex justify-between items-start mb-6">
-                <span className="text-[9px] font-black bg-white/5 px-4 py-1.5 rounded-full border border-white/10 text-gray-400 uppercase tracking-widest">
-                  {job.category || "TECH"}
-                </span>
-                <p className="text-2xl font-black text-white italic">${job.budget}</p>
+      {/* 🏠 HOME TAB */}
+      {activeTab === "home" && (
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+          <div className="p-8 bg-linear-to-br from-[#00f2ff]/20 to-purple-500/10 border border-white/10 rounded-4xl">
+            <p className="text-xs font-bold text-gray-400">Welcome back,</p>
+            <h2 className="text-3xl font-black italic tracking-tighter text-white">Emmanuel 👋</h2>
+            <div className="grid grid-cols-2 gap-4 mt-8">
+              <div className="bg-white/5 p-4 rounded-2xl border border-white/10">
+                <p className="text-[10px] font-black text-gray-500 uppercase">Bids Left</p>
+                <p className="text-2xl font-black text-[#00f2ff]">{bids}</p>
               </div>
-              <h3 className="text-xl font-bold mb-3 group-hover:text-[#00f2ff] transition-colors">{job.title}</h3>
-              <p className="text-gray-500 text-sm font-medium line-clamp-2 mb-8">{job.description}</p>
-              
-              <button className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[#00f2ff] hover:text-black hover:border-[#00f2ff] transition-all">
-                Submit Proposal
-              </button>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="py-32 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-[60px] bg-white/1">
-          <div className="relative mb-6">
-            <div className="w-16 h-16 bg-[#00f2ff]/10 rounded-full animate-ping absolute" />
-            <div className="w-16 h-16 bg-[#00f2ff]/5 rounded-full flex items-center justify-center relative border border-[#00f2ff]/20">
-               <span className="text-2xl">📡</span>
+              <div className="bg-white/5 p-4 rounded-2xl border border-white/10">
+                <p className="text-[10px] font-black text-gray-500 uppercase">Wallet</p>
+                <p className="text-2xl font-black text-white">$0.00</p>
+              </div>
             </div>
           </div>
-          <h3 className="text-lg font-bold text-gray-300 uppercase tracking-widest">Scanning Nexus Frequencies</h3>
-          <p className="text-gray-600 text-[10px] font-black uppercase tracking-[0.3em] mt-2">No active missions found in your sector</p>
+
+          <div className="grid grid-cols-1 gap-4">
+            <div className="bg-white/5 p-6 rounded-4xl border border-white/10 flex justify-between items-center">
+               <div>
+                  <p className="text-[10px] font-black text-emerald-500 uppercase mb-1">Wallet Status</p>
+                  <p className="text-2xl font-black">$0.00</p>
+               </div>
+               <button className="px-6 py-2 bg-emerald-500 text-black font-black text-[10px] rounded-full uppercase">Withdraw</button>
+            </div>
+          </div>
         </div>
       )}
+
+      {/* 💼 TASKS TAB */}
+      {activeTab === "tasks" && (
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+          <div className="flex justify-between items-end">
+             <h2 className="text-2xl font-black uppercase italic tracking-tighter">Available <span className="text-[#00f2ff]">Missions</span></h2>
+             <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-center">
+                <p className="text-[8px] font-black text-gray-500 uppercase">Bids</p>
+                <p className="text-xs font-bold">{bids}</p>
+             </div>
+          </div>
+
+          {jobs.length > 0 ? jobs.map(job => (
+            <div key={job._id} className="bg-white/5 border border-white/10 rounded-4xl p-8 space-y-4">
+               <h3 className="text-lg font-bold">{job.title}</h3>
+               <p className="text-gray-500 text-xs line-clamp-2">{job.description}</p>
+               <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-white/5 p-3 rounded-xl border border-white/10">
+                     <p className="text-[8px] font-black text-gray-500 uppercase">Pay</p>
+                     <p className="text-sm font-bold text-emerald-500">${job.budget}</p>
+                  </div>
+                  <div className="bg-white/5 p-3 rounded-xl border border-white/10">
+                     <p className="text-[8px] font-black text-gray-500 uppercase">Region</p>
+                     <p className="text-sm font-bold">Kenya</p>
+                  </div>
+               </div>
+               <button className="w-full py-4 bg-[#00f2ff] text-black font-black rounded-2xl uppercase text-[10px] tracking-widest">
+                  Place Bid →
+               </button>
+            </div>
+          )) : <div className="text-center py-20 text-gray-500">No tasks currently available.</div>}
+        </div>
+      )}
+
+      {/* 👤 ACCOUNT TAB */}
+      {activeTab === "account" && (
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+           <div className="bg-white/5 border border-white/10 rounded-4xl p-8">
+              <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-6">Account Overview</h3>
+              <div className="space-y-4">
+                 <div className="flex justify-between border-b border-white/5 pb-4">
+                    <span className="text-xs text-gray-400">Email Address</span>
+                    <span className="text-xs font-bold text-white">emma@nexus.com</span>
+                 </div>
+                 <div className="flex justify-between border-b border-white/5 pb-4">
+                    <span className="text-xs text-gray-400">Country</span>
+                    <span className="text-xs font-bold text-white">KE</span>
+                 </div>
+              </div>
+           </div>
+        </div>
+      )}
+
+      {/* BOTTOM NAVIGATION */}
+      <TalentNav activeTab={activeTab} setActiveTab={setActiveTab} />
+    </div>
+  );
+};
+
+// Sub-component for the Nav
+const TalentNav = ({ activeTab, setActiveTab }: any) => {
+  const tabs = [
+    { id: 'home', label: 'Home', icon: '🏠' },
+    { id: 'tasks', label: 'Tasks', icon: '💼' },
+    { id: 'account', label: 'Account', icon: '👤' },
+  ];
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0a0f1e]/90 backdrop-blur-xl border-t border-white/5 px-6 py-4 flex justify-between items-center">
+      {tabs.map((tab) => (
+        <button
+          key={tab.id}
+          onClick={() => setActiveTab(tab.id)}
+          className={`flex flex-col items-center gap-1 transition-all ${activeTab === tab.id ? 'text-[#00f2ff]' : 'text-gray-500'}`}
+        >
+          <span className="text-xl">{tab.icon}</span>
+          <span className="text-[9px] font-black uppercase tracking-widest">{tab.label}</span>
+        </button>
+      ))}
     </div>
   );
 };
