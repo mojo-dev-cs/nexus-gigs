@@ -5,9 +5,8 @@ const JobSchema = new Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   budget: { type: Number, required: true },
-  category: { type: String, required: true }, // e.g., Web Dev, Design, Marketing
+  category: { type: String, required: true },
   status: { type: String, enum: ["open", "in-progress", "completed"], default: "open" },
 }, { timestamps: true });
 
-const Job = models.Job || model("Job", JobSchema);
-export default Job;
+export default models.Job || model("Job", JobSchema);

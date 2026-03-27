@@ -2,15 +2,17 @@
 
 import { auth } from "@clerk/nextjs/server";
 import mongoose from "mongoose";
-import Job from "../../models/Job"; // Relative path to Job model
+import Job from "../../models/Job";
 import { revalidatePath } from "next/cache";
 
-// Direct connection logic to stop the import error
 const MONGODB_URI = process.env.MONGODB_URI;
 
+// This version is "Strict" so Vercel won't crash
 async function connectDirect() {
   if (mongoose.connection.readyState >= 1) return;
-  return mongoose.connect(MONGODB_URI!);
+  if (!MONGODB_URI) throw new Error("MONGODB_URI is missing");
+  
+  return mongoose.connect(MONGODB_URI);
 }
 
 export async function createJob(formData: FormData) {
@@ -24,6 +26,7 @@ export async function createJob(formData: FormData) {
 
   try {
     await connectDirect();
+    
     await Job.create({
       clientClerkId: userId,
       title,
