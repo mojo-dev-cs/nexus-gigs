@@ -21,7 +21,7 @@ export async function completeOnboarding(role: "freelancer" | "client") {
     }
 
     // 2. Sync to MongoDB
-    await User.findOneAndUpdate(
+   await User.findOneAndUpdate(
       { clerkId: userId },
       {
         clerkId: userId,
@@ -31,7 +31,7 @@ export async function completeOnboarding(role: "freelancer" | "client") {
         role: role,
         onboardingComplete: true,
       },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: 'after' } // Fixed the warning here
     );
 
     // 3. Update Clerk Metadata
