@@ -50,22 +50,23 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
   ];
 
   // --- ⚡ REAL PAYMENT HANDLER ---
-  const handleMpesaVerification = async () => {
-    if (mpesaNumber.length < 10) return alert("Enter a valid M-Pesa number.");
+const handleMpesaVerification = async () => {
     setIsPaying(true);
 
     const result = await verifyMpesaPayment(mpesaNumber);
 
-    if (result.success) {
-      alert("✅ " + result.message);
+    if (result.success && result.redirectUrl) {
+      // This opens your Lipwa Link in a new tab
+      window.open(result.redirectUrl, '_blank');
+      
       setIsPaying(false);
-      // Logic for confirming manually if needed
+      setShowVerifyModal(false);
+      alert("🚀 Secure M-Pesa Portal Opened. After paying, your status will be updated by HQ.");
     } else {
       setIsPaying(false);
       alert("❌ ERROR: " + result.error);
     }
   };
-
   return (
     <div className="max-w-7xl mx-auto pb-44 pt-4 px-4 text-white relative selection:bg-[#00f2ff]/30">
       
