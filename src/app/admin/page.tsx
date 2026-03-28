@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useUser, SignOutButton } from "@clerk/nextjs";
-import Link from "next/link";
 
 export default function AdminPage() {
   const { user, isLoaded } = useUser();
@@ -10,7 +9,7 @@ export default function AdminPage() {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
 
-  // Check for session on load
+  // Load session
   useEffect(() => {
     const auth = sessionStorage.getItem("nexus_admin_session");
     if (auth === "true") {
@@ -21,7 +20,7 @@ export default function AdminPage() {
   const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // 🔓 STEP 1: Check ONLY the password first to let you in
+    // 🔓 PURE PASSWORD ACCESS - No email check for now
     if (passInput === "Nexus123!") {
       sessionStorage.setItem("nexus_admin_session", "true");
       setIsAuthorized(true);
@@ -52,23 +51,8 @@ export default function AdminPage() {
     );
   }
 
-  // 🛡️ STEP 2: Secondary Email Shield (Runs only AFTER password is correct)
-  const adminEmail = "mojojojjy@gmail.com";
-  if (isLoaded && user?.emailAddresses[0].emailAddress.toLowerCase() !== adminEmail.toLowerCase()) {
-    return (
-      <div className="min-h-screen bg-[#020617] flex items-center justify-center p-10 text-center">
-         <div className="max-w-md space-y-6">
-            <h1 className="text-4xl font-black italic text-red-500">IDENTITY MISMATCH</h1>
-            <p className="text-gray-500 text-xs uppercase font-bold leading-relaxed">
-              Password accepted, but your current Clerk account ({user?.emailAddresses[0].emailAddress}) does not have Overseer privileges.
-            </p>
-            <button onClick={() => {sessionStorage.clear(); window.location.href="/dashboard"}} className="px-8 py-3 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase">Return to Freelancer Node</button>
-         </div>
-      </div>
-    );
-  }
-
-  // --- 🛰️ THE 9-MODULE COMMAND CENTER (Rest of your sidebar code) ---
+  // --- 🛰️ THE 9-MODULE COMMAND CENTER ---
+  // (This part stays the same as before)
   const modules = [
     { id: "dashboard", label: "Overview", icon: "📊", desc: "Global Stats" },
     { id: "users", label: "Users", icon: "👤", desc: "Registry" },
@@ -83,12 +67,11 @@ export default function AdminPage() {
 
   return (
     <div className="flex min-h-screen">
-      {/* (Sidebar and Main Content code from the previous step) */}
       <aside className="w-72 border-r border-red-500/10 bg-black/40 backdrop-blur-xl flex flex-col fixed h-full z-50">
         <div className="p-10"><h2 className="font-black italic text-red-500 uppercase text-2xl tracking-tighter">NEXUS <span className="text-white">HQ</span></h2></div>
         <nav className="flex-1 px-6 space-y-2 overflow-y-auto no-scrollbar">
           {modules.map(m => (
-            <button key={m.id} onClick={() => setActiveTab(m.id)} className={`w-full flex items-center gap-4 px-6 py-4 rounded-3xl transition-all ${activeTab === m.id ? 'bg-red-500 text-white shadow-lg shadow-red-500/20' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}>
+            <button key={m.id} onClick={() => setActiveTab(m.id)} className={`w-full flex items-center gap-4 px-6 py-4 rounded-3xl transition-all ${activeTab === m.id ? 'bg-red-500 text-white' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}>
               <span className="text-xl">{m.icon}</span>
               <div className="text-left leading-none">
                 <p className="text-[10px] font-black uppercase tracking-widest">{m.label}</p>
@@ -97,20 +80,23 @@ export default function AdminPage() {
             </button>
           ))}
         </nav>
+        <div className="p-8 border-t border-white/5">
+           <button onClick={() => {sessionStorage.clear(); window.location.reload();}} className="w-full py-2 bg-white/5 text-[8px] font-black uppercase text-gray-500">Lock Console</button>
+        </div>
       </aside>
       <main className="flex-1 ml-72 p-16">
+         {/* DASHBOARD TAB CONTENT */}
          {activeTab === "dashboard" && (
             <div className="space-y-12">
                <h3 className="text-4xl font-black italic uppercase tracking-tighter">System <span className="text-red-500">Intelligence</span></h3>
                <div className="grid grid-cols-4 gap-6">
-                  <div className="p-8 bg-white/5 border border-white/10 rounded-[40px] shadow-2xl">
+                  <div className="p-8 bg-white/5 border border-white/10 rounded-[40px]">
                      <p className="text-[9px] font-black text-gray-500 uppercase mb-4 tracking-widest italic">Live Nodes</p>
-                     <h4 className="text-4xl font-black italic">Active</h4>
+                     <h4 className="text-4xl font-black italic">ACTIVE</h4>
                   </div>
                </div>
             </div>
          )}
-         {/* Other tabs go here */}
       </main>
     </div>
   );
