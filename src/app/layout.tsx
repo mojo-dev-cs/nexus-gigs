@@ -16,6 +16,7 @@ export default function RootLayout({
           <div className="pt-24">
             {children}
           </div>
+                  <script src="https://applet.payherokenya.com/cdn/button_sdk.js?v=3.1"></script>
         </body>
       </html>
     </ClerkProvider>
