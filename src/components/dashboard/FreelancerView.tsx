@@ -50,23 +50,21 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
   ];
 
   // --- ⚡ REAL PAYMENT HANDLER ---
-const handleMpesaVerification = async () => {
+  const handleMpesaVerification = async () => {
+    if (mpesaNumber.length < 10) return alert("Enter a valid M-Pesa number.");
     setIsPaying(true);
 
     const result = await verifyMpesaPayment(mpesaNumber);
 
-    if (result.success && result.redirectUrl) {
-      // This opens your Lipwa Link in a new tab
-      window.open(result.redirectUrl, '_blank');
-      
+    if (result.success) {
+      alert("✅ " + result.message); 
       setIsPaying(false);
-      setShowVerifyModal(false);
-      alert("🚀 Secure M-Pesa Portal Opened. After paying, your status will be updated by HQ.");
     } else {
       setIsPaying(false);
       alert("❌ ERROR: " + result.error);
     }
   };
+
   return (
     <div className="max-w-7xl mx-auto pb-44 pt-4 px-4 text-white relative selection:bg-[#00f2ff]/30">
       
@@ -91,7 +89,8 @@ const handleMpesaVerification = async () => {
                 <div className="space-y-3">
                    <h4 className="text-xs font-black text-[#00f2ff] uppercase italic tracking-widest">Why Verify ($10 Fee)?</h4>
                    <p>Unlock gigs, earn the "Elite" badge, and get priority in client feeds. Required to prevent bots and secure payments.</p>
-                   {/* PAYMENT PROMPT ADDED HERE */}
+                   
+                   {/* PAYMENT PROMPT ADDED HERE AS REQUESTED */}
                    {!isVerified && (
                     <button 
                       onClick={() => setShowVerifyModal(true)} 
@@ -110,7 +109,7 @@ const handleMpesaVerification = async () => {
         </div>
       )}
 
-      {/* --- 💼 GIGS MARKETPLACE (12 JOBS) --- */}
+      {/* --- 💼 GIGS MARKETPLACE --- */}
       {activeTab === "tasks" && (
         <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
           <h2 className="text-xl font-black uppercase italic tracking-tighter">Mission <span className="text-[#00f2ff]">Feed</span></h2>
@@ -155,7 +154,7 @@ const handleMpesaVerification = async () => {
              <div className="bg-white/5 p-6 rounded-[30px] max-w-lg mb-4">
                 <p className="text-xs leading-relaxed">
                    Welcome to <span className="font-black italic text-white uppercase underline decoration-[#00f2ff]">NexusGigs</span>, Operator. <br/><br/>
-                   This is your secure communication hub. All transmissions here are encrypted. Coordinate with Visionaries to complete missions and receive instant payouts.
+                   This is your secure communication hub. Coordinate with Visionaries to complete missions and receive instant payouts.
                 </p>
                 <p className="text-[8px] font-black text-gray-600 mt-4 uppercase italic tracking-widest text-right">MARCH 28, 2026 • SIGNED: HQ</p>
              </div>
@@ -236,7 +235,7 @@ const handleMpesaVerification = async () => {
       {showVerifyModal && (
         <div className="fixed inset-0 z-300 flex items-center justify-center p-6 backdrop-blur-3xl">
           <div className="absolute inset-0 bg-[#020617]/95" onClick={() => setShowVerifyModal(false)} />
-          <div className="relative w-full max-w-sm bg-[#0a0f1e] border border-white/10 rounded-[48px] p-10 text-center animate-in zoom-in-95">
+          <div className="relative w-full max-w-sm bg-[#0a0f1e] border border-white/10 rounded-[48px] p-10 text-center animate-in zoom-in-95 shadow-2xl">
             <h3 className="text-2xl font-black uppercase text-white mb-2 italic">ACTIVATE <span className="text-[#00f2ff]">GIGS</span></h3>
             <p className="text-gray-400 text-[11px] mb-8 italic">Verification fee: <span className="text-white font-bold">$10.00</span>. Required to unlock professional contracts.</p>
             <div className="space-y-3">
