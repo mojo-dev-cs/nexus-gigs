@@ -7,25 +7,46 @@ import { SignOutButton, useUser } from "@clerk/nextjs";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [authenticated, setAuthenticated] = useState(false);
+  const [checking, setChecking] = useState(true);
   const { user, isLoaded } = useUser();
   const router = useRouter();
 
-  // 🔒 Security Check: Password & Email Verification
   useEffect(() => {
+    // Wait for Clerk to load before making security decisions
+    if (!isLoaded) return;
+
     const isAuth = sessionStorage.getItem("admin_auth");
     const adminEmail = "mojojojjy@gmail.com";
 
     if (!isAuth) {
+      // No password session found
       router.push("/admin/login");
-    } else if (isLoaded && user?.emailAddresses[0].emailAddress !== adminEmail) {
-      // Secondary check: Even with password, must be your email
+    } else if (user?.emailAddresses[0].emailAddress !== adminEmail) {
+      // Password correct but email is not the Master Overseer
       router.push("/dashboard");
     } else {
+      // Access Granted
       setAuthenticated(true);
+      setChecking(false);
     }
   }, [user, isLoaded, router]);
 
-  if (!authenticated || !isLoaded) return null;
+  // --- 🛰️ LOADING STATE (Prevents Black Screen) ---
+  if (checking || !isLoaded) {
+    return (
+      <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center">
+        <div className="relative">
+          <div className="w-16 h-16 rounded-full border-t-2 border-red-500 animate-spin" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+          </div>
+        </div>
+        <p className="mt-6 text-[10px] font-black uppercase tracking-[0.3em] text-red-500 animate-pulse">
+          Authenticating Nexus HQ
+        </p>
+      </div>
+    );
+  }
 
   const menuItems = [
     { label: "Overview", icon: "📊", href: "/admin" },
@@ -63,12 +84,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <div className="p-8 border-t border-white/5 space-y-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center font-black italic text-white text-xs border border-white/10">
+            <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center font-black italic text-white text-xs border border-white/10 shadow-lg shadow-red-500/20">
               {user?.firstName?.[0]}
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-tighter">{user?.firstName}</p>
-              <p className="text-[7px] text-red-500 font-bold uppercase tracking-widest">Master Overseer</p>
+              <p className="text-[10px] font-black uppercase tracking-tighter leading-none">{user?.firstName}</p>
+              <p className="text-[7px] text-red-500 font-bold uppercase tracking-widest mt-1">Master Overseer</p>
             </div>
           </div>
           <SignOutButton>
