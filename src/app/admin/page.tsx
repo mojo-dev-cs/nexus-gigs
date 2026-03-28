@@ -27,7 +27,7 @@ export default function AdminPage() {
     if (auth === "true") setIsAuthorized(true);
   }, []);
 
-  // Data Synchronization - Fetches real Clerk users
+  // Data Synchronization
   useEffect(() => {
     if (isAuthorized) {
       const loadData = async () => {
@@ -53,13 +53,10 @@ export default function AdminPage() {
     }
   };
 
-  // Metrics Logic - Dynamically calculated from fetched users
   const verifiedUsers = operators.filter(o => o.status === "Verified");
-  const pendingUsers = operators.filter(o => o.status !== "Verified");
   const conversionRate = operators.length > 0 ? ((verifiedUsers.length / operators.length) * 100).toFixed(1) : "0";
-  const revenueKes = verifiedUsers.length * 1250; // KES 1,250 per user
+  const revenueKes = verifiedUsers.length * 1250;
 
-  // PayHero Widget Trigger (External SDK)
   const launchPayHero = (phone: string, amount: number) => {
     if (!window.PayHero) return alert("PayHero SDK still loading. Refresh in 3s.");
     window.PayHero.init({
@@ -96,25 +93,48 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-[#020617] text-white selection:bg-red-500/30 font-sans">
+    <div className="flex flex-col md:flex-row min-h-screen bg-[#020617] text-white selection:bg-red-500/30 font-sans relative">
       
-      {/* SIDEBAR */}
-      <aside className={`w-full md:w-72 border-r border-red-500/10 bg-black/40 backdrop-blur-3xl fixed md:h-full z-100 transition-transform duration-300 ${isMobileMenuOpen ? 'translate-y-0 h-full' : '-translate-y-full md:translate-y-0'}`}>
-        <div className="p-10 hidden md:block"><h2 className="font-black italic text-red-500 uppercase text-2xl tracking-tighter">NEXUS <span className="text-white">HQ</span></h2></div>
-        <nav className="px-6 space-y-1 py-10 md:py-0">
+      {/* 📱 MOBILE HEADER */}
+      <div className="md:hidden flex items-center justify-between p-6 bg-black/40 border-b border-white/5 backdrop-blur-xl sticky top-0 z-110">
+        <h2 className="font-black italic text-red-500 text-xl tracking-tighter uppercase">NEXUS <span className="text-white">HQ</span></h2>
+        <button 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+          className="w-10 h-10 flex items-center justify-center bg-white/5 rounded-xl border border-white/10"
+        >
+          {isMobileMenuOpen ? "✕" : "☰"}
+        </button>
+      </div>
+
+      {/* 🛡️ SIDEBAR */}
+      <aside className={`
+        w-full md:w-72 bg-black/40 border-r border-red-500/10 backdrop-blur-3xl fixed md:sticky top-0 h-screen z-100 transition-transform duration-300 ease-in-out
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      `}>
+        <div className="p-10 hidden md:block">
+          <h2 className="font-black italic text-red-500 uppercase text-2xl tracking-tighter">NEXUS <span className="text-white">HQ</span></h2>
+        </div>
+        
+        <nav className="px-6 space-y-1 mt-10 md:mt-0">
           {modules.map(m => (
-            <button key={m.id} onClick={() => { setActiveTab(m.id); setIsMobileMenuOpen(false); }} className={`w-full flex items-center gap-4 px-6 py-4 rounded-3xl transition-all ${activeTab === m.id ? 'bg-red-600 text-white shadow-lg shadow-red-600/20 scale-105' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}>
+            <button 
+              key={m.id} 
+              onClick={() => { setActiveTab(m.id); setIsMobileMenuOpen(false); }} 
+              className={`w-full flex items-center gap-4 px-6 py-4 rounded-3xl transition-all ${activeTab === m.id ? 'bg-red-600 text-white shadow-lg shadow-red-600/20 scale-105' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
+            >
               <span className="text-xl">{m.icon}</span>
               <span className="text-[10px] font-black uppercase tracking-widest">{m.label}</span>
             </button>
           ))}
         </nav>
-        <div className="mt-auto p-8 border-t border-white/5 text-center">
+        
+        <div className="absolute bottom-8 left-0 w-full px-8 text-center">
            <button onClick={() => {sessionStorage.clear(); window.location.reload();}} className="text-[8px] font-black uppercase text-gray-600 hover:text-red-500 transition-colors">Lock Protocol</button>
         </div>
       </aside>
 
-      <main className="flex-1 md:ml-72 p-6 md:p-16">
+      {/* 🖥️ MAIN CONTENT */}
+      <main className="flex-1 p-6 md:p-16">
         
         {/* TAB: DASHBOARD */}
         {activeTab === "dashboard" && (
@@ -171,8 +191,7 @@ export default function AdminPage() {
         {activeTab === "payments" && (
           <div className="space-y-10 animate-in slide-in-from-bottom-4">
              <h3 className="text-3xl font-black uppercase italic">Financial <span className="text-red-500">Vault</span></h3>
-             <div className="grid md:grid-cols-2 gap-8">
-                {/* MPESA WIDGET BOX */}
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="p-10 bg-white/5 border border-emerald-500/20 rounded-[48px] space-y-8 shadow-2xl">
                   <header>
                     <h4 className="text-[10px] font-black uppercase text-emerald-500 italic tracking-widest mb-2">M-Pesa Gateway</h4>
@@ -195,7 +214,6 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* STRIPE BOX */}
                 <div className="p-10 bg-white/5 border border-blue-500/20 rounded-[48px] space-y-8 shadow-2xl">
                   <header>
                     <h4 className="text-[10px] font-black uppercase text-blue-500 italic tracking-widest mb-2">Global Card Settlement</h4>
