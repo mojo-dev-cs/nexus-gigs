@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { getAllNexusUsers } from "./_actions/users"; 
+import { initiateMpesaPayment } from "./_actions/mpesa";
+import { createStripeSession } from "./_actions/stripe";
 
 export default function AdminPage() {
   const { user, isLoaded } = useUser();
@@ -30,7 +32,6 @@ export default function AdminPage() {
         const res = await getAllNexusUsers();
         if (res.success && res.users) {
           setOperators(res.users || []);
-          // Calculate $10 for every verified user
           const verifiedCount = res.users.filter((u: any) => u.status === "Verified").length;
           setTotalRevenue(verifiedCount * 10);
         }
@@ -75,7 +76,6 @@ export default function AdminPage() {
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-[#020617] text-white selection:bg-red-500/30">
       
-      {/* --- 📱 MOBILE HEADER --- */}
       <div className="md:hidden flex items-center justify-between p-6 border-b border-white/5 bg-black/40 backdrop-blur-xl sticky top-0 z-110">
         <h2 className="font-black italic text-red-500 text-xl">NEXUS <span className="text-white">HQ</span></h2>
         <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-2xl">
@@ -83,7 +83,6 @@ export default function AdminPage() {
         </button>
       </div>
 
-      {/* --- 🛡️ SIDEBAR (Desktop & Mobile) --- */}
       <aside className={`w-full md:w-72 border-r border-red-500/10 bg-black/40 backdrop-blur-3xl fixed md:h-full z-100 transition-transform duration-300 ${isMobileMenuOpen ? 'translate-y-0 h-full' : '-translate-y-full md:translate-y-0'}`}>
         <div className="p-10 hidden md:block"><h2 className="font-black italic text-red-500 uppercase text-2xl tracking-tighter">NEXUS <span className="text-white">HQ</span></h2></div>
         <nav className="px-6 space-y-1 py-10 md:py-0">
@@ -99,10 +98,8 @@ export default function AdminPage() {
         </div>
       </aside>
 
-      {/* --- 🖥️ MAIN CONTENT --- */}
       <main className="flex-1 md:ml-72 p-6 md:p-16">
         
-        {/* DASHBOARD */}
         {activeTab === "dashboard" && (
           <div className="space-y-10 animate-in fade-in">
             <h3 className="text-3xl font-black uppercase italic tracking-tighter">System <span className="text-red-500">Pulse</span></h3>
@@ -123,7 +120,6 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* USERS */}
         {activeTab === "users" && (
           <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -151,7 +147,68 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* SETTINGS */}
+        {activeTab === "payments" && (
+          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4">
+            <header>
+              <h3 className="text-3xl font-black italic uppercase tracking-tighter">Global <span className="text-red-500">Vault</span></h3>
+              <p className="text-[8px] font-black text-gray-500 uppercase tracking-[0.3em] mt-2">Live M-Pesa & Multi-Channel Revenue</p>
+            </header>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="p-8 bg-white/5 border border-emerald-500/20 rounded-[40px] space-y-6 shadow-2xl shadow-emerald-500/5">
+                <div className="flex justify-between items-start">
+                  <h4 className="text-[10px] font-black uppercase text-emerald-500 italic">M-Pesa STK Push (Live)</h4>
+                  <span className="text-[8px] px-2 py-1 bg-emerald-500/10 text-emerald-500 rounded-lg font-black">ACTIVE</span>
+                </div>
+                
+                <div className="space-y-4">
+                  <input 
+                    id="livePhone" 
+                    placeholder="2547XXXXXXXX" 
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-[11px] font-black outline-none focus:border-emerald-500 transition-all text-white" 
+                  />
+                  <button 
+                    onClick={async () => {
+                      const phone = (document.getElementById('livePhone') as HTMLInputElement).value;
+                      if(!phone) return alert("Enter Phone Number");
+                      const res = await initiateMpesaPayment(phone, 1, user?.id || ""); 
+                      alert(res.success ? "Check your phone for the PIN prompt!" : "Error: " + res.error);
+                    }}
+                    className="w-full py-5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-2xl uppercase text-[10px] tracking-widest transition-all shadow-lg shadow-emerald-600/20 active:scale-95"
+                  >
+                    Authenticate Node (1 KES)
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-8 bg-white/5 border border-blue-500/20 rounded-[40px] space-y-6 shadow-2xl shadow-blue-500/5">
+                <div className="flex justify-between items-start">
+                  <h4 className="text-[10px] font-black uppercase text-blue-500 italic">Global Card Payment</h4>
+                  <span className="text-[8px] px-2 py-1 bg-blue-500/10 text-blue-500 rounded-lg font-black">ONLINE</span>
+                </div>
+                <div className="space-y-4">
+                  <p className="text-[10px] text-gray-500 font-bold uppercase italic">Secure International Settlement via Stripe</p>
+                  <button 
+                    onClick={async () => {
+                      const res = await createStripeSession(user?.emailAddresses[0].emailAddress || "");
+                      if (res.url) window.location.href = res.url;
+                      else alert("Stripe Error: " + res.error);
+                    }}
+                    className="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl uppercase text-[10px] tracking-widest transition-all shadow-lg shadow-blue-600/20 active:scale-95"
+                  >
+                    Authorize via Card ($10)
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-10 bg-white/5 border border-white/10 rounded-4xl">
+               <h5 className="text-[10px] font-black uppercase text-red-500 mb-6 italic tracking-widest">Recent Transactions</h5>
+               <p className="text-[10px] text-gray-600 font-bold uppercase italic">Monitoring Live Gateway Streams...</p>
+            </div>
+          </div>
+        )}
+
         {activeTab === "settings" && (
           <div className="max-w-xl space-y-8 animate-in fade-in">
             <h3 className="text-2xl font-black italic uppercase tracking-tighter">Platform <span className="text-red-500">Settings</span></h3>
@@ -174,8 +231,7 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* PAYMENTS, DISPUTES, ANALYTICS placeholders remain similar but streamlined */}
-        {["payments", "disputes", "analytics"].includes(activeTab) && (
+        {["disputes", "analytics"].includes(activeTab) && (
           <div className="p-10 border border-dashed border-white/10 rounded-4xl text-center opacity-40">
              <p className="text-[8px] font-black uppercase tracking-[0.4em] text-red-500">Module Connectivity Pending</p>
           </div>
