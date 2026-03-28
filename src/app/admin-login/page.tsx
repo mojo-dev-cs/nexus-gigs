@@ -11,15 +11,14 @@ export default function AdminLogin() {
     setIsAuthenticating(true);
 
     if (password === "Nexus123!") {
-      // 💾 Save to BOTH storage types for maximum compatibility
       sessionStorage.setItem("admin_auth", "true");
       localStorage.setItem("admin_auth_backup", "true"); 
-
-      // 🚀 HARD REDIRECT: Bypasses the router hang
+      
+      // 🚀 HARD RELOAD to /admin ensures the Layout starts fresh
       window.location.href = "/admin";
     } else {
       setIsAuthenticating(false);
-      alert("INVALID ACCESS KEY");
+      alert("ACCESS DENIED");
       setPassword("");
     }
   };
@@ -34,10 +33,10 @@ export default function AdminLogin() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="ENTER ACCESS KEY" 
-          className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-center font-bold outline-none focus:border-red-500 mb-4"
+          className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-center font-bold outline-none focus:border-red-500 mb-6"
         />
-        <button className="w-full py-4 bg-red-600 text-white font-black rounded-2xl uppercase text-[10px] tracking-widest hover:bg-red-500 transition-all">
-          {isAuthenticating ? "VERIFYING..." : "Authenticate →"}
+        <button className="w-full py-5 bg-red-600 text-white font-black rounded-2xl uppercase text-[10px] tracking-widest hover:bg-red-500 transition-all">
+          {isAuthenticating ? "SYNCING..." : "Authenticate →"}
         </button>
       </form>
     </div>
