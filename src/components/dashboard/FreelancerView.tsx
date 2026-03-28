@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useUser, SignOutButton } from "@clerk/nextjs";
-import { getPaymentLink } from "@/app/dashboard/_actions/payment";
+import { verifyMpesaPayment } from "@/app/dashboard/_actions/payment";
 import { useRouter } from "next/navigation";
 
 export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetadata: any }) => {
@@ -21,6 +21,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
   const [skills, setSkills] = useState(["Next.js", "React", "Tailwind", "Python"]);
   const [newSkill, setNewSkill] = useState("");
 
+  // Navigation Pill Data
   const navItems = [
     { id: 'home', icon: '🏠', label: 'Home' },
     { id: 'tasks', icon: '💼', label: 'Gigs' },
@@ -48,15 +49,17 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
     { id: "12", title: "App Localization (Swahili)", budget: 150, client: "Global App", rating: "5.0", dur: "4 Days", img: "https://ui-avatars.com/api/?name=GA&background=00f2ff&color=000", expired: false },
   ];
 
-  // --- ⚡ LIPWA LINK PAYMENT HANDLER ---
+  // --- ⚡ REAL PAYMENT HANDLER ---
   const handleMpesaVerification = async () => {
+    if (mpesaNumber.length < 10) return alert("Enter a valid M-Pesa number.");
     setIsPaying(true);
-    const result = await getPaymentLink();
-    
-    if (result.success && result.url) {
-      window.open(result.url, '_blank');
+
+    const result = await verifyMpesaPayment(mpesaNumber);
+
+    if (result.success) {
+      alert("✅ " + result.message);
       setIsPaying(false);
-      alert("🚀 Redirecting to Secure M-Pesa Portal... After paying, click 'Confirm Activation' in your dashboard.");
+      // Logic for confirming manually if needed
     } else {
       setIsPaying(false);
       alert("❌ ERROR: " + result.error);
@@ -87,6 +90,15 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 <div className="space-y-3">
                    <h4 className="text-xs font-black text-[#00f2ff] uppercase italic tracking-widest">Why Verify ($10 Fee)?</h4>
                    <p>Unlock gigs, earn the "Elite" badge, and get priority in client feeds. Required to prevent bots and secure payments.</p>
+                   {/* PAYMENT PROMPT ADDED HERE */}
+                   {!isVerified && (
+                    <button 
+                      onClick={() => setShowVerifyModal(true)} 
+                      className="mt-2 px-6 py-3 bg-emerald-600/20 border border-emerald-500/40 text-emerald-400 rounded-xl text-[9px] font-black uppercase hover:bg-emerald-500 hover:text-white transition-all w-fit"
+                    >
+                      Initialize Verification Process →
+                    </button>
+                   )}
                 </div>
                 <div className="space-y-3">
                    <h4 className="text-xs font-black text-[#00f2ff] uppercase italic tracking-widest">2% Commission</h4>
@@ -97,7 +109,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
         </div>
       )}
 
-      {/* --- 💼 GIGS MARKETPLACE --- */}
+      {/* --- 💼 GIGS MARKETPLACE (12 JOBS) --- */}
       {activeTab === "tasks" && (
         <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
           <h2 className="text-xl font-black uppercase italic tracking-tighter">Mission <span className="text-[#00f2ff]">Feed</span></h2>
@@ -106,7 +118,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
               <div key={g.id} className={`p-6 border rounded-[30px] transition-all bg-white/2 ${g.expired ? 'border-red-500/20 grayscale' : 'border-white/10 hover:border-[#00f2ff]/30 shadow-lg'}`}>
                 <div className="flex justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <img src={g.img} className="w-8 h-8 rounded-full border border-white/10" alt="Client" />
+                    <img src={g.img} className="w-8 h-8 rounded-full border border-white/10 shadow-sm" alt="Client" />
                     <div><p className="text-[10px] font-bold text-white uppercase">{g.client}</p><p className="text-[8px] font-black text-emerald-500 italic">⭐ {g.rating}/5</p></div>
                   </div>
                   <p className="text-lg font-black text-[#00f2ff]">${g.budget}</p>
@@ -227,21 +239,20 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             <h3 className="text-2xl font-black uppercase text-white mb-2 italic">ACTIVATE <span className="text-[#00f2ff]">GIGS</span></h3>
             <p className="text-gray-400 text-[11px] mb-8 italic">Verification fee: <span className="text-white font-bold">$10.00</span>. Required to unlock professional contracts.</p>
             <div className="space-y-3">
-              <button onClick={handleMpesaVerification} className="w-full py-4 bg-emerald-600 text-white font-black rounded-2xl uppercase text-[10px] tracking-widest shadow-xl shadow-emerald-500/10">
-                Open M-Pesa Portal ($10)
+              <input value={mpesaNumber} onChange={e => setMpesaNumber(e.target.value)} placeholder="07XXXXXXXX" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-center font-bold outline-none focus:border-[#00f2ff]" />
+              <button disabled={isPaying} onClick={handleMpesaVerification} className="w-full py-4 bg-emerald-600 text-white font-black rounded-2xl uppercase text-[10px] tracking-widest shadow-xl shadow-emerald-500/10">
+                {isPaying ? "ENCRYPTING..." : "Pay via M-Pesa"}
               </button>
               <button onClick={() => { setIsVerified(true); setShowVerifyModal(false); router.refresh(); }} className="w-full py-2 text-[8px] font-black uppercase text-gray-600 hover:text-white transition-all">
-                Confirm Activation (After Payment)
+                Confirm Activation (Paid)
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* --- 🆘 SUPPORT FLOAT --- */}
       <button onClick={() => setActiveTab('messages')} className="fixed bottom-32 right-8 w-14 h-14 bg-[#00f2ff] rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(0,242,255,0.4)] hover:scale-110 active:scale-90 transition-all z-100"><span className="text-2xl text-black font-black">?</span></button>
 
-      {/* --- 📱 NAVIGATION PILL --- */}
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-200 w-[95%] max-w-4xl flex justify-around items-center p-2 bg-[#0a0f1e]/90 backdrop-blur-3xl border border-white/10 rounded-full shadow-2xl no-scrollbar overflow-x-auto">
          {navItems.map(item => (
            <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex flex-col items-center py-3 px-5 rounded-full min-w-17.5 transition-all duration-300 ${activeTab === item.id ? 'bg-[#00f2ff] text-black scale-110 shadow-[0_0_20px_rgba(0,242,255,0.3)]' : 'text-gray-500 hover:text-white'}`}>
