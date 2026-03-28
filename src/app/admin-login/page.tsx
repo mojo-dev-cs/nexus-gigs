@@ -16,7 +16,7 @@ export default function AdminLogin() {
       sessionStorage.setItem("admin_auth", "true");
       // Force a small delay to ensure storage is committed
       setTimeout(() => {
-        router.push("/admin");
+        router.push("/admin-login");
         router.refresh(); 
       }, 500);
     } else {
