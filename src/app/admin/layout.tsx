@@ -8,42 +8,53 @@ import { SignOutButton, useUser } from "@clerk/nextjs";
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [authenticated, setAuthenticated] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [showRetry, setShowRetry] = useState(false);
   const { user, isLoaded } = useUser();
   const router = useRouter();
 
   useEffect(() => {
-    // Wait for Clerk to load before making security decisions
     if (!isLoaded) return;
 
+    // Timer to show a retry button if it hangs too long
+    const timer = setTimeout(() => setShowRetry(true), 5000);
+
     const isAuth = sessionStorage.getItem("admin_auth");
-    const adminEmail = "mojojojjy@gmail.com";
+    // Ensure this matches your Clerk email EXACTLY (case-sensitive)
+    const adminEmail = "mojojojjy@gmail.com"; 
 
     if (!isAuth) {
-      // No password session found
       router.push("/admin/login");
-    } else if (user?.emailAddresses[0].emailAddress !== adminEmail) {
-      // Password correct but email is not the Master Overseer
+    } else if (user?.emailAddresses[0].emailAddress.toLowerCase() !== adminEmail.toLowerCase()) {
+      // Added .toLowerCase() to prevent casing errors
+      console.log("Access Denied for:", user?.emailAddresses[0].emailAddress);
       router.push("/dashboard");
     } else {
-      // Access Granted
       setAuthenticated(true);
       setChecking(false);
     }
+
+    return () => clearTimeout(timer);
   }, [user, isLoaded, router]);
 
-  // --- 🛰️ LOADING STATE (Prevents Black Screen) ---
   if (checking || !isLoaded) {
     return (
       <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center">
-        <div className="relative">
-          <div className="w-16 h-16 rounded-full border-t-2 border-red-500 animate-spin" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-          </div>
-        </div>
-        <p className="mt-6 text-[10px] font-black uppercase tracking-[0.3em] text-red-500 animate-pulse">
+        <div className="w-12 h-12 rounded-full border-t-2 border-red-500 animate-spin mb-4" />
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-red-500 animate-pulse">
           Authenticating Nexus HQ
         </p>
+        
+        {showRetry && (
+          <div className="mt-8 space-y-4 text-center animate-in fade-in duration-1000">
+            <p className="text-[9px] text-gray-500 uppercase font-bold">Taking too long?</p>
+            <button 
+              onClick={() => { sessionStorage.clear(); window.location.reload(); }}
+              className="px-6 py-2 bg-white/5 border border-white/10 rounded-xl text-[8px] font-black uppercase text-red-500 hover:bg-red-500 hover:text-white"
+            >
+              Reset Session & Retry
+            </button>
+          </div>
+        )}
       </div>
     );
   }
@@ -59,51 +70,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   return (
-    <div className="flex min-h-screen bg-[#020617] text-white selection:bg-red-500/30">
-      {/* --- 🛡️ SIDEBAR --- */}
+    <div className="flex min-h-screen bg-[#020617] text-white">
       <aside className="w-64 border-r border-red-500/10 bg-black/40 backdrop-blur-xl fixed h-full flex flex-col z-100">
         <div className="p-8">
           <h1 className="font-black italic text-red-500 uppercase tracking-tighter text-2xl">
             NEXUS <span className="text-white">HQ</span>
           </h1>
-          <p className="text-[8px] font-black text-gray-600 tracking-[0.2em] mt-1 uppercase">Command Center V1.0</p>
         </div>
-
-        <nav className="flex-1 px-4 space-y-2 mt-4">
+        <nav className="flex-1 px-4 space-y-2">
           {menuItems.map((item) => (
-            <Link 
-              key={item.label} 
-              href={item.href}
-              className="flex items-center gap-4 px-6 py-4 rounded-2xl hover:bg-red-500/5 text-gray-400 hover:text-red-500 transition-all group"
-            >
-              <span className="text-xl group-hover:scale-110 transition-transform">{item.icon}</span>
+            <Link key={item.label} href={item.href} className="flex items-center gap-4 px-6 py-4 rounded-2xl text-gray-400 hover:text-red-500 transition-all">
+              <span className="text-xl">{item.icon}</span>
               <span className="text-[10px] font-black uppercase tracking-widest">{item.label}</span>
             </Link>
           ))}
         </nav>
-
-        <div className="p-8 border-t border-white/5 space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center font-black italic text-white text-xs border border-white/10 shadow-lg shadow-red-500/20">
-              {user?.firstName?.[0]}
-            </div>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-tighter leading-none">{user?.firstName}</p>
-              <p className="text-[7px] text-red-500 font-bold uppercase tracking-widest mt-1">Master Overseer</p>
-            </div>
-          </div>
-          <SignOutButton>
-            <button className="w-full py-2 bg-white/5 border border-white/10 rounded-xl text-[8px] font-black uppercase text-gray-500 hover:text-red-500 transition-all">
-              Terminate Session
-            </button>
-          </SignOutButton>
+        <div className="p-8 border-t border-white/5">
+          <SignOutButton><button className="w-full py-2 bg-white/5 border border-white/10 rounded-xl text-[8px] font-black uppercase text-gray-500">Terminate</button></SignOutButton>
         </div>
       </aside>
-
-      {/* --- 🖥️ MAIN VIEWPORT --- */}
-      <main className="flex-1 ml-64 p-10 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-red-500/5 via-transparent to-transparent">
-        {children}
-      </main>
+      <main className="flex-1 ml-64 p-10">{children}</main>
     </div>
   );
 }
