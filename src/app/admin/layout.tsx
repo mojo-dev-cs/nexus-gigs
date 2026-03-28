@@ -19,6 +19,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (!isAuth) {
       window.location.href = "/admin-login";
     } else if (user?.emailAddresses[0].emailAddress.toLowerCase() !== adminEmail.toLowerCase()) {
+      // If they have the password but NOT the right email, send to freelancer dash
       router.push("/dashboard");
     } else {
       setAuthenticated(true);
@@ -27,75 +28,47 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (!authenticated || !isLoaded) {
     return (
-      <div className="min-h-screen bg-[#020617] flex items-center justify-center">
-        <div className="w-10 h-10 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center">
+        <div className="w-10 h-10 border-2 border-red-500 border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-red-500">Syncing Nexus HQ...</p>
       </div>
     );
   }
 
-  // --- 🛰️ YOUR 9 COMMAND MODULES ---
   const navModules = [
-    { label: "Dashboard", icon: "📊", href: "/admin", desc: "Overview & Real-time Feed" },
+    { label: "Dashboard", icon: "📊", href: "/admin", desc: "Overview & Feed" },
     { label: "Users", icon: "👤", href: "/admin/users", desc: "Registry & KYC" },
-    { label: "Payments", icon: "💰", href: "/admin/payments", desc: "M-Pesa & Payouts" },
+    { label: "Payments", icon: "💰", href: "/admin/payments", desc: "M-Pesa & Fees" },
     { label: "Gigs & Jobs", icon: "💼", href: "/admin/gigs", desc: "Moderation" },
     { label: "Contracts", icon: "📜", href: "/admin/contracts", desc: "Milestones" },
-    { label: "Disputes", icon: "⚖️", href: "/admin/disputes", desc: "Resolution Center" },
-    { label: "Analytics", icon: "📈", href: "/admin/analytics", desc: "Growth Reports" },
-    { label: "Marketing", icon: "📢", href: "/admin/marketing", desc: "Broadcasts & Codes" },
-    { label: "Settings", icon: "⚙️", href: "/admin/settings", desc: "Platform Config" },
+    { label: "Disputes", icon: "⚖️", href: "/admin/disputes", desc: "Resolutions" },
+    { label: "Analytics", icon: "📈", href: "/admin/analytics", desc: "Reports" },
+    { label: "Marketing", icon: "📢", href: "/admin/marketing", desc: "Campaigns" },
+    { label: "Settings", icon: "⚙️", href: "/admin/settings", desc: "Config" },
   ];
 
   return (
     <div className="flex min-h-screen bg-[#020617] text-white">
-      {/* --- 🛡️ NEXUS HQ SIDEBAR --- */}
       <aside className="w-72 border-r border-red-500/10 bg-black/40 backdrop-blur-3xl fixed h-full flex flex-col z-100 overflow-y-auto no-scrollbar">
         <div className="p-8">
-          <h1 className="font-black italic text-red-500 uppercase tracking-tighter text-2xl">
-            NEXUS <span className="text-white">HQ</span>
-          </h1>
-          <p className="text-[7px] font-black text-gray-600 tracking-[0.4em] mt-1 uppercase">Overseer Protocol Active</p>
+          <h1 className="font-black italic text-red-500 uppercase tracking-tighter text-2xl">NEXUS <span className="text-white">HQ</span></h1>
         </div>
-
         <nav className="flex-1 px-4 pb-10 space-y-1">
           {navModules.map((item) => (
-            <Link 
-              key={item.label} 
-              href={item.href}
-              className="flex items-start gap-4 px-6 py-4 rounded-3xl hover:bg-red-500/5 text-gray-500 hover:text-white transition-all group"
-            >
+            <Link key={item.label} href={item.href} className="flex items-start gap-4 px-6 py-4 rounded-3xl hover:bg-red-500/5 text-gray-500 hover:text-white transition-all group">
               <span className="text-xl mt-1">{item.icon}</span>
               <div className="flex flex-col">
                 <span className="text-[10px] font-black uppercase tracking-widest leading-none">{item.label}</span>
-                <span className="text-[7px] font-bold text-gray-600 mt-1 uppercase group-hover:text-red-500 transition-colors">{item.desc}</span>
+                <span className="text-[7px] font-bold text-gray-600 mt-1 uppercase group-hover:text-red-500">{item.desc}</span>
               </div>
             </Link>
           ))}
         </nav>
-
         <div className="p-8 border-t border-white/5 bg-black/20">
-           <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 rounded-full bg-red-600 border border-white/10 flex items-center justify-center font-black italic text-xs">
-                {user?.firstName?.[0]}
-              </div>
-              <div>
-                <p className="text-[10px] font-black uppercase leading-none">{user?.firstName}</p>
-                <p className="text-[7px] text-red-500 font-bold uppercase mt-1">Master Admin</p>
-              </div>
-           </div>
-           <button 
-             onClick={() => { sessionStorage.clear(); localStorage.removeItem("admin_auth_backup"); window.location.href = "/admin-login"; }} 
-             className="w-full py-3 bg-white/5 border border-white/10 rounded-2xl text-[8px] font-black uppercase text-gray-500 hover:text-red-500 hover:border-red-500/30 transition-all"
-           >
-              Terminate Session
-           </button>
+           <button onClick={() => { sessionStorage.clear(); localStorage.removeItem("admin_auth_backup"); window.location.href = "/admin-login"; }} className="w-full py-3 bg-white/5 border border-white/10 rounded-2xl text-[8px] font-black uppercase text-gray-500 hover:text-red-500 transition-all">Terminate Session</button>
         </div>
       </aside>
-
-      {/* --- 🖥️ MAIN CONTENT --- */}
-      <main className="flex-1 ml-72 p-12 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-red-500/3 via-transparent to-transparent">
-        {children}
-      </main>
+      <main className="flex-1 ml-72 p-12">{children}</main>
     </div>
   );
 }
