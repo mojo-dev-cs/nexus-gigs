@@ -13,27 +13,26 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
-  // Real-time Financial & Registry State
+  // State Management
   const [operators, setOperators] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [fetching, setFetching] = useState(false);
-  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [payLoading, setPayLoading] = useState(false);
 
+  // Persistence
   useEffect(() => {
     const auth = sessionStorage.getItem("nexus_admin_session");
     if (auth === "true") setIsAuthorized(true);
   }, []);
 
-  // Sync Registry & Calculate Revenue
+  // Data Synchronization
   useEffect(() => {
     if (isAuthorized) {
       const loadData = async () => {
         setFetching(true);
         const res = await getAllNexusUsers();
         if (res.success && res.users) {
-          setOperators(res.users || []);
-          const verifiedCount = res.users.filter((u: any) => u.status === "Verified").length;
-          setTotalRevenue(verifiedCount * 10);
+          setOperators(res.users);
         }
         setFetching(false);
       };
@@ -52,6 +51,12 @@ export default function AdminPage() {
     }
   };
 
+  // Metrics Logic
+  const verifiedUsers = operators.filter(o => o.status === "Verified");
+  const pendingUsers = operators.filter(o => o.status !== "Verified");
+  const conversionRate = operators.length > 0 ? ((verifiedUsers.length / operators.length) * 100).toFixed(1) : "0";
+  const revenue = verifiedUsers.length * 1250; // Approx 1250 KES per user
+
   if (!isAuthorized) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-[#020617]">
@@ -68,21 +73,14 @@ export default function AdminPage() {
     { id: "dashboard", label: "Dashboard", icon: "📊" },
     { id: "users", label: "Users", icon: "👤" },
     { id: "payments", label: "Payments", icon: "💰" },
-    { id: "disputes", label: "Disputes", icon: "⚖️" },
     { id: "analytics", label: "Analytics", icon: "📈" },
     { id: "settings", label: "Settings", icon: "⚙️" },
   ];
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-[#020617] text-white selection:bg-red-500/30">
+    <div className="flex flex-col md:flex-row min-h-screen bg-[#020617] text-white selection:bg-red-500/30 font-sans">
       
-      <div className="md:hidden flex items-center justify-between p-6 border-b border-white/5 bg-black/40 backdrop-blur-xl sticky top-0 z-110">
-        <h2 className="font-black italic text-red-500 text-xl">NEXUS <span className="text-white">HQ</span></h2>
-        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-2xl">
-          {isMobileMenuOpen ? "✕" : "☰"}
-        </button>
-      </div>
-
+      {/* SIDEBAR */}
       <aside className={`w-full md:w-72 border-r border-red-500/10 bg-black/40 backdrop-blur-3xl fixed md:h-full z-100 transition-transform duration-300 ${isMobileMenuOpen ? 'translate-y-0 h-full' : '-translate-y-full md:translate-y-0'}`}>
         <div className="p-10 hidden md:block"><h2 className="font-black italic text-red-500 uppercase text-2xl tracking-tighter">NEXUS <span className="text-white">HQ</span></h2></div>
         <nav className="px-6 space-y-1 py-10 md:py-0">
@@ -93,52 +91,49 @@ export default function AdminPage() {
             </button>
           ))}
         </nav>
-        <div className="mt-auto p-8 border-t border-white/5 text-center">
-           <button onClick={() => {sessionStorage.clear(); window.location.reload();}} className="text-[8px] font-black uppercase text-gray-600">Lock Console</button>
-        </div>
       </aside>
 
       <main className="flex-1 md:ml-72 p-6 md:p-16">
         
+        {/* TAB: DASHBOARD */}
         {activeTab === "dashboard" && (
           <div className="space-y-10 animate-in fade-in">
             <h3 className="text-3xl font-black uppercase italic tracking-tighter">System <span className="text-red-500">Pulse</span></h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-              <div className="p-6 md:p-8 bg-white/5 border border-white/10 rounded-4xl shadow-2xl">
-                 <p className="text-[8px] font-black text-gray-500 uppercase mb-4 tracking-widest italic">Live Nodes</p>
-                 <h4 className="text-3xl md:text-4xl font-black italic">{operators.length}</h4>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+              <div className="p-8 bg-white/5 border border-white/10 rounded-[40px] shadow-2xl">
+                 <p className="text-[8px] font-black text-gray-500 uppercase mb-4 tracking-widest">Total Operators</p>
+                 <h4 className="text-4xl font-black italic">{operators.length}</h4>
               </div>
-              <div className="p-6 md:p-8 bg-red-500/5 border border-red-500/20 rounded-4xl shadow-2xl">
-                 <p className="text-[8px] font-black text-red-500/50 uppercase mb-4 tracking-widest italic">Global Balance</p>
-                 <h4 className="text-3xl md:text-4xl font-black italic text-red-500">${totalRevenue.toLocaleString()}</h4>
-              </div>
-              <div className="col-span-2 md:col-span-1 p-6 md:p-8 bg-white/5 border border-white/10 rounded-4xl">
-                 <p className="text-[8px] font-black text-gray-500 uppercase mb-4 tracking-widest italic">Verifications</p>
-                 <h4 className="text-3xl md:text-4xl font-black italic">{operators.filter(o => o.status === "Verified").length}</h4>
+              <div className="p-8 bg-red-500/5 border border-red-500/20 rounded-[40px] shadow-2xl">
+                 <p className="text-[8px] font-black text-red-500/50 uppercase mb-4 tracking-widest">Global Balance</p>
+                 <h4 className="text-4xl font-black italic text-red-500">KES {revenue.toLocaleString()}</h4>
               </div>
             </div>
           </div>
         )}
 
+        {/* TAB: USERS (FIXED LOAD) */}
         {activeTab === "users" && (
-          <div className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-              <h3 className="text-2xl font-black italic uppercase tracking-tighter">Operator <span className="text-red-500">Registry</span></h3>
-              <input type="text" placeholder="SEARCH..." className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-[10px] font-black outline-none focus:border-red-500/50" onChange={(e) => setSearchTerm(e.target.value)} />
+          <div className="space-y-6 animate-in slide-in-from-right-4">
+            <div className="flex justify-between items-end">
+              <h3 className="text-2xl font-black uppercase italic">Operator <span className="text-red-500">Registry</span></h3>
+              <input type="text" placeholder="FILTER NODES..." className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-[10px] font-black outline-none focus:border-red-500" onChange={(e) => setSearchTerm(e.target.value)} />
             </div>
-            <div className="bg-white/5 border border-white/10 rounded-4xl overflow-hidden overflow-x-auto">
-              <table className="w-full text-left min-w-125">
-                <thead className="bg-white/5 text-[8px] font-black uppercase text-gray-500">
-                  <tr><th className="p-6">Operator</th><th className="p-6">Status</th><th className="p-6 text-right">Command</th></tr>
+            <div className="bg-white/5 border border-white/10 rounded-[40px] overflow-hidden">
+              <table className="w-full text-left">
+                <thead className="bg-white/5 text-[8px] font-black uppercase text-gray-500 tracking-widest">
+                  <tr><th className="p-6">Operator</th><th className="p-6">Status</th><th className="p-6 text-right">Action</th></tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {operators.filter(o => o.name.toLowerCase().includes(searchTerm.toLowerCase())).map((op) => (
-                    <tr key={op.id} className="text-[10px]">
+                  {fetching ? (
+                    <tr><td colSpan={3} className="p-20 text-center animate-pulse text-red-500 font-black italic">SYNCING CLERK DATABASE...</td></tr>
+                  ) : operators.filter(o => o.name.toLowerCase().includes(searchTerm.toLowerCase())).map((op) => (
+                    <tr key={op.id} className="text-[10px] hover:bg-white/2 transition-all">
                       <td className="p-6 font-black uppercase italic">{op.name}<br/><span className="text-[8px] text-gray-600 not-italic">{op.email}</span></td>
                       <td className="p-6">
-                        <span className={`px-2 py-0.5 rounded-full border ${op.status === 'Verified' ? 'text-emerald-500 border-emerald-500/20' : 'text-amber-500 border-amber-500/20'}`}>{op.status}</span>
+                        <span className={`px-3 py-1 rounded-lg border ${op.status === 'Verified' ? 'text-emerald-500 border-emerald-500/20 bg-emerald-500/5' : 'text-amber-500 border-amber-500/20 bg-amber-500/5'}`}>{op.status}</span>
                       </td>
-                      <td className="p-6 text-right text-red-500 font-black cursor-pointer">MANAGE</td>
+                      <td className="p-6 text-right font-black text-red-500 cursor-pointer hover:underline">REVOKE</td>
                     </tr>
                   ))}
                 </tbody>
@@ -147,93 +142,80 @@ export default function AdminPage() {
           </div>
         )}
 
+        {/* TAB: PAYMENTS (FIXED FOR PAYHERO) */}
         {activeTab === "payments" && (
-          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4">
-            <header>
-              <h3 className="text-3xl font-black italic uppercase tracking-tighter">Global <span className="text-red-500">Vault</span></h3>
-              <p className="text-[8px] font-black text-gray-500 uppercase tracking-[0.3em] mt-2">Live M-Pesa & Multi-Channel Revenue</p>
-            </header>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="p-8 bg-white/5 border border-emerald-500/20 rounded-[40px] space-y-6 shadow-2xl shadow-emerald-500/5">
-                <div className="flex justify-between items-start">
-                  <h4 className="text-[10px] font-black uppercase text-emerald-500 italic">M-Pesa STK Push (Live)</h4>
-                  <span className="text-[8px] px-2 py-1 bg-emerald-500/10 text-emerald-500 rounded-lg font-black">ACTIVE</span>
-                </div>
-                
-                <div className="space-y-4">
-                  <input 
-                    id="livePhone" 
-                    placeholder="2547XXXXXXXX" 
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-[11px] font-black outline-none focus:border-emerald-500 transition-all text-white" 
-                  />
+          <div className="space-y-10 animate-in slide-in-from-bottom-4">
+             <h3 className="text-3xl font-black italic uppercase">Financial <span className="text-red-500">Vault</span></h3>
+             <div className="grid md:grid-cols-2 gap-8">
+                <div className="p-10 bg-white/5 border border-emerald-500/20 rounded-[48px] space-y-6 shadow-2xl">
+                  <h4 className="text-[10px] font-black uppercase text-emerald-500 italic">Manual STK Trigger</h4>
+                  <input id="payPhone" placeholder="2547XXXXXXXX" className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-white font-black outline-none focus:border-emerald-500" />
                   <button 
+                    disabled={payLoading}
                     onClick={async () => {
-                      const phone = (document.getElementById('livePhone') as HTMLInputElement).value;
-                      if(!phone) return alert("Enter Phone Number");
-                      const res = await initiateMpesaPayment(phone, 1, user?.id || ""); 
-                      alert(res.success ? "Check your phone for the PIN prompt!" : "Error: " + res.error);
+                      setPayLoading(true);
+                      const phone = (document.getElementById('payPhone') as HTMLInputElement).value;
+                      const res = await initiateMpesaPayment(phone, 1, user?.id || "");
+                      setPayLoading(false);
+                      alert(res.success ? "STK Push Dispatched!" : "Gateway Error: " + res.error);
                     }}
-                    className="w-full py-5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-2xl uppercase text-[10px] tracking-widest transition-all shadow-lg shadow-emerald-600/20 active:scale-95"
+                    className="w-full py-5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-2xl uppercase text-[10px] tracking-widest transition-all"
                   >
-                    Authenticate Node (1 KES)
+                    {payLoading ? "TRANSMITTING..." : "EXECUTE PAYMENT REQUEST"}
                   </button>
                 </div>
-              </div>
-
-              <div className="p-8 bg-white/5 border border-blue-500/20 rounded-[40px] space-y-6 shadow-2xl shadow-blue-500/5">
-                <div className="flex justify-between items-start">
-                  <h4 className="text-[10px] font-black uppercase text-blue-500 italic">Global Card Payment</h4>
-                  <span className="text-[8px] px-2 py-1 bg-blue-500/10 text-blue-500 rounded-lg font-black">ONLINE</span>
+                <div className="p-10 bg-white/5 border border-blue-500/20 rounded-[48px] space-y-6">
+                   <h4 className="text-[10px] font-black uppercase text-blue-500 italic">Global Card Link</h4>
+                   <button onClick={async () => { const res = await createStripeSession(user?.emailAddresses[0].emailAddress || ""); if(res.url) window.location.href = res.url; }} className="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl uppercase text-[10px] tracking-widest">ACTIVATE STRIPE CHECKOUT</button>
                 </div>
-                <div className="space-y-4">
-                  <p className="text-[10px] text-gray-500 font-bold uppercase italic">Secure International Settlement via Stripe</p>
-                  <button 
-                    onClick={async () => {
-                      const res = await createStripeSession(user?.emailAddresses[0].emailAddress || "");
-                      if (res.url) window.location.href = res.url;
-                      else alert("Stripe Error: " + res.error);
-                    }}
-                    className="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl uppercase text-[10px] tracking-widest transition-all shadow-lg shadow-blue-600/20 active:scale-95"
-                  >
-                    Authorize via Card ($10)
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-10 bg-white/5 border border-white/10 rounded-4xl">
-               <h5 className="text-[10px] font-black uppercase text-red-500 mb-6 italic tracking-widest">Recent Transactions</h5>
-               <p className="text-[10px] text-gray-600 font-bold uppercase italic">Monitoring Live Gateway Streams...</p>
-            </div>
+             </div>
           </div>
         )}
 
+        {/* TAB: ANALYTICS (REAL-TIME METRICS) */}
+        {activeTab === "analytics" && (
+          <div className="space-y-10 animate-in fade-in">
+             <h3 className="text-3xl font-black uppercase italic">Intelligence <span className="text-red-500">Reports</span></h3>
+             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {[
+                  { l: "Gross Revenue", v: `KES ${revenue.toLocaleString()}`, c: "text-emerald-500" },
+                  { l: "Conversion Rate", v: `${conversionRate}%`, c: "text-blue-500" },
+                  { l: "Verified Nodes", v: verifiedUsers.length, c: "text-white" },
+                  { l: "Pending Nodes", v: pendingUsers.length, c: "text-amber-500" }
+                ].map(m => (
+                  <div key={m.l} className="p-8 bg-white/5 border border-white/10 rounded-4xl">
+                    <p className="text-[8px] font-black text-gray-500 uppercase mb-4 tracking-tighter italic">{m.l}</p>
+                    <h4 className={`text-2xl font-black italic ${m.c}`}>{m.v}</h4>
+                  </div>
+                ))}
+             </div>
+          </div>
+        )}
+
+        {/* TAB: SETTINGS (PROPER CONFIG) */}
         {activeTab === "settings" && (
-          <div className="max-w-xl space-y-8 animate-in fade-in">
-            <h3 className="text-2xl font-black italic uppercase tracking-tighter">Platform <span className="text-red-500">Settings</span></h3>
-            <div className="space-y-4">
-               {[ 
-                 { t: "M-Pesa Till Config", v: "Currently Active" }, 
-                 { t: "Verification Fee", v: "$10.00" }, 
-                 { t: "Platform Commission", v: "2%" }, 
-                 { t: "System Maintenance", v: "Offline Mode" } 
-               ].map(s => (
-                 <div key={s.t} className="p-6 bg-white/5 border border-white/10 rounded-2xl flex justify-between items-center group cursor-pointer hover:border-red-500/30">
-                    <div className="flex flex-col">
-                      <span className="text-[9px] font-black uppercase text-gray-500">{s.t}</span>
-                      <span className="text-[11px] font-bold text-white mt-1 uppercase italic tracking-wider">{s.v}</span>
-                    </div>
-                    <span className="text-[8px] font-black text-gray-700">EDIT →</span>
-                 </div>
-               ))}
-            </div>
-          </div>
-        )}
-
-        {["disputes", "analytics"].includes(activeTab) && (
-          <div className="p-10 border border-dashed border-white/10 rounded-4xl text-center opacity-40">
-             <p className="text-[8px] font-black uppercase tracking-[0.4em] text-red-500">Module Connectivity Pending</p>
+          <div className="max-w-2xl space-y-10 animate-in fade-in">
+             <h3 className="text-3xl font-black uppercase italic">Platform <span className="text-red-500">Config</span></h3>
+             <div className="space-y-4">
+                <div className="p-8 bg-white/5 border border-white/10 rounded-4xl flex justify-between items-center">
+                  <div>
+                    <p className="text-[10px] font-black uppercase text-gray-500">M-Pesa Gateway</p>
+                    <p className="text-sm font-black italic uppercase mt-1">PayHero Channel 6861</p>
+                  </div>
+                  <span className="text-[8px] px-3 py-1 bg-emerald-500/20 text-emerald-500 rounded-full font-black italic">CONNECTED</span>
+                </div>
+                <div className="p-8 bg-white/5 border border-white/10 rounded-4xl flex justify-between items-center">
+                  <div>
+                    <p className="text-[10px] font-black uppercase text-gray-500">Security Protocol</p>
+                    <p className="text-sm font-black italic uppercase mt-1">Admin Access Code</p>
+                  </div>
+                  <button className="text-[9px] font-black text-red-500 hover:underline italic">CHANGE KEY</button>
+                </div>
+                <div className="p-8 bg-red-500/10 border border-red-500/30 rounded-4xl">
+                  <p className="text-[10px] font-black uppercase text-red-500 italic mb-2">Danger Zone</p>
+                  <button className="w-full py-4 border border-red-500/50 rounded-2xl text-[10px] font-black uppercase hover:bg-red-500 transition-all">Flush System Cache</button>
+                </div>
+             </div>
           </div>
         )}
 
