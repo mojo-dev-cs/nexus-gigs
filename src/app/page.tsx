@@ -3,6 +3,8 @@
 import { useUser, SignInButton, SignUpButton } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { FreelancerView } from "@/components/dashboard/FreelancerView";
+// ✅ Import the ClientView component
+import { ClientView } from "@/components/dashboard/ClientView";
 
 export default function Home() {
   const { isLoaded, isSignedIn, user } = useUser();
@@ -40,6 +42,15 @@ export default function Home() {
           </div>
         </div>
 
+        {/* --- 🛰️ FREELANCING ANIMATION LAYER --- */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+            <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-[#00f2ff] rounded-full shadow-[0_0_15px_#00f2ff] animate-float" style={{ animationDuration: '8s' }} />
+            <div className="absolute top-3/4 right-1/3 w-1 h-1 bg-[#00f2ff] rounded-full shadow-[0_0_10px_#00f2ff] animate-float" style={{ animationDuration: '12s', animationDelay: '2s' }} />
+            <svg className="absolute inset-0 w-full h-full opacity-10">
+              <line x1="25%" y1="25%" x2="75%" y2="50%" stroke="#00f2ff" strokeWidth="0.5" strokeDasharray="5,5" className="animate-dash" />
+            </svg>
+        </div>
+
         {/* --- HERO SECTION --- */}
         <div className="relative z-10 flex flex-col items-center">
           <section className="min-h-screen flex flex-col items-center justify-center p-6 text-center relative">
@@ -60,12 +71,12 @@ export default function Home() {
 
             <div className="w-full max-w-sm space-y-4 animate-in slide-in-from-bottom-8 duration-700">
               <SignUpButton mode="modal">
-                <button className="w-full py-6 bg-[#00f2ff] text-black font-black rounded-3xl uppercase text-[12px] tracking-[0.3em] hover:scale-105 transition-all shadow-2xl shadow-[#00f2ff]/20 italic">
+                <button className="w-full py-6 bg-[#00f2ff] text-black font-black rounded-3xl uppercase text-[12px] tracking-[0.3em] hover:scale-105 transition-all shadow-2xl shadow-[#00f2ff]/20 italic text-center">
                   Get Started
                 </button>
               </SignUpButton>
               <SignInButton mode="modal">
-                <button className="w-full py-5 border border-white/10 text-white font-black rounded-3xl uppercase text-[10px] tracking-[0.3em] hover:bg-white/5 transition-all italic">
+                <button className="w-full py-5 border border-white/10 text-white font-black rounded-3xl uppercase text-[10px] tracking-[0.3em] hover:bg-white/5 transition-all italic text-center">
                   Sign In
                 </button>
               </SignInButton>
@@ -84,7 +95,7 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
-                { step: "01", title: "Join & Verify", desc: "Create your account and complete the $10 protocol verification to secure your node and prove your identity." },
+                { step: "01", title: "Join & Verify", desc: "Create your account and complete the $10 protocol verification to prove your identity and secure the network." },
                 { step: "02", title: "Accept Gigs", desc: "Browse high-paying technical tasks in the Gig Feed. Apply for work that matches your expertise." },
                 { step: "03", title: "Instant Settlement", desc: "Once the gig is cleared, funds are released instantly to your Nexus Wallet for withdrawal via M-Pesa or USDT." }
               ].map((item, i) => (
@@ -104,14 +115,18 @@ export default function Home() {
 
         <style jsx global>{`
           @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.2); } }
+          @keyframes float { 0%, 100% { transform: translateY(0px) translateX(0px); } 50% { transform: translateY(-40px) translateX(20px); } }
+          @keyframes dash { to { stroke-dashoffset: -100; } }
           .animate-twinkle { animation: twinkle 3s infinite ease-in-out; }
+          .animate-float { animation: float 10s infinite ease-in-out; }
+          .animate-dash { animation: dash 20s linear infinite; }
         `}</style>
       </div>
     );
   }
 
   // --- 🛡️ 2. PATH SELECTION (Post-Login Onboarding) ---
-  if (!selectedRole) {
+  if (isSignedIn && user && !selectedRole) {
     return (
       <div className="min-h-screen bg-[#020617] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,242,255,0.05)_0%,transparent_70%)]" />
@@ -124,14 +139,14 @@ export default function Home() {
               <button onClick={() => setSelectedRole('freelancer')} className="group p-12 bg-white/5 border border-white/10 rounded-[60px] hover:border-[#00f2ff]/40 transition-all text-left relative overflow-hidden shadow-2xl active:scale-95">
                 <div className="absolute -right-4 -top-4 text-8xl opacity-5 italic font-black uppercase">WORK</div>
                 <div className="text-4xl mb-6">💼</div>
-                <h3 className="text-2xl font-black uppercase italic mb-4 group-hover:text-[#00f2ff]">Freelancer</h3>
-                <p className="text-xs text-gray-500 leading-relaxed font-medium uppercase tracking-wider">Access the Gig Feed, submit bids, and receive instant settlements for your expertise.</p>
+                <h3 className="text-2xl font-black uppercase italic mb-4 group-hover:text-[#00f2ff] transition-colors">Freelancer</h3>
+                <p className="text-xs text-gray-500 leading-relaxed font-medium uppercase tracking-wider italic">Access the Gig Feed, submit bids, and receive instant settlements for your expertise.</p>
               </button>
               <button onClick={() => setSelectedRole('client')} className="group p-12 bg-white/5 border border-white/10 rounded-[60px] hover:border-[#00f2ff]/40 transition-all text-left relative overflow-hidden shadow-2xl active:scale-95">
-                <div className="absolute -right-4 -top-4 text-8xl opacity-5 italic font-black uppercase">HIRE</div>
+                <div className="absolute -right-4 -top-4 text-8xl opacity-5 font-black uppercase italic">HIRE</div>
                 <div className="text-4xl mb-6">🎯</div>
-                <h3 className="text-2xl font-black uppercase italic mb-4 group-hover:text-[#00f2ff]">Client</h3>
-                <p className="text-xs text-gray-500 leading-relaxed font-medium uppercase tracking-wider">Deploy new gigs and connect with elite talent through secure protocols.</p>
+                <h3 className="text-2xl font-black uppercase italic mb-4 group-hover:text-[#00f2ff] transition-colors">Client</h3>
+                <p className="text-xs text-gray-500 leading-relaxed font-medium uppercase tracking-wider italic">Deploy new gigs and connect with elite talent through secure protocols.</p>
               </button>
             </div>
          </div>
@@ -139,17 +154,14 @@ export default function Home() {
     );
   }
 
-  // --- 🖥️ 3. DASHBOARDS (Post-Selection) ---
+  // --- 🖥️ 3. DASHBOARDS (Post-Selection Redirects) ---
   return (
     <main className="min-h-screen bg-[#020617]">
       {selectedRole === "freelancer" ? (
         <FreelancerView jobs={[]} userMetadata={user.publicMetadata || {}} />
       ) : (
-        <div className="min-h-screen flex flex-col items-center justify-center text-white p-10 text-center">
-            <h2 className="text-4xl font-black italic uppercase tracking-tighter">Client <span className="text-[#00f2ff]">Portal</span></h2>
-            <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mt-4 italic">Infrastructure Synchronizing... Under Construction</p>
-            <button onClick={() => setSelectedRole(null)} className="mt-8 text-[#00f2ff] text-[8px] font-black uppercase underline">Change Path</button>
-        </div>
+        /* ✅ Redirecting to ClientView */
+        <ClientView jobs={[]} />
       )}
     </main>
   );
