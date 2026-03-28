@@ -2,16 +2,14 @@
 
 import axios from "axios";
 
-export async function initiateMpesaPayment(phoneNumber: string, amount: number) {
+export async function initiateMpesaPayment(phoneNumber: string, amount: number, userId: string) {
   try {
     const username = process.env.PAYHERO_API_USERNAME;
     const password = process.env.PAYHERO_API_PASSWORD;
     const channelId = process.env.PAYHERO_CHANNEL_ID;
 
-    // Basic Auth generation
     const auth = Buffer.from(`${username}:${password}`).toString("base64");
 
-    // PayHero V2 API Call
     const response = await axios.post(
       "https://backend.payhero.co.ke/api/v2/payments",
       {
@@ -19,7 +17,7 @@ export async function initiateMpesaPayment(phoneNumber: string, amount: number) 
         phone_number: phoneNumber,
         channel_id: channelId,
         provider: "m-pesa",
-        external_reference: "NEXUS-" + Date.now(),
+        external_reference: userId, // This links the payment to the user in the callback
         callback_url: "https://nexus-gigs.vercel.app/api/mpesa-callback"
       },
       {
