@@ -1,40 +1,37 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import Link from "next/link";
+"use client";
 
-export default async function LandingPage() {
-  const { userId } = await auth();
-  const user = await currentUser();
+import { useUser } from "@clerk/nextjs";
+import { useEffect, useState } from "react";
+// This path MUST match where you saved the file
+import { FreelancerView } from "@/components/dashboard/FreelancerView";
 
-  // If logged in, check their role and teleport them!
-  if (userId && user) {
-    const onboardingComplete = user.publicMetadata?.onboardingComplete;
-    const role = user.publicMetadata?.role;
+export default function DashboardPage() {
+  const { isLoaded, user } = useUser();
+  const [mounted, setMounted] = useState(false);
 
-    if (!onboardingComplete) {
-      redirect("/onboarding");
-    } else {
-      redirect("/dashboard");
-    }
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Show loading state while Clerk or Component mounts
+  if (!mounted || !isLoaded) {
+    return (
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center p-4">
+        <div className="text-[#00f2ff] font-black animate-pulse uppercase tracking-[0.5em] text-[10px]">
+          Synchronizing Node...
+        </div>
+      </div>
+    );
   }
 
-  // ONLY show the landing page if they are logged OUT
+  if (!user) return null;
+
   return (
-    <main className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-6 text-white">
-      <h1 className="text-6xl font-black uppercase tracking-tighter italic mb-4">
-        NEXUS<span className="text-[#00f2ff]">GIGS</span>
-      </h1>
-      <p className="text-gray-400 mb-8 max-w-md text-center">
-        The future of freelancing globally. Immersive. Secure. Decentralized.
-      </p>
-      <div className="flex gap-4">
-        <Link href="/sign-up" className="px-8 py-4 bg-[#00f2ff] text-black font-black rounded-xl hover:scale-105 transition-all">
-          GET STARTED
-        </Link>
-        <Link href="/sign-in" className="px-8 py-4 border border-white/10 rounded-xl hover:bg-white/5 transition-all">
-          SIGN IN
-        </Link>
-      </div>
+    <main className="min-h-screen bg-[#020617]">
+      <FreelancerView 
+        jobs={[]} 
+        userMetadata={user.publicMetadata || {}} 
+      />
     </main>
   );
 }
