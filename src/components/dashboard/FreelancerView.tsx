@@ -247,7 +247,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 {isVerified && <div className="absolute -bottom-2 -right-2 bg-emerald-500 p-2 rounded-full border-4 border-[#020617] text-[8px]">🏆</div>}
               </div>
               <h3 className="text-2xl font-black uppercase italic tracking-tighter">{user?.firstName} {user?.lastName}</h3>
-              <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] mb-10 italic">📍 RUIRU, KE • NODE ACTIVE</p>
+              <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] mb-10 italic">📍KE • NODE ACTIVE</p>
               <div className="w-full flex flex-wrap gap-2 justify-center pt-8 border-t border-white/5">
                 {skills.map(s => <span key={s} className="px-4 py-1.5 bg-white/5 rounded-xl text-[9px] font-black uppercase italic">{s}</span>)}
               </div>
