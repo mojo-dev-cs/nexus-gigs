@@ -1,24 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function AdminLogin() {
   const [password, setPassword] = useState("");
   const [isAuthenticating, setIsAuthenticating] = useState(false);
-  const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsAuthenticating(true);
 
     if (password === "Nexus123!") {
+      // 💾 Save to BOTH storage types for maximum compatibility
       sessionStorage.setItem("admin_auth", "true");
-      // Force a small delay to ensure storage is committed
-      setTimeout(() => {
-        router.push("/admin-login");
-        router.refresh(); 
-      }, 500);
+      localStorage.setItem("admin_auth_backup", "true"); 
+
+      // 🚀 HARD REDIRECT: Bypasses the router hang
+      window.location.href = "/admin";
     } else {
       setIsAuthenticating(false);
       alert("INVALID ACCESS KEY");
