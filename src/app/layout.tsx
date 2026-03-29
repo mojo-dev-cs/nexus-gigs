@@ -16,7 +16,7 @@ export default function RootLayout({
           <div className="pt-24">
             {children}
           </div>
-                  <script src="https://applet.payherokenya.com/cdn/button_sdk.js?v=3.1"></script>
+<script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js" async></script>
         </body>
       </html>
     </ClerkProvider>
