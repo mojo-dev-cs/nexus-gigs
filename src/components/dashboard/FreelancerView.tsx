@@ -371,15 +371,35 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
               </div>
             )}
 
-            {paymentStep === "card" && (
-              <div className="space-y-4">
-                <h3 className="text-xl font-black uppercase text-white mb-4 italic">CARD <span className="text-[#00f2ff]">DETAILS</span></h3>
-                <input placeholder="CARD NUMBER" className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-[10px] font-black outline-none focus:border-[#00f2ff] text-white tracking-widest" />
-                <button onClick={() => { setIsPaying(true); setTimeout(() => { alert("Satellite Gateway Error. Use M-Pesa Manual."); setIsPaying(false); }, 1500); }} className="w-full py-5 bg-[#00f2ff] text-black font-black rounded-2xl uppercase text-[10px] tracking-widest italic shadow-xl shadow-[#00f2ff]/20">{isPaying ? "..." : "PAY $10"}</button>
-                <button onClick={() => setPaymentStep("choice")} className="text-[8px] text-gray-500 font-black uppercase italic">Back</button>
-              </div>
-            )}
-
+{paymentStep === "card" && (
+  <div className="space-y-4 text-left">
+    <h3 className="text-xl font-black uppercase text-white mb-4 italic text-center">BANK <span className="text-[#00f2ff]">DETAILS</span></h3>
+    <div className="space-y-3">
+       <div>
+         <label className="text-[8px] font-black uppercase text-gray-500 ml-2">Bank Name</label>
+         <select className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-[10px] font-black outline-none focus:border-[#00f2ff] text-white uppercase italic">
+            <option>Equity Bank</option>
+            <option>KCB Bank</option>
+            <option>Co-operative Bank</option>
+            <option>NCBA Bank</option>
+            <option>Absa Bank</option>
+         </select>
+       </div>
+       <div>
+         <label className="text-[8px] font-black uppercase text-gray-500 ml-2">Account Number</label>
+         <input placeholder="ENTER ACCOUNT NO" className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-[10px] font-black outline-none focus:border-[#00f2ff] text-white tracking-widest" />
+       </div>
+       <div>
+         <label className="text-[8px] font-black uppercase text-gray-500 ml-2">Account Holder Name</label>
+         <input defaultValue={user?.fullName || ""} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-[10px] font-black outline-none focus:border-[#00f2ff] text-white uppercase" />
+       </div>
+    </div>
+    <button onClick={() => { setIsPaying(true); setTimeout(() => { alert("Manual Bank Transfer Initiated. Reflects in 24hrs."); setIsPaying(false); setShowVerifyModal(false); }, 1500); }} className="w-full py-5 bg-[#00f2ff] text-black font-black rounded-2xl uppercase text-[10px] tracking-widest italic shadow-xl shadow-[#00f2ff]/20">
+      {isPaying ? "ENCRYPTING..." : "SUBMIT FOR SETTLEMENT ($10)"}
+    </button>
+    <button onClick={() => setPaymentStep("choice")} className="w-full text-[8px] text-gray-500 font-black uppercase italic text-center">Back</button>
+  </div>
+)}
           </div>
         </div>
       )}
