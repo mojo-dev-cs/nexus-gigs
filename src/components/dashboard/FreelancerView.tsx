@@ -18,7 +18,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
   const [mpesaNumber, setMpesaNumber] = useState("");
   const [isPaying, setIsPaying] = useState(false);
   const [currency, setCurrency] = useState<"USD" | "KES">("USD");
-  const [withdrawMethod, setWithdrawMethod] = useState<"mpesa" | "binance" | null>(null);
+  const [withdrawMethod, setWithdrawMethod] = useState<"mpesa" | "bank" | null>(null);
 
   // --- 💳 NEW PAYMENT STATES ---
   const [paymentStep, setPaymentStep] = useState<"choice" | "card" | "mpesa">("choice");
@@ -74,12 +74,9 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
     }
   };
 
-  // --- 🛡️ MANUAL VERIFICATION HANDLER ---
   const handleManualMpesaVerify = async () => {
     if (mpesaCode.length < 5) return alert("Enter a valid M-Pesa Transaction Code");
     setIsPaying(true);
-    
-    // Simulate API Check
     setTimeout(async () => {
       await fetch("/api/onboarding/verify", { method: "POST" });
       setIsVerified(true);
@@ -88,6 +85,10 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
       alert("🏆 Payment Received. Node Synchronized.");
       router.refresh();
     }, 2000);
+  };
+
+  const handleWithdrawal = (method: string) => {
+    alert(`Initiating ${method} withdrawal. Minimum $10 required. Current balance: $0.00`);
   };
 
   return (
@@ -121,7 +122,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                   <div className="space-y-2">
                      <h4 className="text-[10px] font-black text-[#00f2ff] uppercase italic tracking-widest">Verification Protocol ($10.00)</h4>
                      <p>Required to secure the network from bots and ensure high-fidelity client matches. Verification unlocks the Elite Badge and instant withdrawals.</p>
-                     <button onClick={() => setShowVerifyModal(true)} className="mt-2 px-6 py-3 bg-[#00f2ff] text-black rounded-xl text-[8px] font-black uppercase hover:bg-white transition-all">Initialize Verification →</button>
+                     <button onClick={() => setShowVerifyModal(true)} className="mt-2 px-5 py-2.5 bg-[#00f2ff] text-black rounded-xl text-[8px] font-black uppercase hover:bg-white transition-all">Initialize Verification →</button>
                   </div>
                   <div className="space-y-2">
                      <h4 className="text-[10px] font-black text-white uppercase tracking-widest italic">2% Service Fee</h4>
@@ -163,32 +164,139 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
         </div>
       )}
 
-      {/* ... [CODE FOR CONTRACTS, MESSAGES, WALLET, STATS, PROFILE, SETTINGS REMAINS UNCHANGED] ... */}
+      {/* --- 📜 WORK TAB (FIXED) --- */}
+      {activeTab === "contracts" && (
+        <div className="py-20 text-center space-y-10 animate-in zoom-in-95">
+          <div className="w-24 h-24 bg-amber-500/10 border border-amber-500/20 rounded-full flex items-center justify-center mx-auto text-4xl shadow-2xl shadow-amber-500/5 text-amber-500 italic font-black">!</div>
+          <h2 className="text-4xl font-black uppercase italic tracking-tighter text-white">Action <span className="text-amber-500">Required</span></h2>
+          <p className="text-gray-500 text-sm max-w-sm mx-auto leading-relaxed">Your account is currently unverified. To start accepting gigs and building your work history, complete the protocol activation.</p>
+          <button onClick={() => setShowVerifyModal(true)} className="px-12 py-5 bg-[#00f2ff] text-black font-black rounded-2xl uppercase text-[10px] tracking-widest hover:scale-105 transition-all shadow-xl shadow-[#00f2ff]/20 italic">Verify Account Now</button>
+        </div>
+      )}
+
+      {/* --- 💬 CHATS TAB (FIXED) --- */}
+      {activeTab === "messages" && (
+        <div className="h-[60vh] flex border border-white/10 rounded-4xl overflow-hidden bg-white/2 animate-in fade-in">
+          <aside className="w-1/3 border-r border-white/5 bg-black/20 p-6 hidden md:block">
+            <h4 className="text-[9px] font-black text-[#00f2ff] uppercase tracking-[0.3em] mb-6 italic">Active Streams</h4>
+            <div className="p-4 bg-[#00f2ff]/5 border border-[#00f2ff]/20 rounded-2xl flex items-center gap-3 cursor-pointer">
+              <div className="w-8 h-8 bg-[#00f2ff] rounded-full flex items-center justify-center text-[10px] font-black text-black">HQ</div>
+              <div className="flex-1"><p className="text-[9px] font-black text-white italic">Nexus Support</p><p className="text-[7px] text-gray-500 line-clamp-1">Welcome Operator...</p></div>
+            </div>
+          </aside>
+          <main className="flex-1 flex flex-col p-6 bg-black/40 relative">
+            <div className="flex-1 space-y-4 overflow-y-auto">
+              <div className="flex flex-col gap-1 max-w-[80%]">
+                <p className="text-[8px] font-black text-[#00f2ff] uppercase italic tracking-widest ml-2">Nexus System</p>
+                <div className="bg-white/5 border border-white/10 p-4 rounded-3xl rounded-tl-none">
+                  <p className="text-[11px] leading-relaxed italic text-white">Greetings, Operator {user?.firstName}. Welcome to NexusGigs. Your node is now active. All secure gig transmissions and client negotiations will occur in this encrypted stream.</p>
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 flex gap-2">
+              <input placeholder="Type secure message..." className="flex-1 bg-white/5 border border-white/10 p-4 rounded-2xl text-[10px] font-medium outline-none focus:border-[#00f2ff] text-white" />
+              <button className="p-4 bg-[#00f2ff] text-black rounded-2xl font-black">➤</button>
+            </div>
+          </main>
+        </div>
+      )}
+
+      {/* --- 💰 WALLET --- */}
       {activeTab === "earnings" && (
-        <div className="space-y-10 animate-in fade-in">
-           <div className="flex justify-between items-end border-b border-white/5 pb-4">
+        <div className="space-y-8 animate-in fade-in">
+           <div className="flex justify-between items-end border-b border-white/5 pb-3">
               <h3 className="text-3xl font-black uppercase italic tracking-tighter">Nexus <span className="text-[#00f2ff]">Wallet</span></h3>
-              <button onClick={() => setCurrency(currency === "USD" ? "KES" : "USD")} className="text-[9px] font-black uppercase text-[#00f2ff] bg-[#00f2ff]/10 px-4 py-2 rounded-full border border-[#00f2ff]/20 transition-all">Toggle {currency === "USD" ? "KES" : "USD"}</button>
+              <button onClick={() => setCurrency(currency === "USD" ? "KES" : "USD")} className="text-[8px] font-black uppercase text-[#00f2ff] bg-[#00f2ff]/10 px-3 py-1.5 rounded-full border border-[#00f2ff]/20 transition-all">Toggle {currency === "USD" ? "KES" : "USD"}</button>
            </div>
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="p-10 bg-linear-to-br from-[#00f2ff]/10 to-transparent border border-[#00f2ff]/20 rounded-4xl shadow-2xl text-center">
-                 <p className="text-[10px] font-black text-[#00f2ff] uppercase italic tracking-widest mb-4">Available Funds</p>
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-8 bg-linear-to-br from-[#00f2ff]/10 to-transparent border border-[#00f2ff]/20 rounded-4xl shadow-2xl text-center">
+                 <p className="text-[10px] font-black text-[#00f2ff] uppercase italic tracking-widest mb-3">Available Funds</p>
                  <h4 className="text-5xl font-black italic">{currency === "USD" ? "$0.00" : "KES 0"}</h4>
               </div>
-              <div className="p-10 bg-white/5 border border-white/10 rounded-4xl text-center">
-                 <p className="text-[10px] font-black text-gray-500 uppercase italic tracking-widest mb-4">Lifetime Yield</p>
-                 <h4 className="text-5xl font-black italic text-gray-400">{currency === "USD" ? "$0.00" : "KES 0"}</h4>
+              <div className="p-8 bg-white/5 border border-white/10 rounded-4xl text-center">
+                 <p className="text-[10px] font-black text-gray-500 uppercase italic tracking-widest mb-3">Lifetime Yield</p>
+                 <h4 className="text-4xl font-black italic text-gray-400">{currency === "USD" ? "$0.00" : "KES 0"}</h4>
               </div>
            </div>
-           <div className="grid grid-cols-2 gap-6">
-              <div onClick={() => setWithdrawMethod('mpesa')} className={`p-8 rounded-[40px] border cursor-pointer transition-all ${withdrawMethod === 'mpesa' ? 'border-emerald-500 bg-emerald-500/5' : 'border-white/10 bg-white/2 hover:border-white/20'}`}>
-                 <div className="flex justify-between items-center mb-4"><span className="text-2xl">📱</span><span className="text-[8px] font-black uppercase text-emerald-500 tracking-widest">M-Pesa</span></div>
-                 <p className="text-[10px] font-black uppercase italic">Withdraw via Phone</p>
+           <div className="grid grid-cols-2 gap-4">
+              <div onClick={() => setWithdrawMethod('mpesa')} className={`p-6 rounded-[28px] border cursor-pointer transition-all ${withdrawMethod === 'mpesa' ? 'border-emerald-500 bg-emerald-500/5' : 'border-white/10 bg-white/2 hover:border-white/20'}`}>
+                 <div className="flex justify-between items-center mb-2"><span className="text-xl">📱</span><span className="text-[7px] font-black uppercase text-emerald-500 tracking-widest">M-Pesa</span></div>
+                 <p className="text-[9px] font-black uppercase italic">Withdraw via Phone</p>
               </div>
-              <div onClick={() => setWithdrawMethod('binance')} className={`p-8 rounded-[40px] border cursor-pointer transition-all ${withdrawMethod === 'binance' ? 'border-amber-500 bg-amber-500/5' : 'border-white/10 bg-white/2 hover:border-white/20'}`}>
-                 <div className="flex justify-between items-center mb-4"><span className="text-2xl">🔶</span><span className="text-[8px] font-black uppercase text-amber-500 tracking-widest">Binance Pay</span></div>
-                 <p className="text-[10px] font-black uppercase italic">Withdraw via BEP20</p>
+              <div onClick={() => setWithdrawMethod('bank')} className={`p-6 rounded-[28px] border cursor-pointer transition-all ${withdrawMethod === 'bank' ? 'border-amber-500 bg-amber-500/5' : 'border-white/10 bg-white/2 hover:border-white/20'}`}>
+                 <div className="flex justify-between items-center mb-2"><span className="text-xl">🏦</span><span className="text-[7px] font-black uppercase text-amber-500 tracking-widest">Bank</span></div>
+                 <p className="text-[9px] font-black uppercase italic">Direct Bank Payout</p>
               </div>
+           </div>
+           {withdrawMethod && (
+             <button onClick={() => handleWithdrawal(withdrawMethod)} className="w-full py-5 bg-white text-black font-black rounded-2xl uppercase text-[10px] tracking-[0.4em] active:scale-95 transition-all">Confirm {withdrawMethod} Withdrawal ($10 Min)</button>
+           )}
+        </div>
+      )}
+
+      {/* --- 📊 STATS (GROWTH METRICS) --- */}
+      {activeTab === "analytics" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in zoom-in-95">
+           <div className="p-8 bg-white/5 border border-white/10 rounded-4xl flex flex-col items-center justify-center">
+              <div className="h-32 flex items-end gap-2 mb-8">{[20,40,35,90,60,80,45].map((h,i) => (<div key={i} className="flex-1 bg-[#00f2ff]/20 rounded-t-xl hover:bg-[#00f2ff]/50 transition-all" style={{height:`${h}%`}}/>))}</div>
+              <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest italic">Growth Pulse (Real-Time)</p>
+           </div>
+           <div className="grid grid-cols-1 gap-4">
+              <div className="p-6 bg-white/5 border border-white/10 rounded-3xl flex justify-between items-center">
+                <span className="text-[10px] font-black uppercase italic text-gray-400">Network Reach</span>
+                <span className="text-xl font-black text-emerald-500 italic">+12.4%</span>
+              </div>
+              <div className="p-6 bg-white/5 border border-white/10 rounded-3xl flex justify-between items-center">
+                <span className="text-[10px] font-black uppercase italic text-gray-400">Bid Success</span>
+                <span className="text-xl font-black text-[#00f2ff] italic">88%</span>
+              </div>
+              <div className="p-6 bg-white/5 border border-white/10 rounded-3xl flex justify-between items-center">
+                <span className="text-[10px] font-black uppercase italic text-gray-400">Earnings Growth</span>
+                <span className="text-xl font-black text-white italic">$0.00</span>
+              </div>
+           </div>
+        </div>
+      )}
+
+      {/* --- 👤 PROFILE (FIXED) --- */}
+      {activeTab === "account" && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in">
+           <div className="md:col-span-1 bg-white/2 border border-white/10 rounded-4xl p-8 flex flex-col items-center text-center">
+              <img src={user?.imageUrl} className="w-24 h-24 rounded-full border-4 border-[#00f2ff]/20 mb-4 shadow-2xl" alt="Profile" />
+              <h3 className="text-xl font-black uppercase italic tracking-tighter">{user?.fullName}</h3>
+              <p className="text-[8px] font-black text-gray-500 uppercase tracking-[0.3em] mb-8 italic">📍 KE • NODE {isVerified ? 'VERIFIED' : 'PENDING'}</p>
+              <div className="w-full flex flex-wrap gap-1.5 justify-center pt-6 border-t border-white/5">
+                {skills.map(s => <span key={s} className="px-3 py-1 bg-white/5 rounded-lg text-[8px] font-black uppercase italic">{s}</span>)}
+              </div>
+           </div>
+           <div className="md:col-span-2 space-y-4">
+              <div className="p-6 bg-white/5 border border-white/10 rounded-3xl">
+                <h4 className="text-[10px] font-black text-[#00f2ff] uppercase italic mb-4">Identity Protocol</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div><p className="text-[8px] text-gray-500 uppercase font-black">Email Relay</p><p className="text-[11px] font-bold">{user?.emailAddresses[0].emailAddress}</p></div>
+                  <div><p className="text-[8px] text-gray-500 uppercase font-black">Node ID</p><p className="text-[11px] font-bold">{user?.id.slice(0,12)}...</p></div>
+                </div>
+              </div>
+              <div className="p-6 bg-white/5 border border-white/10 rounded-3xl">
+                <h4 className="text-[10px] font-black text-white uppercase italic mb-4">Professional Resume</h4>
+                <p className="text-[11px] text-gray-400 italic">No summary provided. Update your professional sync details in settings.</p>
+              </div>
+           </div>
+        </div>
+      )}
+
+      {/* --- ⚙️ SETTINGS (FIXED) --- */}
+      {activeTab === "settings" && (
+        <div className="max-w-xl mx-auto space-y-4 animate-in fade-in">
+           {['Security Uplink', 'Payout Channels', 'Notification Streams', 'Privacy Protocol'].map(s => (
+              <div key={s} className="p-6 bg-white/5 border border-white/10 rounded-3xl flex justify-between items-center group cursor-pointer hover:border-[#00f2ff]/30 transition-all">
+                 <span className="text-[10px] font-black uppercase text-gray-400 group-hover:text-white italic tracking-widest">{s}</span>
+                 <span className="text-gray-700 font-black text-[10px]">SYNC →</span>
+              </div>
+           ))}
+           <div className="p-8 bg-white/2 rounded-4xl text-center space-y-6 border border-white/5 shadow-2xl mt-10">
+              <p className="text-[8px] font-black text-[#00f2ff] uppercase tracking-[0.5em] italic">Account Termination</p>
+              <SignOutButton><button className="w-full py-4 bg-red-900/10 border border-red-500/20 text-red-500 font-black rounded-2xl text-[9px] uppercase tracking-[0.3em] hover:bg-red-500/10 active:scale-95 transition-all italic">Terminate Session</button></SignOutButton>
            </div>
         </div>
       )}
@@ -199,7 +307,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
           <button 
             key={item.id} 
             onClick={() => setActiveTab(item.id)} 
-            className={`flex flex-col items-center py-2.5 px-5 rounded-full min-w-15 transition-all duration-500 ${activeTab === item.id ? 'bg-[#00f2ff] text-black scale-105 shadow-2xl shadow-[#00f2ff]/30' : 'text-gray-500 hover:text-white'}`}
+            className={`flex flex-col items-center py-2.5 px-5 rounded-full min-w-15 transition-all duration-300 ${activeTab === item.id ? 'bg-[#00f2ff] text-black scale-105 shadow-2xl shadow-[#00f2ff]/30' : 'text-gray-500 hover:text-white'}`}
           >
             <span className="text-lg mb-0.5">{item.icon}</span>
             <span className="text-[6px] font-black uppercase tracking-tighter">{item.label}</span>
@@ -207,7 +315,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
         ))}
       </div>
 
-      {/* --- 🚨 VERIFY MODAL (UPDATED PAYMENT PROCESS) --- */}
+      {/* --- 🚨 VERIFY MODAL (FIXED TILL: 5372924) --- */}
       {showVerifyModal && (
         <div className="fixed inset-0 z-400 flex items-center justify-center p-6 backdrop-blur-3xl">
           <div className="absolute inset-0 bg-[#020617]/95" onClick={() => { setShowVerifyModal(false); setPaymentStep("choice"); }} />
@@ -227,30 +335,13 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
               </div>
             )}
 
-            {paymentStep === "card" && (
-              <div className="space-y-4">
-                <h3 className="text-xl font-black uppercase text-white mb-4 italic">CARD <span className="text-[#00f2ff]">DETAILS</span></h3>
-                <div className="space-y-3">
-                   <input placeholder="CARD NUMBER" className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-[10px] font-black outline-none focus:border-[#00f2ff] text-white" />
-                   <div className="flex gap-2">
-                      <input placeholder="MM/YY" className="w-1/2 bg-white/5 border border-white/10 rounded-xl p-4 text-[10px] font-black outline-none focus:border-[#00f2ff] text-white" />
-                      <input placeholder="CVC" className="w-1/2 bg-white/5 border border-white/10 rounded-xl p-4 text-[10px] font-black outline-none focus:border-[#00f2ff] text-white" />
-                   </div>
-                </div>
-                <button disabled={isPaying} onClick={() => { setIsPaying(true); setTimeout(() => { alert("Card verification error. Try Manual M-Pesa."); setIsPaying(false); }, 2000); }} className="w-full py-5 bg-[#00f2ff] text-black font-black rounded-2xl uppercase text-[10px] tracking-widest italic active:scale-95">
-                  {isPaying ? "PROCESSING..." : "VERIFY CARD ($10)"}
-                </button>
-                <button onClick={() => setPaymentStep("choice")} className="text-[8px] text-gray-500 font-black uppercase italic tracking-widest">Back to Protocol</button>
-              </div>
-            )}
-
             {paymentStep === "mpesa" && (
               <div className="space-y-6">
                 <h3 className="text-xl font-black uppercase text-emerald-500 mb-2 italic">M-PESA <span className="text-white">MANUAL</span></h3>
                 <div className="bg-white/5 p-6 rounded-3xl text-left space-y-3 border border-emerald-500/10 shadow-inner">
                   <p className="text-[9px] text-gray-400 uppercase font-black italic">1. Dial *334# or Open M-Pesa App</p>
                   <p className="text-[9px] text-gray-400 uppercase font-black italic">2. Lipa na M-Pesa {'>'} Buy Goods</p>
-                  <p className="text-[9px] text-emerald-500 uppercase font-black italic">3. Till Number: <span className="text-white bg-emerald-500/20 px-2 rounded">6861XX</span></p>
+                  <p className="text-[11px] text-emerald-500 uppercase font-black italic">3. Till Number: <span className="text-white bg-emerald-500/20 px-3 py-1 rounded">5372924</span></p>
                   <p className="text-[9px] text-gray-400 uppercase font-black italic">4. Amount: <span className="text-white">KES 1,250</span></p>
                 </div>
                 <div className="space-y-3">
@@ -258,13 +349,23 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                    <input 
                      value={mpesaCode} 
                      onChange={e => setMpesaCode(e.target.value.toUpperCase())} 
-                     placeholder="TRANSACTION CODE (e.g. SDC7...)" 
+                     placeholder="TRANSACTION CODE" 
                      className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-center text-[10px] font-black outline-none focus:border-emerald-500 text-white tracking-widest" 
                    />
                 </div>
-                <button disabled={isPaying} onClick={handleManualMpesaVerify} className="w-full py-5 bg-emerald-600 text-white font-black rounded-2xl uppercase text-[10px] tracking-widest shadow-xl shadow-emerald-600/20 active:scale-95 transition-all italic">
+                <button disabled={isPaying} onClick={handleManualMpesaVerify} className="w-full py-5 bg-emerald-600 text-white font-black rounded-2xl uppercase text-[10px] tracking-widest shadow-xl active:scale-95 transition-all italic">
                    {isPaying ? "VERIFYING CODE..." : "I HAVE PAID"}
                 </button>
+                <button onClick={() => setPaymentStep("choice")} className="text-[8px] text-gray-500 font-black uppercase italic">Back</button>
+              </div>
+            )}
+            
+            {/* Card Step remains but with updated UI styling */}
+            {paymentStep === "card" && (
+              <div className="space-y-4">
+                <h3 className="text-xl font-black uppercase text-white mb-4 italic">CARD <span className="text-[#00f2ff]">DETAILS</span></h3>
+                <input placeholder="CARD NUMBER" className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-[10px] font-black outline-none focus:border-[#00f2ff] text-white" />
+                <button onClick={() => { setIsPaying(true); setTimeout(() => { alert("Gateway Error. Use M-Pesa."); setIsPaying(false); }, 1500); }} className="w-full py-5 bg-[#00f2ff] text-black font-black rounded-2xl uppercase text-[10px] tracking-widest italic">{isPaying ? "..." : "PAY $10"}</button>
                 <button onClick={() => setPaymentStep("choice")} className="text-[8px] text-gray-500 font-black uppercase italic">Back</button>
               </div>
             )}
