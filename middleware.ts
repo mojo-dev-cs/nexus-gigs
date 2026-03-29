@@ -1,11 +1,10 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// Define which routes are public (anyone can see)
 const isPublicRoute = createRouteMatcher([
   '/', 
   '/sign-in(.*)', 
   '/sign-up(.*)',
-  '/api/mpesa-callback(.*)' // Ensure your callback is public!
+  '/api/mpesa-callback(.*)' 
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
