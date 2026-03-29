@@ -9,6 +9,7 @@ export default function Home() {
   const { isLoaded, isSignedIn, user } = useUser();
   const [mounted, setMounted] = useState(false);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [surveyComplete, setSurveyComplete] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -17,19 +18,25 @@ export default function Home() {
     if (user?.publicMetadata?.role) {
       setSelectedRole(user.publicMetadata.role as string);
     } 
-    // 2. Fallback: Check Local Storage (Browser Cache) so it survives a reload
+    // 2. Fallback: Check Local Storage
     else {
       const savedRole = localStorage.getItem("nexus_user_role");
       if (savedRole) setSelectedRole(savedRole);
     }
+
+    // Check if survey was already done
+    const surveyStatus = localStorage.getItem("nexus_survey_complete");
+    if (surveyStatus === "true") setSurveyComplete(true);
   }, [user]);
 
-  // Handle Role Selection
   const handleRoleSelect = (role: string) => {
     setSelectedRole(role);
     localStorage.setItem("nexus_user_role", role);
-    // Note: In the next step, we will add a Server Action here to 
-    // permanently save this to user.publicMetadata in Clerk.
+  };
+
+  const handleCompleteSurvey = () => {
+    setSurveyComplete(true);
+    localStorage.setItem("nexus_survey_complete", "true");
   };
 
   if (!mounted || !isLoaded) {
@@ -40,7 +47,7 @@ export default function Home() {
     );
   }
 
-  // --- ✨ 1. LANDING PAGE (Not Signed In) ---
+  // --- ✨ 1. LANDING PAGE ---
   if (!isSignedIn) {
     return (
       <div className="min-h-screen bg-[#020617] text-white selection:bg-[#00f2ff]/30 overflow-x-hidden relative">
@@ -54,8 +61,7 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 flex flex-col items-center">
-          <section className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
-            {/* Stats Grid */}
+          <section className="min-h-[80vh] flex flex-col items-center justify-center p-6 text-center">
             <div className="grid grid-cols-2 gap-4 max-w-lg mb-12 animate-in fade-in zoom-in duration-1000">
               {[{ l: "Active Gigs", v: "1.2M+" }, { l: "Total Settlements", v: "$ 2.5M+" }, { l: "Gigs Completed", v: "480K+" }, { l: "Relay Latency", v: "0.02s" }].map((stat, i) => (
                 <div key={i} className="p-8 bg-white/5 border border-white/10 rounded-[40px] backdrop-blur-md shadow-2xl">
@@ -75,8 +81,20 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Intel Cards */}
-          <section className="max-w-7xl mx-auto px-6 pb-32 space-y-32 text-left w-full">
+          {/* --- 🌍 GLOBAL SPONSOR RELAY --- */}
+          <section className="w-full py-20 border-y border-white/5 bg-white/2 overflow-hidden">
+            <p className="text-center text-[8px] font-black text-gray-600 uppercase tracking-[0.6em] mb-12 italic animate-pulse">Nodes Trusted By Global Infrastructure</p>
+            <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-8 grayscale opacity-40 hover:opacity-100 transition-opacity duration-700">
+              {["COCA-COLA", "SAFARICOM", "GOOGLE", "BINANCE", "STRIPE", "MICROSOFT", "AMAZON", "TESLA"].map((brand) => (
+                <div key={brand} className="flex flex-col items-center justify-center group">
+                  <span className="text-[10px] font-black italic tracking-tighter text-white group-hover:text-[#00f2ff] transition-colors">{brand}</span>
+                  <div className="w-6 h-px bg-white/10 group-hover:bg-[#00f2ff]/50 mt-1 transition-all" />
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="max-w-7xl mx-auto px-6 py-32 text-left w-full">
             <div className="p-12 md:p-20 bg-linear-to-br from-white/5 to-[#00f2ff]/5 border border-white/10 rounded-[60px] relative overflow-hidden shadow-2xl backdrop-blur-sm">
               <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter mb-6">WHAT IS <span className="text-[#00f2ff]">NEXUSGIGS?</span></h2>
               <p className="text-gray-400 text-lg md:text-xl leading-relaxed max-w-2xl font-medium">NexusGigs is a decentralized satellite relay connecting elite talent to global gigs. Bypass banking delays with instant settlements.</p>
@@ -88,7 +106,7 @@ export default function Home() {
     );
   }
 
-  // --- 🛡️ 2. PATH SELECTION (Only if no role is stored) ---
+  // --- 🛡️ 2. PATH SELECTION ---
   if (isSignedIn && !selectedRole) {
     return (
       <div className="min-h-screen bg-[#020617] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
@@ -112,7 +130,41 @@ export default function Home() {
     );
   }
 
-  // --- 🖥️ 3. DASHBOARD ROUTING (Role is remembered) ---
+  // --- 🧬 3. PROTOCOL SYNC (Survey) ---
+  if (isSignedIn && selectedRole && !surveyComplete) {
+    return (
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center p-6 text-white text-center">
+        <div className="max-w-md w-full bg-[#0a0f1e] border border-white/10 p-12 rounded-[50px] space-y-8 animate-in zoom-in duration-500 shadow-2xl">
+          <div className="space-y-2">
+            <h2 className="text-3xl font-black italic uppercase tracking-tighter text-[#00f2ff]">Protocol <span className="text-white">Sync</span></h2>
+            <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Identify Credentials for Satellite Uplink</p>
+          </div>
+          <div className="space-y-6 text-left">
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-gray-400 uppercase italic">Primary Technical Stack</label>
+              <select className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-[10px] font-black uppercase outline-none focus:border-[#00f2ff]">
+                <option>Fullstack Development</option>
+                <option>AI & Machine Learning</option>
+                <option>UI/UX & Branding</option>
+                <option>Technical Content Writing</option>
+              </select>
+            </div>
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-gray-400 uppercase italic">Operator Level</label>
+              <select className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-[10px] font-black uppercase outline-none focus:border-[#00f2ff]">
+                <option>Junior (1-2 Years)</option>
+                <option>Intermediate (3-5 Years)</option>
+                <option>Elite (5+ Years)</option>
+              </select>
+            </div>
+          </div>
+          <button onClick={handleCompleteSurvey} className="w-full py-5 bg-[#00f2ff] text-black font-black rounded-2xl uppercase text-[11px] tracking-[0.3em] hover:scale-105 active:scale-95 transition-all shadow-xl shadow-[#00f2ff]/20">Initialize Dashboard</button>
+        </div>
+      </div>
+    );
+  }
+
+  // --- 🖥️ 4. DASHBOARD ROUTING ---
   return (
     <main className="min-h-screen bg-[#020617]">
       {selectedRole === "freelancer" ? (
