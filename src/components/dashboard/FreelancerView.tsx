@@ -24,6 +24,41 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
   const [paymentStep, setPaymentStep] = useState<"choice" | "card" | "mpesa">("choice");
   const [mpesaCode, setMpesaCode] = useState("");
 
+  // --- 🚀 INTASEND UPLINK LOGIC ---
+  const handleIntasendPayment = async (method: "M-PESA" | "CARD") => {
+    if (method === "M-PESA" && mpesaNumber.length < 10) return alert("Enter valid M-Pesa number");
+    
+    setIsPaying(true);
+    try {
+      const response = await fetch("/api/intasend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: 1250, // KES 1,250 ($10)
+          phone: mpesaNumber,
+          email: user?.primaryEmailAddress?.emailAddress,
+          firstName: user?.firstName,
+          lastName: user?.lastName,
+          method: method
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.url) {
+        // Redirect user to IntaSend Secure Checkout (STK Push happens here)
+        window.location.href = data.url;
+      } else {
+        alert("Payment initialization failed. Ensure API keys are active.");
+        setIsPaying(false);
+      }
+    } catch (error) {
+      console.error("Payment Error:", error);
+      alert("Connection to Payment Gateway failed.");
+      setIsPaying(false);
+    }
+  };
+
   const skills = ["Next.js", "React", "Node.js", "TypeScript", "Python", "Solidity", "Web3"];
 
   const navItems = [
@@ -55,41 +90,9 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
     { id: "15", title: "PostgreSQL Optimizer", budget: 900, client: "Data Core", rating: 5.0, dur: "3 Hours Left", img: "https://i.pravatar.cc/150?u=15", closed: false },
   ];
 
-  const handleMpesaVerification = () => {
-    if (mpesaNumber.length < 10) return alert("Enter valid M-Pesa number");
-    setIsPaying(true);
-    if (window.PayHero) {
-      window.PayHero.init({
-        paymentUrl: "https://lipwa.link/6861",
-        containerId: "payHeroContainer",
-        channelId: 6861,
-        amount: 1250,
-        phone: mpesaNumber,
-        reference: `verify_${user?.id || Date.now()}`,
-        callbackUrl: "https://nexus-gigs.vercel.app/api/mpesa-callback",
-      });
-    } else {
-      alert("Payment system loading... try again in 2s.");
-      setIsPaying(false);
-    }
-  };
-
-  const handleManualMpesaVerify = async () => {
-    if (mpesaCode.length < 5) return alert("Enter a valid M-Pesa Transaction Code");
-    setIsPaying(true);
-    setTimeout(async () => {
-      await fetch("/api/onboarding/verify", { method: "POST" });
-      setIsVerified(true);
-      setShowVerifyModal(false);
-      setIsPaying(false);
-      alert("🏆 Payment Received. Node Synchronized.");
-      router.refresh();
-    }, 2000);
-  };
-
   const handleWithdrawal = (method: string) => {
     const minAmount = 10;
-    const currentBalance = 0; // Linked to your DB later
+    const currentBalance = 0; 
     if (currentBalance < minAmount) {
         return alert(`❌ INSUFFICIENT FUNDS: Minimum withdrawal is $${minAmount}. Current Balance: $${currentBalance.toFixed(2)}`);
     }
@@ -243,7 +246,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
         </div>
       )}
 
-      {/* --- 📊 STATS (REAL-TIME METRICS) --- */}
+      {/* --- 📊 STATS --- */}
       {activeTab === "analytics" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in zoom-in-95">
            <div className="p-8 bg-white/5 border border-white/10 rounded-4xl flex flex-col items-center justify-center">
@@ -326,10 +329,10 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
         ))}
       </div>
 
-      {/* --- 🚨 VERIFY MODAL (FIXED TILL: 5372924) --- */}
+      {/* --- 🚨 VERIFY MODAL --- */}
       {showVerifyModal && (
         <div className="fixed inset-0 z-400 flex items-center justify-center p-6 backdrop-blur-3xl">
-          <div className="absolute inset-0 bg-[#020617]/95" onClick={() => { setShowVerifyModal(false); setPaymentStep("choice"); }} />
+          <div className="absolute inset-0 bg-[#020617]/95" onClick={() => { if(!isPaying) setShowVerifyModal(false); setPaymentStep("choice"); }} />
           <div className="relative w-full max-w-sm bg-[#0a0f1e] border border-white/10 rounded-[48px] p-8 text-center animate-in zoom-in-95 shadow-2xl">
             
             {paymentStep === "choice" && (
@@ -337,10 +340,10 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 <h3 className="text-xl font-black uppercase text-[#00f2ff] mb-1 italic tracking-tighter">ACTIVATE <span className="text-white">NODE</span></h3>
                 <p className="text-gray-400 text-[10px] mb-8 italic tracking-widest uppercase">Select Payment Protocol</p>
                 <button onClick={() => setPaymentStep("card")} className="w-full py-5 bg-white text-black font-black rounded-2xl uppercase text-[10px] tracking-widest flex items-center justify-center gap-3 active:scale-95 transition-all italic">
-                   💳 CREDIT / DEBIT CARD
+                    💳 SECURE CARD PROTOCOL
                 </button>
                 <button onClick={() => setPaymentStep("mpesa")} className="w-full py-5 bg-emerald-600 text-white font-black rounded-2xl uppercase text-[10px] tracking-widest flex items-center justify-center gap-3 active:scale-95 transition-all italic shadow-lg shadow-emerald-600/10">
-                   📱 M-PESA MANUAL
+                    📱 M-PESA STK PUSH
                 </button>
                 <button onClick={() => setShowVerifyModal(false)} className="text-[8px] text-gray-600 font-black uppercase tracking-widest italic">Abort Sync</button>
               </div>
@@ -348,58 +351,37 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
 
             {paymentStep === "mpesa" && (
               <div className="space-y-6">
-                <h3 className="text-xl font-black uppercase text-emerald-500 mb-2 italic">M-PESA <span className="text-white">MANUAL</span></h3>
-                <div className="bg-white/5 p-6 rounded-3xl text-left space-y-3 border border-emerald-500/10 shadow-inner">
-                  <p className="text-[9px] text-gray-400 uppercase font-black italic">1. Dial *334# or Open M-Pesa App</p>
-                  <p className="text-[9px] text-gray-400 uppercase font-black italic">2. Lipa na M-Pesa {'>'} Buy Goods</p>
-                  <p className="text-[11px] text-emerald-500 uppercase font-black italic">3. Till Number: <span className="text-white bg-emerald-500/20 px-3 py-1 rounded tracking-widest">5372924</span></p>
-                  <p className="text-[9px] text-gray-400 uppercase font-black italic">4. Amount: <span className="text-white">KES 1,250</span></p>
-                </div>
+                <h3 className="text-xl font-black uppercase text-emerald-500 mb-2 italic tracking-tighter">M-PESA <span className="text-white">UPLINK</span></h3>
+                <p className="text-[9px] text-gray-400 uppercase font-black italic mb-4">Enter Phone for STK Prompt</p>
                 <div className="space-y-3">
-                   <p className="text-[8px] text-gray-500 font-black uppercase italic tracking-widest">Enter Code for Auto-Detection</p>
                    <input 
-                     value={mpesaCode} 
-                     onChange={e => setMpesaCode(e.target.value.toUpperCase())} 
-                     placeholder="TRANSACTION CODE" 
-                     className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-center text-[10px] font-black outline-none focus:border-emerald-500 text-white tracking-widest" 
+                     value={mpesaNumber} 
+                     onChange={e => setMpesaNumber(e.target.value)} 
+                     placeholder="2547XXXXXXXX" 
+                     className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-center text-[11px] font-black outline-none focus:border-emerald-500 text-white tracking-widest" 
                    />
                 </div>
-                <button disabled={isPaying} onClick={handleManualMpesaVerify} className="w-full py-5 bg-emerald-600 text-white font-black rounded-2xl uppercase text-[10px] tracking-widest shadow-xl active:scale-95 transition-all italic">
-                   {isPaying ? "VERIFYING SIGNAL..." : "I HAVE PAID"}
+                <button disabled={isPaying} onClick={() => handleIntasendPayment("M-PESA")} className="w-full py-5 bg-emerald-600 text-white font-black rounded-2xl uppercase text-[10px] tracking-widest shadow-xl active:scale-95 transition-all italic">
+                   {isPaying ? "ENCRYPTING SIGNAL..." : "PAY KES 1,250"}
                 </button>
                 <button onClick={() => setPaymentStep("choice")} className="text-[8px] text-gray-500 font-black uppercase italic">Back</button>
               </div>
             )}
 
-{paymentStep === "card" && (
-  <div className="space-y-4 text-left">
-    <h3 className="text-xl font-black uppercase text-white mb-4 italic text-center">BANK <span className="text-[#00f2ff]">DETAILS</span></h3>
-    <div className="space-y-3">
-       <div>
-         <label className="text-[8px] font-black uppercase text-gray-500 ml-2">Bank Name</label>
-         <select className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-[10px] font-black outline-none focus:border-[#00f2ff] text-white uppercase italic">
-            <option>Equity Bank</option>
-            <option>KCB Bank</option>
-            <option>Co-operative Bank</option>
-            <option>NCBA Bank</option>
-            <option>Absa Bank</option>
-         </select>
-       </div>
-       <div>
-         <label className="text-[8px] font-black uppercase text-gray-500 ml-2">Account Number</label>
-         <input placeholder="ENTER ACCOUNT NO" className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-[10px] font-black outline-none focus:border-[#00f2ff] text-white tracking-widest" />
-       </div>
-       <div>
-         <label className="text-[8px] font-black uppercase text-gray-500 ml-2">Account Holder Name</label>
-         <input defaultValue={user?.fullName || ""} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-[10px] font-black outline-none focus:border-[#00f2ff] text-white uppercase" />
-       </div>
-    </div>
-    <button onClick={() => { setIsPaying(true); setTimeout(() => { alert("Manual Bank Transfer Initiated. Reflects in 24hrs."); setIsPaying(false); setShowVerifyModal(false); }, 1500); }} className="w-full py-5 bg-[#00f2ff] text-black font-black rounded-2xl uppercase text-[10px] tracking-widest italic shadow-xl shadow-[#00f2ff]/20">
-      {isPaying ? "ENCRYPTING..." : "SUBMIT FOR SETTLEMENT ($10)"}
-    </button>
-    <button onClick={() => setPaymentStep("choice")} className="w-full text-[8px] text-gray-500 font-black uppercase italic text-center">Back</button>
-  </div>
-)}
+            {paymentStep === "card" && (
+              <div className="space-y-6">
+                <h3 className="text-xl font-black uppercase text-[#00f2ff] mb-4 italic tracking-tighter">CARD <span className="text-white">ENCRYPTION</span></h3>
+                <p className="text-[9px] text-gray-400 uppercase font-black italic mb-8">Secure $10.00 Transaction via IntaSend</p>
+                <button 
+                  disabled={isPaying} 
+                  onClick={() => handleIntasendPayment("CARD")} 
+                  className="w-full py-5 bg-[#00f2ff] text-black font-black rounded-2xl uppercase text-[10px] tracking-widest italic shadow-xl shadow-[#00f2ff]/20 active:scale-95 transition-all"
+                >
+                  {isPaying ? "PROCESSING..." : "OPEN SECURE CHECKOUT"}
+                </button>
+                <button onClick={() => setPaymentStep("choice")} className="w-full text-[8px] text-gray-500 font-black uppercase italic text-center">Back</button>
+              </div>
+            )}
           </div>
         </div>
       )}
