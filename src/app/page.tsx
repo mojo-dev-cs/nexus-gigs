@@ -9,7 +9,6 @@ export default function Home() {
   const { isLoaded, isSignedIn, user } = useUser();
   const [mounted, setMounted] = useState(false);
   
-  // Logic states: checking -> landing -> path -> survey -> loading -> dashboard
   const [step, setStep] = useState<"checking" | "landing" | "path" | "survey" | "loading" | "dashboard">("checking");
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -39,24 +38,27 @@ export default function Home() {
     { q: "Ready for node activation?", options: ["Yes", "Maybe"] },
   ];
 
+  // --- 🧬 THE UNIQUE REDIRECT FIX ---
   useEffect(() => {
     setMounted(true);
     
-    // HARD RESET FOR MOBILE/PC CACHE
     if (isLoaded) {
       if (!isSignedIn) {
         setStep("landing");
       } else {
+        // BIND STORAGE TO THE SPECIFIC USER ID
+        // This ensures if you delete the account and make a new one, the keys won't match
+        const surveyKey = `nexus_survey_done_${user.id}`;
+        const roleKey = `nexus_user_role_${user.id}`;
+        
         const metaRole = user?.publicMetadata?.role as string;
-        const savedRole = localStorage.getItem("nexus_user_role");
-        const isSurveyDone = localStorage.getItem("nexus_survey_done");
+        const savedRole = localStorage.getItem(roleKey);
+        const isSurveyDone = localStorage.getItem(surveyKey);
 
-        // THE LOCK: Only proceed to dashboard if BOTH role and survey are confirmed
         if (metaRole || (isSurveyDone === "true" && savedRole)) {
           setSelectedRole(metaRole || savedRole);
           setStep("dashboard");
         } else {
-          // If signed in but "Survey Done" is missing, FORCE path selection
           setStep("path");
         }
       }
@@ -79,16 +81,20 @@ export default function Home() {
         setLoadingProgress(p);
         if (p >= 100) {
           clearInterval(inv);
-          // SAVE TO STORAGE TO PREVENT LOOPS
-          localStorage.setItem("nexus_survey_done", "true");
-          localStorage.setItem("nexus_user_role", selectedRole!);
+          
+          // SAVE TO STORAGE USING THE DYNAMIC USER ID KEY
+          const surveyKey = `nexus_survey_done_${user?.id}`;
+          const roleKey = `nexus_user_role_${user?.id}`;
+          
+          localStorage.setItem(surveyKey, "true");
+          localStorage.setItem(roleKey, selectedRole!);
+          
           setStep("dashboard");
         }
       }, 50);
     }
   };
 
-  // 🛡️ SHIELD: Do not show ANY content until mounting is confirmed
   if (!mounted || !isLoaded || step === "checking") {
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center">
@@ -110,19 +116,16 @@ export default function Home() {
     </div>
   );
 
-  // --- 1. LANDING PAGE ---
   if (step === "landing") {
     return (
       <div className="min-h-screen text-white relative font-sans overflow-x-hidden">
         <Stars />
         <main className="relative z-10 flex flex-col items-center justify-center p-6 pt-20">
-          
-          {/* 3D STATS CARDS */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-6xl mb-16 px-4 w-full">
             {[
               {l:"Active Nodes", v:"+1.2M"}, {l:"Settlements", v: "+$2.5M"}, {l:"Tactical Gigs", v:"480K+"}, {l:"Relay Speed", v:"0.02s"}
             ].map((s,i) => (
-              <div key={i} className="p-6 md:p-10 bg-white/5 border border-white/10 rounded-[40px] backdrop-blur-xl shadow-2xl hover:border-[#00f2ff]/40 transition-all group">
+              <div key={i} className="p-6 md:p-10 bg-white/5 border border-white/10 rounded-[40px] backdrop-blur-xl shadow-2xl hover:border-[#00f2ff]/40 transition-all">
                 <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-2 italic">{s.l}</p>
                 <h3 className="text-2xl md:text-4xl font-black italic text-[#00f2ff]">{s.v}</h3>
               </div>
@@ -157,7 +160,6 @@ export default function Home() {
     );
   }
 
-  // --- 2. PATH SELECTION ---
   if (step === "path") {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 relative">
@@ -181,7 +183,6 @@ export default function Home() {
     );
   }
 
-  // --- 3. SURVEY ---
   if (step === "survey") {
     return (
       <div className="min-h-screen flex items-center justify-center p-6 relative">
@@ -204,7 +205,6 @@ export default function Home() {
     );
   }
 
-  // --- 4. LOADING ---
   if (step === "loading") {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 relative">
@@ -221,7 +221,6 @@ export default function Home() {
     );
   }
 
-  // --- 5. DASHBOARD (HARD RENDER BLOCK) ---
   if (step === "dashboard") {
     return (
       <main className="min-h-screen">
