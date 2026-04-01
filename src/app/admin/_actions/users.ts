@@ -4,7 +4,6 @@ import { createClerkClient } from "@clerk/nextjs/server";
 
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
 
-// 1. Fetch all users from Clerk
 export async function getAllNexusUsers() {
   try {
     const response = await clerkClient.users.getUserList();
@@ -13,33 +12,30 @@ export async function getAllNexusUsers() {
       name: `${u.firstName || ""} ${u.lastName || ""}`.trim() || "Unknown Node",
       email: u.emailAddresses[0]?.emailAddress || "N/A",
       status: (u.publicMetadata.status as string) || "Pending",
+      banned: u.banned,
       joined: new Date(u.createdAt).toLocaleDateString(),
     }));
     return { success: true, users };
   } catch (error) {
-    console.error("Clerk Fetch Error:", error);
-    return { success: false, error: "Failed to sync nodes" };
+    return { success: false, error: "Sync Failed" };
   }
 }
 
-// 2. Flip status to 'Verified'
 export async function verifyUserNode(userId: string) {
-  try {
-    await clerkClient.users.updateUser(userId, {
-      publicMetadata: { status: "Verified" },
-    });
-    return { success: true };
-  } catch (error) {
-    return { success: false };
-  }
+  await clerkClient.users.updateUser(userId, { publicMetadata: { status: "Verified" } });
+  return { success: true };
 }
 
-// 3. Delete user from Clerk (Terminate Node)
-export async function terminateUserNode(userId: string) {
-  try {
-    await clerkClient.users.deleteUser(userId);
-    return { success: true };
-  } catch (error) {
-    return { success: false };
+export async function suspendUserNode(userId: string, ban: boolean) {
+  if (ban) {
+    await clerkClient.users.banUser(userId);
+  } else {
+    await clerkClient.users.unbanUser(userId);
   }
+  return { success: true };
+}
+
+export async function terminateUserNode(userId: string) {
+  await clerkClient.users.deleteUser(userId);
+  return { success: true };
 }
