@@ -1,56 +1,43 @@
 "use server";
 
-import { clerkClient } from "@clerk/nextjs/server";
-import { revalidatePath } from "next/cache";
+import { createClerkClient } from "@clerk/nextjs/server";
 
-/**
- * Fetches all Nexus users and calculates metadata-based stats
- */
+const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
+
+// 1. Fetch all users from Clerk
 export async function getAllNexusUsers() {
   try {
-    const client = await clerkClient();
-    const response = await client.users.getUserList({ limit: 100 });
-
-    const users = response.data.map((user) => ({
-      id: user.id,
-      name: `${user.firstName || ""} ${user.lastName || ""}`.trim() || "Unknown Node",
-      email: user.emailAddresses[0]?.emailAddress || "N/A",
-      status: user.publicMetadata?.status === "Verified" ? "Verified" : "Pending",
-      joined: new Date(user.createdAt).toLocaleDateString(),
-      lastActive: new Date(user.updatedAt).toLocaleTimeString(),
+    const response = await clerkClient.users.getUserList();
+    const users = response.data.map((u) => ({
+      id: u.id,
+      name: `${u.firstName || ""} ${u.lastName || ""}`.trim() || "Unknown Node",
+      email: u.emailAddresses[0]?.emailAddress || "N/A",
+      status: (u.publicMetadata.status as string) || "Pending",
+      joined: new Date(u.createdAt).toLocaleDateString(),
     }));
-
     return { success: true, users };
   } catch (error) {
-    console.error("Nexus Registry Sync Error:", error);
-    return { success: false, users: [] };
+    console.error("Clerk Fetch Error:", error);
+    return { success: false, error: "Failed to sync nodes" };
   }
 }
 
-/**
- * Manually authorizes a node for Elite access
- */
+// 2. Flip status to 'Verified'
 export async function verifyUserNode(userId: string) {
   try {
-    const client = await clerkClient();
-    await client.users.updateUser(userId, {
+    await clerkClient.users.updateUser(userId, {
       publicMetadata: { status: "Verified" },
     });
-    revalidatePath("/admin");
     return { success: true };
   } catch (error) {
     return { success: false };
   }
 }
 
-/**
- * Permanently removes a node from the relay
- */
+// 3. Delete user from Clerk (Terminate Node)
 export async function terminateUserNode(userId: string) {
   try {
-    const client = await clerkClient();
-    await client.users.deleteUser(userId);
-    revalidatePath("/admin");
+    await clerkClient.users.deleteUser(userId);
     return { success: true };
   } catch (error) {
     return { success: false };
