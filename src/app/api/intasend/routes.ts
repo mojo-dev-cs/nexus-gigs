@@ -5,7 +5,11 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { amount, phone, email, firstName, lastName, method, api_ref } = body;
 
-    // 1. Prepare the IntaSend Payload
+    // Validate keys exist before calling IntaSend
+    if (!process.env.INTASEND_SECRET_KEY || !process.env.NEXT_PUBLIC_INTASEND_PUBLISHABLE_KEY) {
+      return NextResponse.json({ success: false, message: "Server configuration missing keys." }, { status: 500 });
+    }
+
     const payload = {
       public_key: process.env.NEXT_PUBLIC_INTASEND_PUBLISHABLE_KEY,
       amount: amount,
@@ -14,12 +18,11 @@ export async function POST(req: Request) {
       phone_number: phone,
       first_name: firstName,
       last_name: lastName,
-      api_ref: api_ref,
-      redirect_url: `https://${process.env.VERCEL_URL || 'nexus-gigs.vercel.app'}/dashboard`,
+      api_ref: api_ref || `nexus_${Date.now()}`,
+      redirect_url: `https://nexus-gigs.vercel.app/dashboard`,
       method: method === "M-PESA" ? "MPESA" : "CARD",
     };
 
-    // 2. Uplink to Live IntaSend API
     const response = await fetch("https://payment.intasend.com/api/v1/checkout/", {
       method: "POST",
       headers: {
@@ -32,24 +35,13 @@ export async function POST(req: Request) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("IntaSend API Error:", data);
-      return NextResponse.json({ 
-        success: false, 
-        message: data.detail || "IntaSend handshake failed." 
-      }, { status: 400 });
+      return NextResponse.json({ success: false, message: data.detail || "Gateway rejected sync." }, { status: 400 });
     }
 
-    // 3. Return the secure checkout URL
-    return NextResponse.json({ 
-      success: true, 
-      url: data.url 
-    });
+    return NextResponse.json({ success: true, url: data.url });
 
   } catch (error) {
-    console.error("Internal Payment Error:", error);
-    return NextResponse.json({ 
-      success: false, 
-      message: "Internal Server Error in Payment Relay." 
-    }, { status: 500 });
+    console.error("Payment Relay Error:", error);
+    return NextResponse.json({ success: false, message: "Internal server error." }, { status: 500 });
   }
 }

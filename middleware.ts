@@ -1,8 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-// 1. Define all public routes. 
-// We MUST include /admin here so it doesn't trigger the standard user redirect logic.
+// 1. Define public routes that don't need login
 const isPublicRoute = createRouteMatcher([
   '/', 
   '/sign-in(.*)', 
@@ -10,22 +9,26 @@ const isPublicRoute = createRouteMatcher([
   '/sso-callback(.*)',
   '/api/intasend(.*)', 
   '/api/webhooks(.*)',
-  '/admin(.*)' // 👈 THIS PREVENTS THE REDIRECT TO USER DASHBOARD
+  '/admin(.*)' // Allows Admin to handle its own pass-key security
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-  const session = await auth();
+  const { userId } = await auth();
 
-  // 2. Manual Protection: Only redirect to sign-in if the route is PRIVATE and user is anonymous
-  if (!isPublicRoute(req) && !session.userId) {
+  // 2. If the user is NOT logged in and trying to access a PRIVATE route
+  if (!userId && !isPublicRoute(req)) {
     const signInUrl = new URL('/sign-in', req.url);
     return NextResponse.redirect(signInUrl);
   }
-  
-  // If it's a public route (like /admin), we do nothing and let the page load its own logic.
+
   return NextResponse.next();
 });
 
 export const config = {
-  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
 };
