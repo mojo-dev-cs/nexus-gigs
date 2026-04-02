@@ -1,245 +1,240 @@
 "use client";
 
-import { useUser, SignInButton, SignUpButton } from "@clerk/nextjs";
-import { useEffect, useState, useCallback } from "react";
-import { FreelancerView } from "@/components/dashboard/FreelancerView";
-import { ClientView } from "@/components/dashboard/ClientView";
+import { useState, useEffect, useCallback } from "react";
+import { getAllNexusUsers, verifyUserNode, terminateUserNode, suspendUserNode } from "./_actions/users"; 
 
-export default function Home() {
-  const { isLoaded, isSignedIn, user } = useUser();
-  const [mounted, setMounted] = useState(false);
-  
-  // Checking is the initial state to prevent mobile "ghost" redirects
-  const [step, setStep] = useState<"checking" | "landing" | "path" | "survey" | "loading" | "dashboard">("checking");
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [loadingProgress, setLoadingProgress] = useState(0);
+interface NexusUser {
+  id: string;
+  name: string;
+  email: string;
+  status: string;
+  role: string;
+  banned: boolean;
+  joined: string;
+  createdAt: number;
+}
 
-  const sponsors = [
-    { name: "Safaricom", logo: "/logos/safaricom.jpg" },
-    { name: "Google", logo: "/logos/google.jpg" },
-    { name: "Binance", logo: "/logos/binance.jpg" },
-    { name: "Stripe", logo: "/logos/stripe.jpg" },
-    { name: "Microsoft", logo: "/logos/microsoft.jpg" },
-    { name: "Tesla", logo: "/logos/tesla.jpg" },
-    { name: "Amazon", logo: "/logos/amazon.jpg" },
-    { name: "Coca-Cola", logo: "/logos/cocacola.jpg" }
+export default function AdminPage() {
+  const [passInput, setPassInput] = useState("");
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [operators, setOperators] = useState<NexusUser[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [fetching, setFetching] = useState(false);
+  const [expandedClient, setExpandedClient] = useState<string | null>(null);
+
+  // System Settings
+  const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
+  const [commissionRate, setCommissionRate] = useState(2);
+
+  // --- 📈 REAL-TIME CALCULATIONS ---
+  const verifiedNodes = operators.filter(o => o.status === "Verified");
+  const totalRevenue = (verifiedNodes.length * 1250); // Real value from Clerk
+  const startOfToday = new Date().setHours(0, 0, 0, 0);
+  const todaysRevenue = verifiedNodes.filter(o => o.createdAt >= startOfToday).length * 1250;
+
+  // Mocked Gigs for Settlement Display
+  const activeMissions = [
+    { id: "CL-01", name: "Alpha Tech", totalBudget: "KES 150,000", gigs: [
+      { id: "G-1", title: "E-commerce Optimization", freelancer: "Emmanuel Muema", budget: "KES 45,000" },
+    ]},
+    { id: "CL-02", name: "Nexa Studio", totalBudget: "KES 85,000", gigs: [
+      { id: "G-3", title: "UI/UX Design System", freelancer: "Jane Smith", budget: "KES 85,000" }
+    ]}
   ];
 
-  const surveyQuestions = [
-    { q: "Target monthly revenue bracket?", options: ["$1k-$5k", "$5k-$10k", "$20k+"] },
-    { q: "Technical focus?", options: ["Software", "AI", "Design", "Cyber"] },
-    { q: "Experience level?", options: ["Entry", "Mid-tier", "Elite"] },
-    { q: "Work setup?", options: ["100% Remote", "Hybrid Relay"] },
-    { q: "Primary vertical?", options: ["FinTech", "HealthTech", "Web3"] },
-    { q: "Data security protocol?", options: ["Encrypted", "Standard"] },
-    { q: "Discovery channel?", options: ["Search", "Referral", "Ad"] },
-    { q: "Payout protocol?", options: ["M-Pesa", "Bank", "Crypto"] },
-    { q: "Sync urgency?", options: ["Immediate", "48 Hours"] },
-    { q: "Ready for node activation?", options: ["Yes", "Maybe"] },
-  ];
+  const loadData = useCallback(async () => {
+    if (!isAuthorized) return;
+    setFetching(true);
+    const res = await getAllNexusUsers();
+    if (res.success && res.users) setOperators(res.users as NexusUser[]);
+    setFetching(false);
+  }, [isAuthorized]);
 
-  // --- 🧬 THE NEXUS REDIRECT PROTOCOL ---
   useEffect(() => {
-    setMounted(true);
-    
-    if (isLoaded) {
-      if (!isSignedIn) {
-        setStep("landing");
-      } else if (user?.id) {
-        // Safe check for metadata and localStorage
-        const metaRole = user.publicMetadata?.role as string;
-        const surveyKey = `nexus_survey_done_${user.id}`;
-        const roleKey = `nexus_user_role_${user.id}`;
-        
-        const savedRole = localStorage.getItem(roleKey);
-        const isSurveyDone = localStorage.getItem(surveyKey);
+    if (sessionStorage.getItem("nexus_admin_session") === "true") setIsAuthorized(true);
+  }, []);
 
-        // If a role is found in Server Metadata or LocalStorage, go to Dashboard
-        if (metaRole || (isSurveyDone === "true" && savedRole)) {
-          setSelectedRole(metaRole || savedRole);
-          setStep("dashboard");
-        } else {
-          // New account or fresh session without role selection
-          setStep("path");
-        }
-      }
+  useEffect(() => {
+    if (isAuthorized) {
+      loadData();
+      const heartbeat = setInterval(() => { loadData(); }, 10000); // 10s Real-time Sync
+      return () => clearInterval(heartbeat);
     }
-  }, [isLoaded, isSignedIn, user?.id, user?.publicMetadata?.role]);
+  }, [isAuthorized, loadData]);
 
-  const handleRoleSelect = (role: string) => {
-    setSelectedRole(role);
-    setStep("survey");
+  const handleAction = async (actionFn: any, id: string, extraArg?: any) => {
+    setFetching(true);
+    await actionFn(id, extraArg);
+    await loadData();
   };
 
-  const handleSurveyAnswer = useCallback(() => {
-    if (currentQuestion < surveyQuestions.length - 1) {
-      setCurrentQuestion(prev => prev + 1);
-    } else {
-      setStep("loading");
-      let p = 0;
-      const inv = setInterval(() => {
-        p += 2;
-        setLoadingProgress(p);
-        if (p >= 100) {
-          clearInterval(inv);
-          
-          if (user?.id) {
-            const surveyKey = `nexus_survey_done_${user.id}`;
-            const roleKey = `nexus_user_role_${user.id}`;
-            localStorage.setItem(surveyKey, "true");
-            localStorage.setItem(roleKey, selectedRole!);
-          }
-          
-          setStep("dashboard");
-        }
-      }, 30);
-    }
-  }, [currentQuestion, selectedRole, user?.id, surveyQuestions.length]);
-
-  if (!mounted || !isLoaded || step === "checking") {
+  if (!isAuthorized) {
     return (
-      <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center space-y-4">
-        <div className="w-12 h-12 border-2 border-[#00f2ff] border-t-transparent rounded-full animate-spin shadow-[0_0_20px_#00f2ff]" />
-        <div className="text-[#00f2ff] font-black italic animate-pulse tracking-[0.5em] text-[10px] uppercase">
-          Initializing Nexus Protocol...
-        </div>
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center p-4">
+        <form onSubmit={(e) => { e.preventDefault(); if(passInput === "Nexus123!") { sessionStorage.setItem("nexus_admin_session", "true"); setIsAuthorized(true); } }} className="w-full max-w-sm bg-black border border-red-500/20 p-10 rounded-[50px] text-center shadow-2xl">
+          <div className="w-16 h-16 bg-red-600/10 border border-red-600/20 rounded-3xl flex items-center justify-center mx-auto mb-8 text-2xl">🛡️</div>
+          <h1 className="text-2xl font-black italic text-red-500 uppercase mb-2">NEXUS HQ</h1>
+          <p className="text-[8px] text-gray-500 uppercase tracking-[0.4em] mb-8 font-black">Authorized Personnel Only</p>
+          <input type="password" value={passInput} onChange={(e) => setPassInput(e.target.value)} placeholder="PROTOCOL KEY" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white text-center font-bold mb-6 outline-none focus:border-red-500 transition-all" />
+          <button className="w-full py-4 bg-red-600 text-white font-black rounded-2xl uppercase text-[10px] italic hover:scale-105 active:scale-95 transition-all">Unlock Command Center</button>
+        </form>
       </div>
     );
   }
 
-  const Stars = () => (
-    <div className="fixed inset-0 z-0 pointer-events-none">
-      <div className="absolute inset-0 bg-[#020617]" />
-      {[...Array(40)].map((_, i) => (
-        <div key={i} className="absolute bg-white rounded-full animate-pulse"
-          style={{ top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%`, width: '2px', height: '2px', opacity: Math.random() }}
-        />
-      ))}
-    </div>
-  );
+  return (
+    <div className="flex min-h-screen bg-[#020617] text-white font-sans selection:bg-red-500/30 overflow-x-hidden">
+      
+      {/* --- 📱 MOBILE HEADER --- */}
+      <div className="md:hidden fixed top-0 w-full h-20 bg-black/90 backdrop-blur-xl border-b border-white/5 z-50 flex items-center justify-between px-6">
+        <h2 className="font-black italic text-red-500 uppercase tracking-tighter">NEXUS HQ</h2>
+        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-3 bg-white/5 rounded-xl border border-white/10">{isMobileMenuOpen ? "✕" : "☰"}</button>
+      </div>
 
-  // --- LANDING PAGE ---
-  if (step === "landing") {
-    return (
-      <div className="min-h-screen text-white relative font-sans overflow-x-hidden selection:bg-[#00f2ff]/30">
-        <Stars />
-        <main className="relative z-10 flex flex-col items-center justify-center p-6 pt-10 md:pt-20">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 max-w-6xl mb-16 px-4 w-full animate-in zoom-in-95 duration-700">
-            {[
-              {l:"Active Nodes", v:"+1.2M"}, {l:"Settlements", v: "+$2.5M"}, {l:"Tactical Gigs", v:"480K+"}, {l:"Relay Speed", v:"0.02s"}
-            ].map((s,i) => (
-              <div key={i} className="p-6 md:p-8 bg-white/5 border border-white/10 rounded-[40px] backdrop-blur-xl shadow-2xl hover:border-[#00f2ff]/40 transition-all group">
-                <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-2 italic group-hover:text-[#00f2ff]">{s.l}</p>
-                <h3 className="text-2xl md:text-3xl font-black italic text-white group-hover:text-[#00f2ff]">{s.v}</h3>
+      {/* --- 📟 SIDEBAR --- */}
+      <aside className={`fixed inset-y-0 left-0 z-40 w-72 bg-black border-r border-red-500/10 backdrop-blur-3xl transform transition-transform duration-300 md:translate-x-0 md:sticky md:top-0 md:h-screen ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
+        <div className="p-10 text-center font-black italic text-red-500 border-b border-white/5 hidden md:block uppercase tracking-widest">Nexus Command</div>
+        <nav className="p-6 space-y-2 mt-20 md:mt-4">
+          {[
+            { id: "dashboard", label: "Overview", icon: "📊" },
+            { id: "users", label: "Registry", icon: "👤" },
+            { id: "payments", label: "Settlements", icon: "💰" },
+            { id: "settings", label: "System Core", icon: "⚙️" }
+          ].map(m => (
+            <button key={m.id} onClick={() => { setActiveTab(m.id); setIsMobileMenuOpen(false); }} className={`w-full flex items-center gap-4 px-6 py-5 rounded-[30px] transition-all ${activeTab === m.id ? 'bg-red-600 shadow-xl shadow-red-600/20 italic' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}>
+              <span className="text-xl">{m.icon}</span><span className="text-[10px] font-black uppercase tracking-widest">{m.label}</span>
+            </button>
+          ))}
+        </nav>
+      </aside>
+
+      {/* --- 🚀 MAIN DASHBOARD --- */}
+      <main className="flex-1 p-6 md:p-16 pt-28 md:pt-16 space-y-12 animate-in fade-in duration-700">
+        
+        {/* --- 📊 OVERVIEW TAB --- */}
+        {activeTab === "dashboard" && (
+          <div className="space-y-12">
+            <h3 className="text-3xl font-black uppercase italic text-red-500">System Pulse</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="p-10 bg-white/5 border border-white/10 rounded-[50px] group hover:border-red-500/30 transition-all">
+                <p className="text-[10px] font-black text-gray-500 uppercase mb-4 italic tracking-[0.3em]">Global Yield</p>
+                <div className="flex items-baseline gap-2"><span className="text-sm font-black text-gray-700">KES</span><h4 className="text-5xl font-black italic">{totalRevenue.toLocaleString()}</h4></div>
               </div>
-            ))}
+              <div className="p-10 bg-red-600/10 border border-red-500/20 rounded-[50px]">
+                <p className="text-[10px] font-black text-red-500 uppercase mb-4 italic tracking-[0.3em]">Today's Inflow</p>
+                <h4 className="text-5xl font-black italic text-white">KES {todaysRevenue.toLocaleString()}</h4>
+              </div>
+              <div className="p-10 bg-black/40 border border-white/5 rounded-[50px] flex flex-col justify-center text-center">
+                <p className="text-[10px] font-black text-gray-500 uppercase mb-4 italic tracking-[0.3em]">Verified Nodes</p>
+                <h4 className="text-6xl font-black italic text-white">{verifiedNodes.length}</h4>
+              </div>
+            </div>
           </div>
+        )}
 
-          <h1 className="text-6xl md:text-[10rem] font-black italic uppercase tracking-tighter leading-none mb-12 animate-in slide-in-from-top-10 duration-1000">
-            NEXUS<span className="text-[#00f2ff] drop-shadow-[0_0_30px_rgba(0,242,255,0.4)]">GIGS</span>
-          </h1>
-
-          <div className="flex flex-col md:flex-row gap-6 w-full max-w-sm mb-32 px-4 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
-            <SignUpButton mode="modal">
-              <button className="flex-1 py-5 bg-[#00f2ff] text-black font-black rounded-full uppercase text-[10px] italic hover:scale-105 transition-all shadow-2xl shadow-[#00f2ff]/20">Get Started</button>
-            </SignUpButton>
-            <SignInButton mode="modal">
-              <button className="flex-1 py-5 border border-white/20 text-white font-black rounded-full uppercase text-[10px] italic hover:bg-white/5 transition-all">Sign In</button>
-            </SignInButton>
+        {/* --- 👤 REGISTRY TAB --- */}
+        {activeTab === "users" && (
+          <div className="space-y-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <h3 className="text-2xl font-black italic uppercase text-red-500">Node Registry</h3>
+              <input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="FILTER NODES..." className="w-full md:w-auto bg-white/5 border border-white/10 rounded-2xl px-6 py-3 text-[10px] font-black text-white outline-none focus:border-red-500 transition-all" />
+            </div>
+            <div className="overflow-x-auto bg-white/5 border border-white/10 rounded-[40px] no-scrollbar">
+              <table className="w-full text-left min-w-187.5">
+                <thead className="bg-white/5 text-[8px] font-black uppercase text-gray-500 italic"><tr><th className="p-8">Operator</th><th className="p-8">Sync Status</th><th className="p-8 text-right">Protocol Commands</th></tr></thead>
+                <tbody className="divide-y divide-white/5">
+                  {operators.filter(o => o.name.toLowerCase().includes(searchTerm.toLowerCase())).map((op) => (
+                    <tr key={op.id} className="text-[11px] hover:bg-white/2 transition-all">
+                      <td className="p-8 font-black uppercase italic">{op.name}<br/><span className="text-[8px] text-gray-500 font-bold">{op.email}</span></td>
+                      <td className="p-8"><span className={`px-4 py-1 rounded-full border italic font-black text-[9px] ${op.status === 'Verified' ? 'text-emerald-400 border-emerald-500/20 bg-emerald-500/5' : 'text-amber-500 border-amber-500/20 bg-amber-500/5'}`}>{op.banned ? "TERMINATED" : op.status}</span></td>
+                      <td className="p-8 text-right space-x-6 font-black uppercase italic text-[9px]">
+                        <button onClick={() => handleAction(verifyUserNode, op.id)} className="text-emerald-500 hover:text-white transition-colors">Verify</button>
+                        <button onClick={() => handleAction(suspendUserNode as any, op.id, !op.banned)} className="text-amber-500 hover:text-white transition-colors">{op.banned ? "Restore" : "Suspend"}</button>
+                        <button onClick={() => { if(confirm("Permanently wipe node?")) handleAction(terminateUserNode, op.id); }} className="text-red-500 hover:text-white transition-colors">Kill</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
+        )}
 
-          <div className="w-full max-w-7xl border-t border-white/5 pt-20">
-             <p className="text-center text-[9px] font-black text-[#00f2ff] uppercase tracking-[0.8em] mb-16 italic">Official Relay Partners</p>
-             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6 px-4 pb-20">
-                {sponsors.map((brand) => (
-                  <div key={brand.name} className="bg-white p-3 rounded-2xl flex items-center justify-center h-16 shadow-2xl grayscale hover:grayscale-0 hover:scale-110 transition-all duration-500">
-                    <img src={brand.logo} alt={brand.name} className="max-h-full object-contain" />
+        {/* --- 💰 SETTLEMENTS TAB --- */}
+        {activeTab === "payments" && (
+          <div className="space-y-12 animate-in slide-in-from-bottom-5">
+            <h3 className="text-2xl font-black italic uppercase text-red-500">Financial Stream</h3>
+            
+            <div className="space-y-6">
+              <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest italic border-l-4 border-amber-500 pl-4">Active Client Missions</h4>
+              <div className="grid gap-4">
+                {activeMissions.map((client) => (
+                  <div key={client.id} className="bg-white/5 border border-white/10 rounded-[45px] overflow-hidden">
+                    <button onClick={() => setExpandedClient(expandedClient === client.id ? null : client.id)} className="w-full p-10 flex justify-between items-center hover:bg-white/5 transition-all">
+                      <div className="text-left"><p className="text-2xl font-black uppercase italic tracking-tighter">{client.name}</p><p className="text-[9px] text-gray-500 font-black uppercase mt-1">Total Escrow: {client.totalBudget}</p></div>
+                      <span className="text-2xl font-black text-red-500">{expandedClient === client.id ? "−" : "+"}</span>
+                    </button>
+                    {expandedClient === client.id && (
+                      <div className="px-10 pb-10 space-y-4 animate-in slide-in-from-top-4">
+                        {client.gigs.map((gig) => (
+                          <div key={gig.id} className="p-8 bg-black/40 border border-white/5 rounded-[30px] flex justify-between items-center group hover:border-[#00f2ff]/20">
+                            <div><p className="text-[11px] font-black text-[#00f2ff] uppercase italic">{gig.title}</p><p className="text-[9px] text-gray-600 uppercase mt-1">Target Node: <span className="text-white">{gig.freelancer}</span></p></div>
+                            <div className="text-right"><p className="text-lg font-black italic">{gig.budget}</p><div className="mt-3 flex gap-3 justify-end"><button className="px-4 py-2 bg-emerald-600 text-white text-[8px] font-black uppercase rounded-xl">Release</button><button className="px-4 py-2 bg-red-900/40 text-red-500 border border-red-500/20 text-[8px] font-black uppercase rounded-xl">Dispute</button></div></div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
+              </div>
+            </div>
+
+            <div className="space-y-6 pt-10 border-t border-white/5">
+              <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest italic border-l-4 border-emerald-500 pl-4">Transaction Ledger (Real-Time)</h4>
+              <div className="bg-white/2 border border-white/10 rounded-[40px] overflow-hidden">
+                <table className="w-full text-left">
+                  <thead className="bg-white/5 text-[8px] font-black uppercase text-gray-500 italic"><tr><th className="p-8">Entity</th><th className="p-8">Protocol</th><th className="p-8">Value</th><th className="p-8 text-right">Status</th></tr></thead>
+                  <tbody className="divide-y divide-white/5">
+                    {verifiedNodes.map(u => (
+                      <tr key={u.id} className="text-[10px] hover:bg-white/2 transition-all">
+                        <td className="p-8 font-black uppercase italic">{u.name}</td>
+                        <td className="p-8 text-gray-600 font-bold uppercase italic">NODE_SYNC_VERIFY</td>
+                        <td className="p-8 font-black italic text-emerald-500">KES 1,250</td>
+                        <td className="p-8 text-right"><span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 rounded-full text-[8px] font-black uppercase italic">Settled</span></td>
+                      </tr>
+                    ))}
+                    <tr className="text-[10px] opacity-40"><td className="p-8 font-black uppercase italic">Legacy Pipeline</td><td className="p-8 font-bold italic">GIG_RESERVE</td><td className="p-8 font-black italic">KES 45,000</td><td className="p-8 text-right"><span className="text-[8px] font-black uppercase italic">Archive</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* --- ⚙️ SYSTEM CORE TAB --- */}
+        {activeTab === "settings" && (
+          <div className="max-w-2xl space-y-10 animate-in zoom-in-95">
+             <h3 className="text-2xl font-black italic uppercase text-red-500">System Core</h3>
+             <div className="p-10 md:p-14 bg-white/5 border border-white/10 rounded-[60px] space-y-10">
+                <div className="flex justify-between items-center">
+                   <div><h4 className="text-sm font-black uppercase italic tracking-widest">Protocol Lock</h4><p className="text-[9px] text-gray-500 uppercase italic">Pause all bidding and node activity</p></div>
+                   <button onClick={() => setIsMaintenanceMode(!isMaintenanceMode)} className={`w-14 h-7 rounded-full relative transition-all ${isMaintenanceMode ? 'bg-red-600' : 'bg-white/10'}`}><div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all ${isMaintenanceMode ? 'left-8' : 'left-1'}`} /></button>
+                </div>
+                <div className="space-y-6 pt-10 border-t border-white/5">
+                   <div className="flex justify-between"><label className="text-[10px] font-black text-gray-500 uppercase italic">Commission Relay Rate</label><span className="text-red-500 font-black text-sm">{commissionRate}%</span></div>
+                   <input type="range" min="1" max="10" value={commissionRate} onChange={(e) => setCommissionRate(parseInt(e.target.value))} className="w-full accent-red-600 bg-white/10 h-1 rounded-full appearance-none cursor-pointer" />
+                </div>
+                <button onClick={() => alert("Satellite Uplink Configured Successfully.")} className="w-full py-6 bg-white text-black font-black rounded-[25px] uppercase text-[10px] tracking-[0.4em] italic shadow-2xl transition-all active:scale-95">Synchronize Global Config</button>
+             </div>
+             <div className="p-10 bg-red-900/10 border border-red-500/20 rounded-[50px] text-center space-y-6">
+                <p className="text-[8px] font-black text-red-500 uppercase italic tracking-widest">Wipe Log Command</p>
+                <button className="w-full py-5 bg-red-600 text-white font-black rounded-[25px] text-[10px] uppercase italic">Execute Wipe</button>
              </div>
           </div>
-        </main>
-      </div>
-    );
-  }
-
-  // --- PATH SELECTION ---
-  if (step === "path") {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6 relative">
-        <Stars />
-        <div className="relative z-10 text-center animate-in fade-in slide-in-from-bottom-5 duration-1000 w-full max-w-5xl">
-          <h2 className="text-4xl md:text-7xl font-black italic uppercase text-white mb-20 tracking-tighter">Identity <span className="text-[#00f2ff]">Protocol</span></h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <button onClick={() => handleRoleSelect('freelancer')} className="p-12 md:p-16 bg-[#0a0f1e]/90 border border-white/10 rounded-[60px] hover:border-[#00f2ff] transition-all text-left group shadow-2xl">
-              <div className="w-20 h-20 bg-[#00f2ff]/10 rounded-[30px] flex items-center justify-center text-5xl mb-10 group-hover:bg-[#00f2ff] group-hover:text-black transition-all">💼</div>
-              <h3 className="text-4xl font-black uppercase italic text-white mb-4 tracking-tighter">Freelancer</h3>
-              <p className="text-gray-500 text-sm italic font-bold uppercase tracking-widest leading-relaxed">Execute mission-critical tasks. Clear settlements instantly via M-Pesa.</p>
-            </button>
-            <button onClick={() => handleRoleSelect('client')} className="p-12 md:p-16 bg-[#0a0f1e]/90 border border-white/10 rounded-[60px] hover:border-purple-500 transition-all text-left group shadow-2xl">
-              <div className="w-20 h-20 bg-purple-500/10 rounded-[30px] flex items-center justify-center text-5xl mb-10 group-hover:bg-purple-500 transition-all">🎯</div>
-              <h3 className="text-4xl font-black uppercase italic text-white mb-4 tracking-tighter">Client</h3>
-              <p className="text-gray-500 text-sm italic font-bold uppercase tracking-widest leading-relaxed">Hiring elite nodes. Deploy tactical missions at scale.</p>
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // --- SURVEY CALIBRATION ---
-  if (step === "survey") {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-6 relative">
-        <Stars />
-        <div className="max-w-md w-full bg-[#0a0f1e]/95 border border-white/10 p-12 rounded-[50px] relative z-10 shadow-2xl animate-in zoom-in-95 duration-500">
-          <div className="flex justify-between items-center mb-8">
-             <p className="text-[10px] font-black text-[#00f2ff] uppercase italic tracking-widest">Core Calibration: {currentQuestion + 1} / 10</p>
-             <div className="w-2 h-2 bg-[#00f2ff] rounded-full animate-ping" />
-          </div>
-          <h2 className="text-2xl font-black italic uppercase text-white mb-10 leading-tight tracking-tight border-l-4 border-[#00f2ff] pl-6">{surveyQuestions[currentQuestion].q}</h2>
-          <div className="grid gap-4">
-            {surveyQuestions[currentQuestion].options.map(opt => (
-              <button key={opt} onClick={handleSurveyAnswer} className="w-full py-5 bg-white/5 border border-white/10 rounded-3xl text-left px-8 text-[11px] font-black uppercase text-white hover:bg-white hover:text-black transition-all italic active:scale-95">
-                {opt}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // --- SYNCING LOADER ---
-  if (step === "loading") {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6 relative">
-        <Stars />
-        <div className="relative z-10 flex flex-col items-center w-full max-w-sm">
-          <div className="w-24 h-24 border-4 border-[#00f2ff] border-t-transparent rounded-full animate-spin mb-12 shadow-[0_0_60px_#00f2ff33]" />
-          <h2 className="text-2xl font-black italic uppercase tracking-[0.5em] mb-12 text-[#00f2ff] animate-pulse">Synchronizing Node</h2>
-          <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/10">
-            <div className="h-full bg-linear-to-r from-[#00f2ff] to-blue-600 transition-all duration-300" style={{ width: `${loadingProgress}%` }} />
-          </div>
-          <p className="text-[10px] font-black uppercase text-gray-500 mt-8 tracking-[0.8em] italic">{loadingProgress}% SYNCED</p>
-        </div>
-      </div>
-    );
-  }
-
-  // --- FINAL DASHBOARD RENDER ---
-  if (step === "dashboard") {
-    return (
-      <main className="min-h-screen animate-in fade-in duration-1000">
-        {selectedRole === "freelancer" ? (
-          <FreelancerView jobs={[]} userMetadata={user?.publicMetadata || {}} />
-        ) : (
-          <ClientView jobs={[]} />
         )}
       </main>
-    );
-  }
-
-  return null;
+    </div>
+  );
 }

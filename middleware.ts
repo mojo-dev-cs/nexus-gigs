@@ -1,7 +1,8 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-// 1. Define public routes - we MUST include /admin here so it can use its own password logic
+// 1. Define all public routes. 
+// We MUST include /admin here so it doesn't trigger the standard user redirect logic.
 const isPublicRoute = createRouteMatcher([
   '/', 
   '/sign-in(.*)', 
@@ -9,17 +10,20 @@ const isPublicRoute = createRouteMatcher([
   '/sso-callback(.*)',
   '/api/intasend(.*)', 
   '/api/webhooks(.*)',
-  '/admin(.*)' // 👈 THIS ALLOWS ADMIN TO BYPASS CLERK REDIRECTS
+  '/admin(.*)' // 👈 THIS PREVENTS THE REDIRECT TO USER DASHBOARD
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
   const session = await auth();
 
-  // 2. If it's not a public route and the user isn't logged in, send to sign-in
+  // 2. Manual Protection: Only redirect to sign-in if the route is PRIVATE and user is anonymous
   if (!isPublicRoute(req) && !session.userId) {
     const signInUrl = new URL('/sign-in', req.url);
     return NextResponse.redirect(signInUrl);
   }
+  
+  // If it's a public route (like /admin), we do nothing and let the page load its own logic.
+  return NextResponse.next();
 });
 
 export const config = {
