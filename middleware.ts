@@ -1,11 +1,23 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
-const isPublicRoute = createRouteMatcher(['/', '/sign-in(.*)', '/sign-up(.*)', '/api/intasend(.*)', '/api/webhooks(.*)']);
+// 1. Define public routes
+const isPublicRoute = createRouteMatcher([
+  '/', 
+  '/sign-in(.*)', 
+  '/sign-up(.*)', 
+  '/api/intasend(.*)', 
+  '/api/webhooks(.*)'
+]);
 
 export default clerkMiddleware(async (auth, req) => {
-  if (!isPublicRoute(req)) {
-    // This is the simplest, most stable protection method
-    await auth.protect();
+  const session = await auth();
+
+  // 2. Manual Protection Logic (Avoids the .protect() type error)
+  if (!isPublicRoute(req) && !session.userId) {
+    // If user is not logged in and trying to access a private route, redirect to sign-in
+    const signInUrl = new URL('/sign-in', req.url);
+    return NextResponse.redirect(signInUrl);
   }
 });
 
