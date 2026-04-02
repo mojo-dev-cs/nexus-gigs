@@ -91,9 +91,11 @@ export default function Home() {
     }
   }, [currentQuestion, selectedRole, user?.id, surveyQuestions.length]);
 
-  if (!mounted || !isLoaded || step === "checking") return <div className="min-h-screen bg-[#020617]" />;
+  if (!mounted || !isLoaded || step === "checking") {
+    return <div className="min-h-screen bg-[#020617]" />;
+  }
 
-  // --- 1. LANDING PAGE (PUBLIC VIEW) ---
+  // --- 1. LANDING PAGE ---
   if (step === "landing") {
     return (
       <div className="min-h-screen text-white relative font-sans selection:bg-[#00f2ff]/30 overflow-x-hidden bg-[#020617]">
@@ -117,10 +119,14 @@ export default function Home() {
                 <p className="text-gray-400 max-w-md text-sm md:text-base leading-relaxed font-medium italic">Deploy mission-critical code and manage tactical financial settlements with zero-latency overhead.</p>
               </div>
 
+              {/* UPDATED BUTTONS UNDER THE TEXT */}
               <div className="flex flex-col sm:flex-row gap-4 pt-2">
                 <SignUpButton mode="modal">
-                  <button className="px-10 py-5 bg-[#00f2ff] text-black font-black rounded-2xl uppercase text-[11px] italic hover:scale-105 transition-all shadow-xl shadow-[#00f2ff]/20">Initialize Sync →</button>
+                  <button className="px-10 py-5 bg-[#00f2ff] text-black font-black rounded-2xl uppercase text-[11px] italic hover:scale-105 transition-all shadow-xl shadow-[#00f2ff]/20">Get Started →</button>
                 </SignUpButton>
+                <SignInButton mode="modal">
+                  <button className="px-10 py-5 border border-white/10 text-white font-black rounded-2xl uppercase text-[11px] italic hover:bg-white/5 transition-all">Login</button>
+                </SignInButton>
               </div>
             </div>
 
@@ -138,7 +144,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* --- INTRODUCTION FUNCTIONALITY CARDS --- */}
           <section className="grid md:grid-cols-3 gap-6">
             {[
               { icon: "🛡️", title: "Secure Escrow", desc: "USD funds are locked in cryptographic vaults until mission completion." },
@@ -153,7 +158,6 @@ export default function Home() {
             ))}
           </section>
 
-          {/* --- REVIEWS --- */}
           <section className="relative overflow-hidden py-10 border-y border-white/5">
             <div className="flex gap-8 animate-marquee whitespace-nowrap">
               {[...reviews, ...reviews].map((r, i) => (
@@ -170,11 +174,10 @@ export default function Home() {
             </div>
           </section>
 
-          {/* --- LOGO GRID --- */}
           <section className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 pb-20">
             {sponsors.map((brand) => (
               <div key={brand.name} className="bg-white/5 border border-white/10 backdrop-blur-3xl p-3 rounded-2xl flex items-center justify-center h-16 hover:bg-white transition-all group">
-                <img src={brand.logo} alt={brand.name} className="max-h-full object-contain grayscale group-hover:grayscale-0" />
+                <img src={brand.logo} alt={brand.name} className="max-h-full object-contain grayscale group-hover:grayscale-0 transition-all" />
               </div>
             ))}
           </section>
@@ -187,7 +190,7 @@ export default function Home() {
     );
   }
 
-  // --- 2. PATH SELECTION (PRIVATE VIEW) ---
+  // --- 2. PATH SELECTION ---
   if (step === "path") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#020617] p-6 relative">
@@ -227,7 +230,7 @@ export default function Home() {
   // --- 4. 3D LOADER ---
   if (step === "loading") {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#020617] p-6">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#020617] p-6 relative">
         <div className="w-24 h-24 border-t-2 border-[#00f2ff] rounded-full animate-spin mb-10 shadow-[0_0_40px_rgba(0,242,255,0.3)]" />
         <h2 className="text-2xl font-black italic uppercase text-[#00f2ff] animate-pulse tracking-widest">Syncing Node...</h2>
         <div className="w-full max-w-xs h-1 bg-white/5 rounded-full overflow-hidden mt-6">
