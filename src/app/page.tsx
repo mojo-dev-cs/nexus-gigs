@@ -48,12 +48,15 @@ export default function Home() {
   useEffect(() => {
     setMounted(true);
     if (isLoaded) {
-      if (!isSignedIn) setStep("landing");
-      else if (user?.id) {
+      if (!isSignedIn) {
+        setStep("landing");
+      } else if (user?.id) {
         const roleKey = `nexus_user_role_${user.id}`;
         const savedRole = localStorage.getItem(roleKey);
-        if (user.publicMetadata?.role || savedRole) {
-          setSelectedRole((user.publicMetadata?.role as string) || savedRole);
+        const metaRole = user.publicMetadata?.role as string;
+
+        if (metaRole || savedRole) {
+          setSelectedRole(metaRole || savedRole);
           setStep("dashboard");
         } else {
           setStep("path");
@@ -84,24 +87,17 @@ export default function Home() {
           }
           setStep("dashboard");
         }
-      }, 50);
+      }, 30);
     }
   }, [currentQuestion, selectedRole, user?.id, surveyQuestions.length]);
 
   if (!mounted || !isLoaded || step === "checking") return <div className="min-h-screen bg-[#020617]" />;
 
-  // --- 1. LANDING PAGE ---
+  // --- 1. LANDING PAGE (PUBLIC VIEW) ---
   if (step === "landing") {
     return (
-      <div className="min-h-screen text-white relative font-sans selection:bg-[#00f2ff]/30 overflow-x-hidden">
-        <div className="fixed inset-0 bg-[#020617] z-0">
-          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-600/10 blur-[120px] rounded-full animate-pulse" />
-          {[...Array(30)].map((_, i) => (
-            <div key={i} className="absolute bg-white rounded-full animate-pulse" style={{ top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%`, width: '2px', height: '2px', opacity: Math.random() }} />
-          ))}
-        </div>
-
-        <header className="fixed top-0 w-full h-20 z-50 flex items-center justify-between px-8 bg-[#020617]/80 backdrop-blur-md border-b border-white/5">
+      <div className="min-h-screen text-white relative font-sans selection:bg-[#00f2ff]/30 overflow-x-hidden bg-[#020617]">
+        <header className="fixed top-0 w-full h-20 z-50 flex items-center justify-between px-8 bg-[#020617]/90 backdrop-blur-md border-b border-white/5">
           <h1 className="text-xl font-black italic uppercase tracking-tighter">NEXUS<span className="text-[#00f2ff]">GIGS</span></h1>
           <div className="flex gap-4">
              <SignInButton mode="modal"><button className="text-[10px] font-black uppercase italic tracking-widest hover:text-[#00f2ff]">Login</button></SignInButton>
@@ -109,63 +105,63 @@ export default function Home() {
           </div>
         </header>
 
-        <main className="relative z-10 max-w-7xl mx-auto px-6 pt-24 pb-20 space-y-32">
-          <div className="grid lg:grid-cols-2 gap-24 items-start">
-            <div className="space-y-10 animate-in slide-in-from-left-10 duration-1000">
-              <div className="space-y-6">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#00f2ff]/10 border border-[#00f2ff]/20 rounded-full">
-                  <span className="w-2 h-2 bg-[#00f2ff] rounded-full animate-ping" />
-                  <p className="text-[#00f2ff] text-[8px] font-black uppercase italic tracking-widest">Protocol Active</p>
+        <main className="relative z-10 max-w-7xl mx-auto px-6 pt-24 space-y-24">
+          <div className="grid lg:grid-cols-2 gap-16 items-start">
+            <div className="space-y-8 animate-in slide-in-from-left-10 duration-1000">
+              <div className="space-y-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#00f2ff]/10 border border-[#00f2ff]/20 rounded-full">
+                  <span className="w-1.5 h-1.5 bg-[#00f2ff] rounded-full animate-ping" />
+                  <p className="text-[#00f2ff] text-[7px] font-black uppercase italic">V3.0 Uplink Active</p>
                 </div>
-                <h2 className="text-6xl md:text-[8rem] font-black italic uppercase leading-[0.8] tracking-tighter">Scale Your <br /> <span className="text-transparent bg-clip-text bg-linear-to-r from-[#00f2ff] via-blue-400 to-blue-600">Talent</span></h2>
-                <p className="text-gray-400 max-w-md text-sm md:text-base leading-relaxed font-medium italic">Execute mission-critical tasks and clear tactical settlements with zero-latency overhead.</p>
+                <h2 className="text-6xl md:text-[8rem] font-black italic uppercase leading-[0.8] tracking-tighter">Scale Your <br /> <span className="text-transparent bg-clip-text bg-linear-to-r from-[#00f2ff] to-blue-500">Talent</span></h2>
+                <p className="text-gray-400 max-w-md text-sm md:text-base leading-relaxed font-medium italic">Deploy mission-critical code and manage tactical financial settlements with zero-latency overhead.</p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-6 pt-4">
+              <div className="flex flex-col sm:flex-row gap-4 pt-2">
                 <SignUpButton mode="modal">
-                  <button className="px-12 py-6 bg-[#00f2ff] text-black font-black rounded-[25px] uppercase text-[12px] italic hover:scale-110 hover:-rotate-2 transition-all shadow-[0_20px_50px_rgba(0,242,255,0.4)]">Get Started Now →</button>
+                  <button className="px-10 py-5 bg-[#00f2ff] text-black font-black rounded-2xl uppercase text-[11px] italic hover:scale-105 transition-all shadow-xl shadow-[#00f2ff]/20">Initialize Sync →</button>
                 </SignUpButton>
-                <SignInButton mode="modal">
-                  <button className="px-12 py-6 border border-white/10 text-white font-black rounded-[25px] uppercase text-[12px] italic hover:bg-white/5 transition-all">Resume Session</button>
-                </SignInButton>
               </div>
             </div>
 
             <div className="relative animate-in zoom-in-95 duration-1000 delay-300">
-              <div className="relative z-10 rounded-[60px] overflow-hidden border border-white/10 shadow-2xl">
-                <img src="https://images.unsplash.com/photo-1593062096033-9a26b09da705?q=80&w=2000&auto=format&fit=crop" alt="WFH" className="w-full h-137.5 md:h-162.5 object-cover opacity-80" />
+              <div className="relative z-10 rounded-[50px] overflow-hidden border border-white/10 shadow-2xl">
+                <img src="https://images.unsplash.com/photo-1593062096033-9a26b09da705?q=80&w=1200" alt="Work Space" className="w-full h-125 object-cover opacity-80" />
                 <div className="absolute inset-0 bg-linear-to-t from-[#020617] via-transparent to-transparent" />
               </div>
-              <div className="absolute top-10 left-10 z-20 px-6 py-4 bg-black/60 backdrop-blur-2xl border border-[#00f2ff]/30 rounded-2xl animate-bounce duration-[4s] shadow-2xl">
-                <p className="text-[10px] font-black uppercase text-[#00f2ff]">👤 1.5M+ Nodes</p>
+              <div className="absolute top-10 left-5 z-20 px-5 py-3 bg-black/60 backdrop-blur-2xl border border-[#00f2ff]/30 rounded-xl animate-bounce duration-[4s]">
+                <p className="text-[9px] font-black uppercase text-[#00f2ff]">👤 1.5M+ Nodes</p>
               </div>
-              <div className="absolute bottom-20 right-10 z-20 px-6 py-4 bg-black/60 backdrop-blur-2xl border border-emerald-500/30 rounded-2xl animate-bounce duration-[6s] shadow-2xl">
-                <p className="text-[10px] font-black uppercase text-emerald-400">💰 $2M+ Yield</p>
+              <div className="absolute bottom-10 right-5 z-20 px-5 py-3 bg-black/60 backdrop-blur-2xl border border-emerald-500/30 rounded-xl animate-bounce duration-[6s]">
+                <p className="text-[9px] font-black uppercase text-emerald-400">💰 $2M+ Flow (USD)</p>
               </div>
             </div>
           </div>
 
-          <section className="grid md:grid-cols-2 gap-8">
-            <div className="p-10 bg-white/5 border border-white/10 rounded-[50px] hover:border-[#00f2ff]/50 transition-all group">
-              <div className="w-16 h-16 bg-[#00f2ff]/10 rounded-2xl flex items-center justify-center text-3xl mb-8 group-hover:bg-[#00f2ff] group-hover:text-black transition-all">💼</div>
-              <h3 className="text-3xl font-black italic uppercase mb-4">Freelancer Guide</h3>
-              <p className="text-gray-500 text-sm italic font-bold uppercase tracking-widest leading-relaxed">Sync your node, browse tactical missions, and settle your yield in USD instantly post-execution.</p>
-            </div>
-            <div className="p-10 bg-white/5 border border-white/10 rounded-[50px] hover:border-purple-500/50 transition-all group">
-              <div className="w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center text-3xl mb-8 group-hover:bg-purple-500 transition-all">🎯</div>
-              <h3 className="text-3xl font-black italic uppercase mb-4">Client Guide</h3>
-              <p className="text-gray-500 text-sm italic font-bold uppercase tracking-widest leading-relaxed">Deploy high-priority missions, recruit elite talent nodes, and manage payments via secure escrow.</p>
-            </div>
+          {/* --- INTRODUCTION FUNCTIONALITY CARDS --- */}
+          <section className="grid md:grid-cols-3 gap-6">
+            {[
+              { icon: "🛡️", title: "Secure Escrow", desc: "USD funds are locked in cryptographic vaults until mission completion." },
+              { icon: "⚡", title: "Instant Relay", desc: "Payouts are cleared via M-Pesa or Direct Bank in under 60 seconds." },
+              { icon: "🌍", title: "Global Gigs", desc: "Access high-tier tactical missions from premium international clients." }
+            ].map((card, i) => (
+              <div key={i} className="p-8 bg-white/3 border border-white/10 rounded-[40px] hover:border-[#00f2ff]/40 transition-all group shadow-2xl">
+                <div className="w-14 h-14 bg-[#00f2ff]/10 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">{card.icon}</div>
+                <h3 className="text-xl font-black italic uppercase text-white mb-3 tracking-tight">{card.title}</h3>
+                <p className="text-gray-500 text-[10px] font-bold uppercase leading-relaxed italic">{card.desc}</p>
+              </div>
+            ))}
           </section>
 
-          <section className="relative overflow-hidden py-14 border-y border-white/5">
-            <div className="flex gap-10 animate-marquee whitespace-nowrap marquee-container">
+          {/* --- REVIEWS --- */}
+          <section className="relative overflow-hidden py-10 border-y border-white/5">
+            <div className="flex gap-8 animate-marquee whitespace-nowrap">
               {[...reviews, ...reviews].map((r, i) => (
-                <div key={i} className="inline-flex items-center gap-5 bg-black/40 border border-white/10 p-5 rounded-[30px] min-w-[320px] backdrop-blur-3xl">
-                  <img src={r.img} alt={r.name} className="w-12 h-12 rounded-full border-2 border-[#00f2ff]" />
+                <div key={i} className="inline-flex items-center gap-4 bg-black/40 border border-white/10 p-4 rounded-3xl min-w-70 backdrop-blur-xl">
+                  <img src={r.img} alt={r.name} className="w-10 h-10 rounded-full border border-[#00f2ff]" />
                   <div className="text-left">
-                    <p className="text-[11px] font-black uppercase italic text-white leading-none">{r.name}</p>
-                    <div className="flex gap-0.5 mt-2 text-yellow-500 text-[10px] drop-shadow-[0_0_5px_#f59e0b]">
+                    <p className="text-[10px] font-black uppercase italic text-white">{r.name}</p>
+                    <div className="flex gap-0.5 mt-1 text-yellow-500 text-[9px] drop-shadow-[0_0_5px_#f59e0b]">
                         {[...Array(r.stars)].map((_, si) => <span key={si}>★</span>)}
                     </div>
                   </div>
@@ -174,10 +170,11 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6 pb-20">
+          {/* --- LOGO GRID --- */}
+          <section className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 pb-20">
             {sponsors.map((brand) => (
-              <div key={brand.name} className="bg-white/5 border border-white/10 backdrop-blur-3xl p-4 rounded-[25px] flex items-center justify-center h-20 hover:bg-white transition-all duration-500 group">
-                <img src={brand.logo} alt={brand.name} className="max-h-full object-contain grayscale group-hover:grayscale-0 transition-all" />
+              <div key={brand.name} className="bg-white/5 border border-white/10 backdrop-blur-3xl p-3 rounded-2xl flex items-center justify-center h-16 hover:bg-white transition-all group">
+                <img src={brand.logo} alt={brand.name} className="max-h-full object-contain grayscale group-hover:grayscale-0" />
               </div>
             ))}
           </section>
@@ -185,17 +182,15 @@ export default function Home() {
         <style jsx global>{`
           @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
           .animate-marquee { animation: marquee 30s linear infinite; }
-          .marquee-container:hover { animation-play-state: paused; }
         `}</style>
       </div>
     );
   }
 
-  // --- 2. PATH SELECTION ---
+  // --- 2. PATH SELECTION (PRIVATE VIEW) ---
   if (step === "path") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#020617] p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-blue-600/5 blur-[120px] rounded-full animate-pulse" />
+      <div className="min-h-screen flex items-center justify-center bg-[#020617] p-6 relative">
         <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-10 max-w-5xl w-full animate-in zoom-in-95 duration-700">
            <button onClick={() => handleRoleSelect('freelancer')} className="p-16 bg-white/5 border border-white/10 rounded-[60px] text-left group hover:border-[#00f2ff] transition-all">
               <div className="w-20 h-20 bg-[#00f2ff]/10 rounded-3xl flex items-center justify-center text-4xl mb-10 group-hover:bg-[#00f2ff] group-hover:text-black transition-all">💼</div>
@@ -217,14 +212,11 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#020617] p-6">
         <div className="max-w-md w-full bg-black/60 backdrop-blur-3xl border border-white/10 p-12 rounded-[50px] relative z-10 animate-in slide-in-from-bottom-10">
-           <div className="flex justify-between items-center mb-10 text-white font-black italic uppercase text-[10px] tracking-widest">
-              <p className="text-[#00f2ff]">Protocol Calibration</p>
-              <p>Step {currentQuestion + 1} / 10</p>
-           </div>
+           <p className="text-[10px] font-black text-[#00f2ff] uppercase italic mb-8 tracking-widest">Step {currentQuestion + 1} / 10</p>
            <h2 className="text-2xl font-black italic uppercase text-white mb-10 border-l-4 border-[#00f2ff] pl-6 leading-tight">{surveyQuestions[currentQuestion].q}</h2>
            <div className="grid gap-4">
               {surveyQuestions[currentQuestion].options.map(o => (
-                <button key={o} onClick={handleSurveyAnswer} className="w-full py-5 px-8 bg-white/5 border border-white/10 rounded-2xl text-left text-[11px] font-black uppercase italic hover:bg-white hover:text-black transition-all active:scale-95">{o}</button>
+                <button key={o} onClick={handleSurveyAnswer} className="w-full py-5 px-8 bg-white/5 border border-white/10 rounded-2xl text-left text-[10px] font-black uppercase italic hover:bg-white hover:text-black transition-all">{o}</button>
               ))}
            </div>
         </div>
@@ -232,23 +224,14 @@ export default function Home() {
     );
   }
 
-  // --- 4. 3D MODERN LOADING ---
+  // --- 4. 3D LOADER ---
   if (step === "loading") {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#020617] p-6 relative">
-        <div className="relative z-10 w-full max-w-sm text-center">
-           <div className="relative mb-16">
-              <div className="w-28 h-28 border-4 border-white/10 rounded-full mx-auto" />
-              <div className="absolute inset-0 w-28 h-28 border-t-2 border-[#00f2ff] rounded-full animate-spin mx-auto shadow-[0_0_50px_#00f2ff55]" />
-           </div>
-           <h2 className="text-3xl font-black italic uppercase text-[#00f2ff] mb-12 animate-pulse tracking-[0.3em]">Synchronizing Node</h2>
-           <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/10">
-              <div className="h-full bg-linear-to-r from-[#00f2ff] to-blue-500 transition-all duration-300" style={{ width: `${loadingProgress}%` }} />
-           </div>
-           <div className="flex justify-between w-full mt-6 text-[10px] font-black uppercase italic tracking-widest text-gray-500">
-              <p>Holographic Uplink Active</p>
-              <p className="text-[#00f2ff]">{loadingProgress}%</p>
-           </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#020617] p-6">
+        <div className="w-24 h-24 border-t-2 border-[#00f2ff] rounded-full animate-spin mb-10 shadow-[0_0_40px_rgba(0,242,255,0.3)]" />
+        <h2 className="text-2xl font-black italic uppercase text-[#00f2ff] animate-pulse tracking-widest">Syncing Node...</h2>
+        <div className="w-full max-w-xs h-1 bg-white/5 rounded-full overflow-hidden mt-6">
+           <div className="h-full bg-linear-to-r from-[#00f2ff] to-blue-500" style={{ width: `${loadingProgress}%` }} />
         </div>
       </div>
     );
@@ -257,7 +240,7 @@ export default function Home() {
   // --- 5. DASHBOARD ---
   if (step === "dashboard") {
     return (
-      <main className="min-h-screen bg-[#020617] animate-in fade-in duration-1000">
+      <main className="min-h-screen bg-[#020617]">
         {selectedRole === "freelancer" ? <FreelancerView jobs={[]} userMetadata={user?.publicMetadata || {}} /> : <ClientView jobs={[]} />}
       </main>
     );
