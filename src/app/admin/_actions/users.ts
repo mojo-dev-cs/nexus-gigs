@@ -13,6 +13,7 @@ export async function getAllNexusUsers() {
       email: u.emailAddresses[0]?.emailAddress || "N/A",
       status: (u.publicMetadata.status as string) || "Pending",
       banned: u.banned,
+      createdAt: u.createdAt, // Needed for Today's Revenue
       joined: new Date(u.createdAt).toLocaleDateString(),
     }));
     return { success: true, users };
