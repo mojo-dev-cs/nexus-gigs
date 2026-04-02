@@ -5,11 +5,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { amount, phone, email, firstName, lastName, method, api_ref } = body;
 
-    // Validate keys exist before calling IntaSend
-    if (!process.env.INTASEND_SECRET_KEY || !process.env.NEXT_PUBLIC_INTASEND_PUBLISHABLE_KEY) {
-      return NextResponse.json({ success: false, message: "Server configuration missing keys." }, { status: 500 });
-    }
-
+    // 1. Prepare Payload
     const payload = {
       public_key: process.env.NEXT_PUBLIC_INTASEND_PUBLISHABLE_KEY,
       amount: amount,
@@ -18,11 +14,12 @@ export async function POST(req: Request) {
       phone_number: phone,
       first_name: firstName,
       last_name: lastName,
-      api_ref: api_ref || `nexus_${Date.now()}`,
+      api_ref: api_ref,
       redirect_url: `https://nexus-gigs.vercel.app/dashboard`,
       method: method === "M-PESA" ? "MPESA" : "CARD",
     };
 
+    // 2. LIVE UPLINK (Must use payment.intasend.com, NOT sandbox)
     const response = await fetch("https://payment.intasend.com/api/v1/checkout/", {
       method: "POST",
       headers: {
@@ -35,13 +32,17 @@ export async function POST(req: Request) {
     const data = await response.json();
 
     if (!response.ok) {
-      return NextResponse.json({ success: false, message: data.detail || "Gateway rejected sync." }, { status: 400 });
+      console.error("IntaSend API Error Details:", data);
+      return NextResponse.json({ 
+        success: false, 
+        message: data.detail || "Gateway rejected synchronization." 
+      }, { status: 400 });
     }
 
     return NextResponse.json({ success: true, url: data.url });
 
   } catch (error) {
-    console.error("Payment Relay Error:", error);
+    console.error("Internal Relay Error:", error);
     return NextResponse.json({ success: false, message: "Internal server error." }, { status: 500 });
   }
 }
