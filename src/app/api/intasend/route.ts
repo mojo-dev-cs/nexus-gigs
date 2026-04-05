@@ -7,19 +7,18 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { amount, phone, email, firstName, lastName, method, api_ref } = body;
 
-    const payload = {
-      public_key: process.env.NEXT_PUBLIC_INTASEND_PUBLISHABLE_KEY,
-      amount: amount,
-      currency: "KES",
-      email: email,
-      phone_number: phone.replace(/\s+/g, ''),
-      first_name: firstName || "Nexus",
-      last_name: lastName || "User",
-      api_ref: api_ref,
-      redirect_url: `https://www.nexusgigs.me/dashboard`, 
-      method: method === "M-PESA" ? "MPESA" : "CARD",
-    };
-
+const payload = {
+  public_key: process.env.NEXT_PUBLIC_INTASEND_PUBLISHABLE_KEY,
+  amount: amount,
+  currency: "KES",
+  email: email || "user@nexusgigs.me", // Fallback email
+  phone_number: phone.replace(/\D/g, ''), 
+  first_name: firstName || "Nexus",
+  last_name: lastName || "Member",
+  api_ref: api_ref,
+  redirect_url: `https://www.nexusgigs.me/dashboard`, 
+  method: method === "M-PESA" ? "MPESA" : "CARD",
+};
     const response = await fetch("https://payment.intasend.com/api/v1/checkout/", {
       method: "POST",
       headers: {
