@@ -6,7 +6,11 @@ const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY 
 
 export async function getAllNexusUsers() {
   try {
-    const response = await clerkClient.users.getUserList();
+    const response = await clerkClient.users.getUserList({
+      limit: 500,
+      orderBy: '-created_at',
+    });
+
     const users = response.data.map((u) => ({
       id: u.id,
       name: `${u.firstName || ""} ${u.lastName || ""}`.trim() || "Unknown Node",
@@ -33,17 +37,17 @@ export async function verifyUserNode(userId: string) {
   } catch (e) { return { success: false }; }
 }
 
-export async function terminateUserNode(userId: string) {
-  try {
-    await clerkClient.users.deleteUser(userId);
-    return { success: true };
-  } catch (e) { return { success: false }; }
-}
-
 export async function suspendUserNode(userId: string, ban: boolean) {
   try {
     if (ban) await clerkClient.users.banUser(userId);
     else await clerkClient.users.unbanUser(userId);
+    return { success: true };
+  } catch (e) { return { success: false }; }
+}
+
+export async function terminateUserNode(userId: string) {
+  try {
+    await clerkClient.users.deleteUser(userId);
     return { success: true };
   } catch (e) { return { success: false }; }
 }
