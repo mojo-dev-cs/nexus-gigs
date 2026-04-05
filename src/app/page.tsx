@@ -133,7 +133,7 @@ export default function Home() {
           </div>
         </header>
 
-        <main className="relative z-10 max-w-7xl mx-auto px-6 pt-12 space-y-20">
+        <main className="relative z-10 max-w-7xl mx-auto px-6 pt-24 space-y-20">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <div className="space-y-4">
@@ -146,15 +146,7 @@ export default function Home() {
                 </h2>
                 <p className="text-gray-400 max-w-md text-lg leading-relaxed font-medium italic border-l-2 border-[#00f2ff]/40 pl-6">Command high-tier code. Secure global settlements. The future is your mission.</p>
               </div>
-
-              <div className="flex flex-col sm:flex-row gap-4 pt-2">
-                <SignUpButton mode="modal">
-                  <button onClick={() => triggerWarp(() => {})} className="px-12 py-6 bg-[#00f2ff] text-black font-black rounded-2xl uppercase text-[12px] italic shadow-[0_20px_40px_rgba(0,242,255,0.2)] hover:scale-105 transition-all">Get Started Now →</button>
-                </SignUpButton>
-                <SignInButton mode="modal">
-                  <button onClick={() => triggerWarp(() => {})} className="px-12 py-6 border border-white/10 text-white font-black rounded-2xl uppercase text-[12px] italic hover:bg-white/5 transition-all">Login</button>
-                </SignInButton>
-              </div>
+              {/* HERO BUTTONS REMOVED AS REQUESTED */}
             </div>
 
             <div className="relative">
@@ -163,7 +155,7 @@ export default function Home() {
                 <div className="absolute inset-0 bg-linear-to-t from-[#020617] via-transparent to-transparent" />
               </div>
               
-              {/* MODERN STAT CARDS BELOW IMAGE */}
+              {/* MODERN STAT CARDS */}
               <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[110%] grid grid-cols-2 md:grid-cols-4 gap-4 z-20">
                 {[
                   { icon: <Users size={16}/>, label: "Total Nodes", val: "1.5M+", color: "text-[#00f2ff]" },
