@@ -7,18 +7,22 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { amount, phone, email, firstName, lastName, method, api_ref } = body;
 
-const payload = {
-  public_key: process.env.NEXT_PUBLIC_INTASEND_PUBLISHABLE_KEY,
-  amount: amount,
-  currency: "KES",
-  email: email || "user@nexusgigs.me", // Fallback email
-  phone_number: phone.replace(/\D/g, ''), 
-  first_name: firstName || "Nexus",
-  last_name: lastName || "Member",
-  api_ref: api_ref,
-  redirect_url: `https://www.nexusgigs.me/dashboard`, 
-  method: method === "M-PESA" ? "MPESA" : "CARD",
-};
+    // Clean phone number: remove anything that isn't a digit
+    const cleanPhone = phone.replace(/\D/g, '');
+
+    const payload = {
+      public_key: process.env.NEXT_PUBLIC_INTASEND_PUBLISHABLE_KEY,
+      amount: Number(amount),
+      currency: "KES",
+      email: email || "support@nexusgigs.me",
+      phone_number: cleanPhone,
+      first_name: firstName?.trim() || "Nexus",
+      last_name: lastName?.trim() || "Member",
+      api_ref: api_ref,
+      redirect_url: `https://www.nexusgigs.me/dashboard`,
+      method: method === "M-PESA" ? "MPESA" : "CARD",
+    };
+
     const response = await fetch("https://payment.intasend.com/api/v1/checkout/", {
       method: "POST",
       headers: {
@@ -31,8 +35,8 @@ const payload = {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("IntaSend Error Details:", data);
-      return NextResponse.json({ success: false, message: data.detail || "Handshake Denied" }, { status: 400 });
+      console.error("IntaSend Rejection Reason:", JSON.stringify(data));
+      return NextResponse.json({ success: false, message: "Handshake Denied" }, { status: 400 });
     }
 
     return NextResponse.json({ success: true, url: data.url });
