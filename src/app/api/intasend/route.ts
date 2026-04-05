@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: Request) {
   try {
-    const { amount, phone, email, firstName, lastName, method, api_ref } = await req.json();
+    const body = await req.json();
+    const { amount, phone, email, firstName, lastName, method, api_ref } = body;
 
     const payload = {
       public_key: process.env.NEXT_PUBLIC_INTASEND_PUBLISHABLE_KEY,
@@ -10,8 +13,8 @@ export async function POST(req: Request) {
       currency: "KES",
       email: email,
       phone_number: phone.replace(/\s+/g, ''),
-      first_name: firstName,
-      last_name: lastName,
+      first_name: firstName || "Nexus",
+      last_name: lastName || "User",
       api_ref: api_ref,
       redirect_url: `https://www.nexusgigs.me/dashboard`, 
       method: method === "M-PESA" ? "MPESA" : "CARD",
@@ -27,11 +30,16 @@ export async function POST(req: Request) {
     });
 
     const data = await response.json();
-    return response.ok 
-      ? NextResponse.json({ success: true, url: data.url })
-      : NextResponse.json({ success: false, message: data.detail }, { status: 400 });
+
+    if (!response.ok) {
+      console.error("IntaSend Error Details:", data);
+      return NextResponse.json({ success: false, message: data.detail || "Handshake Denied" }, { status: 400 });
+    }
+
+    return NextResponse.json({ success: true, url: data.url });
 
   } catch (error) {
+    console.error("Server Crash:", error);
     return NextResponse.json({ success: false, message: "Signal Offline" }, { status: 500 });
   }
 }
