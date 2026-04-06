@@ -46,17 +46,49 @@ export default function Home() {
     { name: "John D.", role: "Python Specialist", img: "https://i.pravatar.cc/150?u=3", stars: 4 },
   ], []);
 
+  // --- UPDATED SURVEY QUESTIONS ---
   const surveyQuestions = useMemo(() => [
-    { q: "Experience level with remote contract work?", options: ["Entry (<1 yr)", "Mid-Tier (2-5 yrs)", "Elite (5+ yrs)"] },
-    { q: "Target monthly revenue bracket (USD)?", options: ["< $500", "$500 - $2,000", "$5,000+"] },
-    { q: "Primary technical focus?", options: ["Software", "AI", "Design", "Cyber"] },
-    { q: "Weekly node availability?", options: ["< 10 hrs", "20-30 hrs", "40+ hrs"] },
-    { q: "Ready for Node Activation fee?", options: ["Immediate Sync", "48 hrs", "Requires Sponsorship"] },
-    { q: "Primary payment relay?", options: ["Instant Payout (USD)", "Direct Bank (USD)", "Crypto (Web3)"] },
-    { q: "Long-term mission?", options: ["Tactical Gigs", "Strategic Missions", "Founding an Agency"] },
-    { q: "Status of operating hardware?", options: ["H-Tier (Low latency)", "Standard", "Need Uplink"] },
-    { q: "Comfort level with global high-command clients?", options: ["High", "Moderate", "Needs Onboarding"] },
-    { q: "Ready to initialize immediate node sync?", options: ["Confirmed: Ready", "Standby: 24h"] },
+    { 
+      q: "What is your main reason for joining NexusGigs?", 
+      options: ["I want to find freelance work and earn money", "I want to hire freelancers for my projects", "I want to do both (freelance and hire)", "Just exploring the platform for now"] 
+    },
+    { 
+      q: "What is your primary goal on NexusGigs?", 
+      options: ["Find and apply for gigs quickly", "Build long-term client relationships", "Earn more income from freelance work", "Hire reliable freelancers for my projects", "Explore opportunities (just browsing)"] 
+    },
+    { 
+      q: "How experienced are you as a freelancer?", 
+      options: ["Beginner (just starting)", "Intermediate (have done a few projects)", "Experienced (regular freelance work)", "Professional (full-time freelancer)"] 
+    },
+    { 
+      q: "Which categories are you most interested in?", 
+      options: ["Web & App Development", "Graphic Design & UI/UX", "Writing & Content Creation", "Digital Marketing & SEO", "Video Editing & Animation", "Data Entry & Virtual Assistance", "Other"] 
+    },
+    { 
+      q: "What is your preferred way of working?", 
+      options: ["Short-term gigs (1–7 days)", "Medium projects (1–4 weeks)", "Long-term or ongoing work", "One-off tasks"] 
+    },
+    { 
+      q: "Where are you located?", 
+      options: ["Kenya", "Other African country", "Europe", "North America", "Asia", "Other"] 
+    },
+    { 
+      q: "How did you hear about NexusGigs?", 
+      options: ["Instagram / TikTok", "WhatsApp / Friend referral", "Google Search", "Facebook", "Other"] 
+    },
+    { 
+      q: "What payment method do you prefer?", 
+      options: ["M-Pesa (Kenya)", "Binance / Crypto", "Bank Transfer", "PayPal or International", "No preference"] 
+    },
+    { 
+      q: "Would you like personalized gig recommendations?", 
+      options: ["Yes, show me relevant gigs right away", "Yes, but only after I complete my profile", "No thanks"] 
+    },
+    { 
+      q: "Anything else we should know? (Optional)", 
+      options: [], // Empty options indicates a text area for the final step
+      isOptional: true 
+    },
   ], []);
 
   useEffect(() => {
@@ -110,7 +142,6 @@ export default function Home() {
       >
         <RocketWarp active={isWarping} />
         
-        {/* SPACE BACKGROUND */}
         <div className="fixed inset-0 z-0 pointer-events-none">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,242,255,0.05)_0%,transparent_70%)]" />
           <div className="stars-animation" />
@@ -146,7 +177,6 @@ export default function Home() {
                 </h2>
                 <p className="text-gray-400 max-w-md text-lg leading-relaxed font-medium italic border-l-2 border-[#00f2ff]/40 pl-6">Command high-tier code. Secure global settlements. The future is your mission.</p>
               </div>
-              {/* HERO BUTTONS REMOVED AS REQUESTED */}
             </div>
 
             <div className="relative">
@@ -155,7 +185,6 @@ export default function Home() {
                 <div className="absolute inset-0 bg-linear-to-t from-[#020617] via-transparent to-transparent" />
               </div>
               
-              {/* MODERN STAT CARDS */}
               <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[110%] grid grid-cols-2 md:grid-cols-4 gap-4 z-20">
                 {[
                   { icon: <Users size={16}/>, label: "Total Nodes", val: "1.5M+", color: "text-[#00f2ff]" },
@@ -202,7 +231,6 @@ export default function Home() {
     );
   }
 
-  // --- 2. PATH SELECTION ---
   if (step === "path") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#020617] p-6 relative">
@@ -223,25 +251,39 @@ export default function Home() {
     );
   }
 
-  // --- 3. SURVEY ---
+  // --- UPDATED SURVEY RENDERER ---
   if (step === "survey") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#020617] p-6">
         <RocketWarp active={isWarping} />
         <div className="max-w-md w-full bg-black/60 backdrop-blur-3xl border border-white/10 p-12 rounded-[50px] relative z-10">
-           <p className="text-[10px] font-black text-[#00f2ff] uppercase italic mb-8 tracking-widest">Step {currentQuestion + 1} / 10</p>
+           <p className="text-[10px] font-black text-[#00f2ff] uppercase italic mb-8 tracking-widest">Step {currentQuestion + 1} / {surveyQuestions.length}</p>
            <h2 className="text-2xl font-black italic uppercase text-white mb-10 border-l-4 border-[#00f2ff] pl-6 leading-tight">{surveyQuestions[currentQuestion].q}</h2>
-           <div className="grid gap-4">
-              {surveyQuestions[currentQuestion].options.map(o => (
-                <button key={o} onClick={handleSurveyAnswer} className="w-full py-5 px-8 bg-white/5 border border-white/10 rounded-2xl text-left text-[10px] font-black uppercase italic hover:bg-white hover:text-black transition-all">{o}</button>
-              ))}
-           </div>
+           
+           {surveyQuestions[currentQuestion].options.length > 0 ? (
+             <div className="grid gap-4">
+                {surveyQuestions[currentQuestion].options.map(o => (
+                  <button key={o} onClick={handleSurveyAnswer} className="w-full py-5 px-8 bg-white/5 border border-white/10 rounded-2xl text-left text-[10px] font-black uppercase italic hover:bg-white hover:text-black transition-all">{o}</button>
+                ))}
+             </div>
+           ) : (
+             <div className="space-y-6">
+                <textarea 
+                  placeholder="Type your response here..." 
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-white text-xs font-bold outline-none focus:border-[#00f2ff] transition-all"
+                  rows={4}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <button onClick={handleSurveyAnswer} className="py-5 bg-white/5 border border-white/10 rounded-2xl text-center text-[10px] font-black uppercase italic hover:text-[#00f2ff] transition-all">Skip</button>
+                  <button onClick={handleSurveyAnswer} className="py-5 bg-[#00f2ff] text-black rounded-2xl text-center text-[10px] font-black uppercase italic hover:scale-105 transition-all">Complete Sync</button>
+                </div>
+             </div>
+           )}
         </div>
       </div>
     );
   }
 
-  // --- 4. LOADING ---
   if (step === "loading") {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#020617] p-6 relative">
