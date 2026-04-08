@@ -12,7 +12,8 @@ import {
   Star, Clock, Bell, Info, ShieldAlert, CheckCircle2,
   Cpu, Moon, Palette, Fingerprint, ChevronDown, MousePointer2,
   Activity, Landmark, Bitcoin, HelpCircle, LifeBuoy, X, CheckCircle, Box,
-  ShieldQuestion, UserCircle, DollarSign, ArrowUpRight, History
+  ShieldQuestion, UserCircle, DollarSign, ArrowUpRight, History,
+  Shield, QrCode, ScanFace, Award, Target
 } from "lucide-react";
 
 export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetadata: any }) => {
@@ -37,7 +38,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
     setCustomAlert({ show: true, title, msg, type });
   };
 
-  // --- 🛰️ AUTO-SYNC AFTER PAYMENT ---
   useEffect(() => {
     const finalizeHandshake = async () => {
       if (searchParams.get("payment") === "success" && isLoaded && user && !isVerified) {
@@ -142,7 +142,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
       <div className="max-w-5xl mx-auto pt-4 px-4 relative z-10">
         <AnimatePresence mode="wait">
           
-          {/* --- HOME --- */}
+          {/* --- 🏠 HOME --- */}
           {activeTab === "home" && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
               <header className="flex justify-between items-center bg-white/5 backdrop-blur-xl p-5 rounded-[25px] border border-white/10">
@@ -174,7 +174,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             </motion.div>
           )}
 
-          {/* --- GIGS --- */}
+          {/* --- 💼 GIGS --- */}
           {activeTab === "tasks" && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
               <h3 className="text-xl font-bold uppercase">Available <span className="text-[#00f2ff]">Jobs</span></h3>
@@ -204,7 +204,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             </motion.div>
           )}
 
-          {/* --- WORK --- */}
+          {/* --- 📜 WORK --- */}
           {activeTab === "contracts" && (
             <div className="pt-10">
                <div className="p-10 bg-white/5 border border-red-500/20 rounded-[35px] text-center space-y-4 max-w-md mx-auto">
@@ -216,131 +216,253 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             </div>
           )}
 
-          {/* --- VAULT (NEW MODERN WALLET) --- */}
+          {/* --- 💬 CHATS (RECONSTRUCTED) --- */}
+          {activeTab === "messages" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+               <div className="flex justify-between items-center px-2">
+                  <h3 className="text-xl font-bold uppercase">Console <span className="text-[#00f2ff]">Feed</span></h3>
+                  <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 rounded-full border border-emerald-500/20">
+                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                    <span className="text-[8px] font-bold text-emerald-500 uppercase">Secure Link Active</span>
+                  </div>
+               </div>
+               
+               <div className="space-y-3">
+                  {[
+                    { id: 0, t: "Nexus Protocol", m: "Welcome, Node Identity Alpha. To initiate global gig access and secure payouts, your $10 validation handshake is required.", time: "Just now", type: "system", icon: <Shield size={14} className="text-[#00f2ff]"/> },
+                    { id: 1, t: "Client: Sarah J.", m: "Hey! I'm interested in your profile for a travel blog project. Please verify so we can start chatting.", time: "2h ago", type: "client", icon: <UserCircle size={14} className="text-white"/> },
+                    { id: 2, t: "Global Marketplace", m: "Surge Alert: Digital Marketing and Writing gigs are up by 15% today. Verify now to bid.", time: "5h ago", type: "alert", icon: <Zap size={14} className="text-amber-500"/> }
+                  ].map((chat, i) => (
+                    <motion.div 
+                      key={i} 
+                      whileHover={{ scale: 1.01 }}
+                      onClick={() => setExpandedMsg(expandedMsg === i ? null : i)}
+                      className={`p-5 rounded-[28px] border transition-all cursor-pointer relative overflow-hidden ${chat.type === 'system' ? 'bg-[#00f2ff]/5 border-[#00f2ff]/20' : 'bg-white/5 border-white/5'}`}
+                    >
+                       <div className="flex gap-4 items-start relative z-10">
+                          <div className="p-3 bg-black/40 rounded-xl border border-white/5">{chat.icon}</div>
+                          <div className="flex-1">
+                             <div className="flex justify-between items-center mb-1">
+                                <h4 className={`text-xs font-black uppercase italic ${chat.type === 'system' ? 'text-[#00f2ff]' : 'text-white'}`}>{chat.t}</h4>
+                                <span className="text-[7px] font-bold text-gray-600 uppercase">{chat.time}</span>
+                             </div>
+                             <p className="text-[10px] text-gray-400 line-clamp-1 group-hover:line-clamp-none">{chat.m}</p>
+                             <AnimatePresence>
+                               {expandedMsg === i && (
+                                 <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="mt-4 pt-4 border-t border-white/5">
+                                    <p className="text-[10px] text-gray-300 leading-relaxed italic">{chat.m}</p>
+                                    <button onClick={() => !isVerified && setShowVerifyModal(true)} className="mt-4 px-6 py-2 bg-white text-black text-[9px] font-bold uppercase rounded-lg">Reply (Verify Node)</button>
+                                 </motion.div>
+                               )}
+                             </AnimatePresence>
+                          </div>
+                       </div>
+                    </motion.div>
+                  ))}
+               </div>
+            </motion.div>
+          )}
+
+          {/* --- 💰 VAULT (PREMIUM WALLET) --- */}
           {activeTab === "earnings" && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
                <div className="flex justify-between items-center">
                   <h3 className="text-xl font-bold uppercase">My <span className="text-[#00f2ff]">Vault</span></h3>
-                  <div className="p-2 bg-white/5 rounded-lg flex gap-2">
-                     <button onClick={() => setCurrency("USD")} className={`px-3 py-1 rounded-md text-[9px] font-bold transition-all ${currency === "USD" ? "bg-[#00f2ff] text-black" : "text-gray-500"}`}>USD</button>
-                     <button onClick={() => setCurrency("KES")} className={`px-3 py-1 rounded-md text-[9px] font-bold transition-all ${currency === "KES" ? "bg-[#00f2ff] text-black" : "text-gray-500"}`}>KES</button>
+                  <div className="p-1.5 bg-white/5 rounded-xl flex gap-1 border border-white/5">
+                     <button onClick={() => setCurrency("USD")} className={`px-4 py-1.5 rounded-lg text-[8px] font-black transition-all ${currency === "USD" ? "bg-[#00f2ff] text-black shadow-lg" : "text-gray-500 hover:text-white"}`}>USD</button>
+                     <button onClick={() => setCurrency("KES")} className={`px-4 py-1.5 rounded-lg text-[8px] font-black transition-all ${currency === "KES" ? "bg-[#00f2ff] text-black shadow-lg" : "text-gray-500 hover:text-white"}`}>KES</button>
                   </div>
                </div>
 
-               {/* Premium Card */}
+               {/* Premium Card Layout */}
                <div className="relative group perspective-1000">
-                  <div className="w-full h-56 bg-linear-to-br from-white/15 to-white/5 backdrop-blur-3xl border border-white/20 rounded-[40px] p-10 flex flex-col justify-between shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#00f2ff]/5 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-[#00f2ff]/10 transition-all" />
+                  <div className="w-full h-52 bg-linear-to-br from-white/15 to-white/5 backdrop-blur-3xl border border-white/20 rounded-[45px] p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden ring-1 ring-white/10">
+                    <div className="absolute -top-10 -right-10 w-48 h-48 bg-[#00f2ff]/5 rounded-full blur-3xl group-hover:bg-[#00f2ff]/10 transition-all duration-1000" />
+                    <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-blue-500/5 rounded-full blur-3xl" />
+                    
                     <div className="flex justify-between items-start relative z-10">
-                       <div>
-                          <p className="text-[10px] font-bold text-[#00f2ff] uppercase tracking-widest mb-1">Current Balance</p>
-                          <h4 className="text-5xl font-black">{currency === "USD" ? "$0.00" : "KES 0.00"}</h4>
+                       <div className="space-y-1">
+                          <p className="text-[9px] font-bold text-[#00f2ff] uppercase tracking-[0.3em]">Available Assets</p>
+                          <h4 className="text-5xl font-black italic tracking-tighter">{currency === "USD" ? "$0.00" : "KES 0"}</h4>
                        </div>
-                       <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10"><Zap className="text-[#00f2ff]" size={24} /></div>
+                       <div className="w-12 h-12 bg-white/5 rounded-[20px] flex items-center justify-center border border-white/10 shadow-inner backdrop-blur-md"><Zap className="text-[#00f2ff]" size={20} /></div>
                     </div>
+                    
                     <div className="flex justify-between items-end relative z-10">
-                       <div>
-                          <p className="text-[8px] font-bold text-gray-500 uppercase mb-1">Account Node</p>
-                          <p className="text-xs font-mono tracking-widest">{user?.id?.substring(0, 12).toUpperCase()}</p>
+                       <div className="space-y-1">
+                          <p className="text-[7px] font-bold text-gray-500 uppercase tracking-widest">Node ID</p>
+                          <p className="text-[10px] font-mono tracking-widest text-white/60">ID_{user?.id?.substring(0, 8).toUpperCase()}</p>
                        </div>
-                       <button onClick={() => showAlert("No Funds", "Connect your account to start receiving payments.", "info")} className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-2xl text-[10px] font-bold uppercase hover:bg-[#00f2ff] transition-all shadow-xl">
-                          Payout <ArrowUpRight size={14}/>
+                       <button onClick={() => showAlert("Handshake Required", "Verify your account for $10 to enable withdrawal relays.", "info")} className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-2xl text-[10px] font-black uppercase italic hover:bg-[#00f2ff] transition-all shadow-[0_10px_20px_rgba(0,0,0,0.3)] active:scale-95">
+                          Withdraw <ArrowUpRight size={14}/>
                        </button>
                     </div>
                   </div>
                </div>
 
-               {/* Stats Row */}
                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-6 bg-white/5 border border-white/10 rounded-3xl flex items-center gap-4">
-                     <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500"><History size={18}/></div>
-                     <div><p className="text-[8px] font-bold text-gray-500 uppercase">Incoming</p><p className="text-sm font-bold">$0.00</p></div>
+                  <div className="p-5 bg-white/5 border border-white/10 rounded-[30px] flex items-center gap-4 group hover:bg-white/10 transition-all">
+                     <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500 border border-emerald-500/20 group-hover:scale-110 transition-transform"><History size={18}/></div>
+                     <div><p className="text-[7px] font-black text-gray-500 uppercase tracking-widest">Received</p><p className="text-sm font-black">$0.00</p></div>
                   </div>
-                  <div className="p-6 bg-white/5 border border-white/10 rounded-3xl flex items-center gap-4">
-                     <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-500"><Clock size={18}/></div>
-                     <div><p className="text-[8px] font-bold text-gray-500 uppercase">Pending</p><p className="text-sm font-bold">$0.00</p></div>
+                  <div className="p-5 bg-white/5 border border-white/10 rounded-[30px] flex items-center gap-4 group hover:bg-white/10 transition-all">
+                     <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-500 border border-amber-500/20 group-hover:scale-110 transition-transform"><Clock size={18}/></div>
+                     <div><p className="text-[7px] font-black text-gray-500 uppercase tracking-widest">Locked</p><p className="text-sm font-black">$0.00</p></div>
                   </div>
                </div>
 
-               {/* Recent Transactions Placeholder */}
-               <div className="space-y-4">
-                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Recent Activity</p>
-                  <div className="p-10 border border-white/5 rounded-[35px] text-center bg-white/1">
-                     <History size={32} className="mx-auto text-gray-700 mb-3" />
-                     <p className="text-[10px] text-gray-600 font-bold uppercase italic">No synchronization logs found.</p>
+               <div className="space-y-3">
+                  <div className="flex justify-between items-center px-2">
+                    <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Recent Activity</p>
+                    <History size={12} className="text-gray-700"/>
+                  </div>
+                  <div className="p-12 border border-dashed border-white/10 rounded-[40px] text-center bg-white/1 backdrop-blur-sm">
+                     <p className="text-[9px] text-gray-600 font-bold uppercase italic tracking-widest leading-loose">No active settlements found.<br/>Verify node to start missions.</p>
                   </div>
                </div>
             </motion.div>
           )}
 
-          {/* --- STATS --- */}
+          {/* --- 📊 STATS --- */}
           {activeTab === "analytics" && (
             <div className="space-y-6">
-               <h3 className="text-xl font-bold uppercase">My <span className="text-[#00f2ff]">Performance</span></h3>
+               <h3 className="text-xl font-bold uppercase px-2">My <span className="text-[#00f2ff]">Metrics</span></h3>
                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[
                     { l: "Success Rate", v: "0%", i: <CheckCircle2 size={16} className="text-emerald-500"/> },
-                    { l: "Jobs Finished", v: "0", i: <Briefcase size={16} className="text-blue-500"/> },
-                    { l: "Trust Score", v: "N/A", i: <ShieldCheck size={16} className="text-purple-500"/> },
-                    { l: "Total Earned", v: "$0.00", i: <DollarSign size={16} className="text-yellow-500"/> }
+                    { l: "Missions", v: "0", i: <Briefcase size={16} className="text-blue-500"/> },
+                    { l: "Node Trust", v: "N/A", i: <ShieldCheck size={16} className="text-purple-500"/> },
+                    { l: "Net Revenue", v: "$0.00", i: <DollarSign size={16} className="text-yellow-500"/> }
                   ].map(stat => (
-                    <div key={stat.l} className="p-5 bg-white/5 border border-white/10 rounded-[20px] text-center">
+                    <div key={stat.l} className="p-5 bg-white/5 border border-white/10 rounded-[25px] text-center hover:bg-white/10 transition-all border-b-2 border-b-transparent hover:border-b-[#00f2ff]">
                        <div className="mb-2 flex justify-center">{stat.i}</div>
-                       <p className="text-[8px] font-bold text-gray-500 uppercase mb-1">{stat.l}</p>
-                       <p className="text-lg font-bold">{stat.v}</p>
+                       <p className="text-[8px] font-bold text-gray-500 uppercase mb-1 tracking-widest">{stat.l}</p>
+                       <p className="text-lg font-black">{stat.v}</p>
                     </div>
                   ))}
                </div>
-               <div className="p-8 bg-white/2 border border-white/5 rounded-[30px] text-center">
-                  <Activity size={32} className="mx-auto text-[#00f2ff] opacity-20 mb-3" />
-                  <p className="text-[10px] text-gray-500 uppercase font-bold">Verification is required to track live data</p>
+               <div className="p-10 bg-white/2 border border-white/10 rounded-[40px] text-center group">
+                  <Activity size={32} className="mx-auto text-[#00f2ff] opacity-10 mb-4 group-hover:opacity-40 transition-opacity" />
+                  <p className="text-[9px] text-gray-600 uppercase font-black tracking-[0.2em]">Verification required to sync global matrix data</p>
                </div>
             </div>
           )}
 
-          {/* --- CONFIG --- */}
+          {/* --- 👤 ME (RECONSTRUCTED) --- */}
+          {activeTab === "account" && (
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="max-w-3xl mx-auto space-y-6 pb-10">
+               {/* Identity Card */}
+               <div className="p-10 bg-linear-to-br from-white/10 to-white/5 border border-white/10 rounded-[50px] text-center shadow-3xl relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-[#00f2ff] to-transparent opacity-50" />
+                  <div className="relative w-32 h-32 mx-auto mb-6">
+                    <div className="absolute inset-0 bg-[#00f2ff]/20 blur-2xl rounded-full" />
+                    <img src={user?.imageUrl} className="w-full h-full rounded-[40px] object-cover border-4 border-white/10 relative z-10 shadow-2xl" alt="Identity" />
+                    <div className="absolute -bottom-2 -right-2 bg-black border-2 border-[#00f2ff] p-2 rounded-2xl text-[#00f2ff] z-20 shadow-glow"><Fingerprint size={16}/></div>
+                  </div>
+                  <h3 className="text-4xl font-black italic uppercase tracking-tighter mb-2">{user?.fullName}</h3>
+                  <div className="inline-flex items-center gap-2 bg-black/40 px-4 py-2 rounded-full border border-white/5 mb-10">
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#00f2ff]">Status Level 1</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                     <button onClick={() => setActiveTab('earnings')} className="py-5 bg-white text-black rounded-[28px] font-black uppercase italic text-[11px] hover:bg-[#00f2ff] transition-all shadow-xl">Vault Sync</button>
+                     <button onClick={() => setActiveTab('settings')} className="py-5 bg-white/5 border border-white/10 rounded-[28px] font-black uppercase italic text-[11px] hover:bg-white/10 transition-all">Config Hub</button>
+                  </div>
+               </div>
+
+               {/* Profile Progress & Meta */}
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-8 bg-white/5 border border-white/10 rounded-[40px] space-y-6">
+                     <div className="flex justify-between items-center">
+                        <h4 className="text-xs font-black uppercase tracking-widest">Node Completion</h4>
+                        <span className="text-[10px] font-bold text-[#00f2ff]">40%</span>
+                     </div>
+                     <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#00f2ff] w-[40%] shadow-glow" />
+                     </div>
+                     <div className="space-y-3 pt-2">
+                        {['Link Portfolio', 'Identity Handshake', 'Sync Technical Skills'].map((item, i) => (
+                          <div key={i} className="flex items-center gap-3 opacity-40">
+                             <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                             <span className="text-[10px] font-medium italic">{item}</span>
+                          </div>
+                        ))}
+                     </div>
+                  </div>
+
+                  <div className="p-8 bg-white/5 border border-white/10 rounded-[40px] space-y-4 flex flex-col justify-center">
+                     <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl">
+                        <Globe size={16} className="text-[#00f2ff]"/>
+                        <div><p className="text-[8px] font-black text-gray-500 uppercase">Current Region</p><p className="text-[10px] font-bold">Global / Remote</p></div>
+                     </div>
+                     <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl">
+                        <Award size={16} className="text-[#00f2ff]"/>
+                        <div><p className="text-[8px] font-black text-gray-500 uppercase">Trust Index</p><p className="text-[10px] font-bold">Authenticated Profile Required</p></div>
+                     </div>
+                  </div>
+               </div>
+
+               <div className="flex justify-center pt-4">
+                  <SignOutButton><button className="px-10 py-5 bg-red-500/5 border-2 border-red-500/10 text-red-500 font-black italic rounded-[30px] uppercase text-[10px] hover:bg-red-500 hover:text-white transition-all tracking-[0.4em] shadow-2xl active:scale-95">Terminate Connection</button></SignOutButton>
+               </div>
+            </motion.div>
+          )}
+
+          {/* --- ⚙️ SETTINGS --- */}
           {activeTab === "settings" && (
             <div className="space-y-6 max-w-xl mx-auto">
-               <h3 className="text-xl font-bold uppercase">System <span className="text-[#00f2ff]">Config</span></h3>
-               <div className="p-8 bg-white/5 border border-white/10 rounded-[40px] space-y-8">
+               <h3 className="text-2xl font-bold uppercase px-2">System <span className="text-[#00f2ff]">Config</span></h3>
+               <div className="p-8 bg-white/5 border border-white/10 rounded-[45px] space-y-8 shadow-2xl">
                   <div className="flex justify-between items-center group cursor-pointer">
                      <div className="flex items-center gap-4">
-                        <div className="p-3 bg-white/5 rounded-xl group-hover:bg-[#00f2ff]/10 transition-colors"><Moon size={20} className="text-[#00f2ff]"/></div>
-                        <div><h4 className="text-xs font-bold uppercase">Dark Mode Sync</h4><p className="text-[9px] text-gray-500">Currently active by default</p></div>
+                        <div className="p-3 bg-white/5 rounded-[18px] group-hover:bg-[#00f2ff]/10 transition-colors shadow-inner"><Moon size={20} className="text-[#00f2ff]"/></div>
+                        <div><h4 className="text-xs font-black uppercase tracking-widest">Stealth Protocol</h4><p className="text-[9px] text-gray-500 italic">Invisible node routing</p></div>
                      </div>
-                     <div className="w-10 h-5 bg-white/10 rounded-full p-1 flex justify-end"><div className="w-3 h-3 bg-[#00f2ff] rounded-full shadow-[0_0_10px_#00f2ff]" /></div>
+                     <div className="w-10 h-5 bg-white/10 rounded-full p-1 flex justify-end items-center"><div className="w-3 h-3 bg-[#00f2ff] rounded-full shadow-glow" /></div>
                   </div>
+                  
                   <div className="flex justify-between items-center opacity-50 cursor-not-allowed">
                      <div className="flex items-center gap-4">
-                        <div className="p-3 bg-white/5 rounded-xl"><Fingerprint size={20}/></div>
-                        <div><h4 className="text-xs font-bold uppercase">Face ID Sync</h4><p className="text-[9px] text-gray-500 italic">Verify account to unlock</p></div>
+                        <div className="p-3 bg-white/5 rounded-[18px] shadow-inner"><Fingerprint size={20}/></div>
+                        <div><h4 className="text-xs font-black uppercase tracking-widest">Biometric Sync</h4><p className="text-[9px] text-gray-500 italic">Face ID unlock relay</p></div>
                      </div>
                      <Lock size={16} className="text-gray-600"/>
                   </div>
+
+                  <div className="pt-6 border-t border-white/5">
+                     <p className="text-[10px] font-black text-gray-500 uppercase mb-5 tracking-widest">Interface Neon Palette</p>
+                     <div className="flex gap-5">
+                        <div className="w-8 h-8 rounded-xl bg-[#00f2ff] border-2 border-white ring-4 ring-[#00f2ff]/10 cursor-pointer shadow-glow" />
+                        <div className="w-8 h-8 rounded-xl bg-emerald-500 opacity-20 border border-white/10 hover:opacity-100 transition-opacity cursor-pointer" />
+                        <div className="w-8 h-8 rounded-xl bg-purple-500 opacity-20 border border-white/10 hover:opacity-100 transition-opacity cursor-pointer" />
+                     </div>
+                  </div>
+
                   <div className="pt-6 border-t border-white/5 space-y-4">
-                    <button onClick={() => showAlert("Saved", "Settings updated.", "success")} className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-bold uppercase hover:bg-white/10 transition-all">Save Config</button>
-                    <button onClick={() => showAlert("Nexus HQ", "V4.0.2 - Current Build", "info")} className="w-full py-2 text-[8px] font-bold text-gray-600 uppercase tracking-widest text-center">Build 4.0.2</button>
+                    <button onClick={() => showAlert("System Saved", "Global node configuration synchronized.", "success")} className="w-full py-4 bg-white text-black font-black italic rounded-2xl text-[11px] uppercase hover:bg-[#00f2ff] transition-all shadow-xl">Apply Sync</button>
+                    <p className="w-full text-[8px] font-bold text-gray-700 uppercase tracking-[0.5em] text-center">Nexus Build Alpha 4.0.2</p>
                   </div>
                </div>
             </div>
           )}
 
-          {/* --- HELP --- */}
+          {/* --- 🛠️ HELP --- */}
           {activeTab === "support" && (
              <div className="grid md:grid-cols-2 gap-4">
-                <div className="p-6 bg-white/5 border border-white/10 rounded-[30px]">
-                   <h4 className="text-xs font-bold uppercase text-[#00f2ff] mb-4">FAQs</h4>
-                   {['Is my money safe?', 'How do I withdraw?', 'Account verification help'].map(q => (
-                     <button key={q} onClick={handleSupportEmail} className="w-full flex justify-between p-3 bg-black/20 rounded-lg mb-2 text-left hover:bg-white/5">
-                        <span className="text-[9px] font-medium">{q}</span>
-                        <ChevronRight size={12} className="text-[#00f2ff]" />
+                <div className="p-8 bg-white/5 border border-white/10 rounded-[40px] shadow-2xl">
+                   <h4 className="text-xs font-black uppercase text-[#00f2ff] mb-6 tracking-widest italic">Protocol FAQ</h4>
+                   {['Is my vault safe?', 'Withdrawal speed?', 'Screening call help'].map(q => (
+                     <button key={q} onClick={handleSupportEmail} className="w-full flex justify-between items-center p-4 bg-black/40 rounded-2xl mb-3 text-left hover:bg-white/5 border border-transparent hover:border-white/5 transition-all">
+                        <span className="text-[10px] font-bold italic">{q}</span>
+                        <ChevronRight size={14} className="text-[#00f2ff]" />
                      </button>
                    ))}
                 </div>
-                <div className="p-6 bg-white/5 border border-white/10 rounded-[30px] text-center flex flex-col justify-center gap-2">
-                   <HelpCircle size={32} className="mx-auto text-[#00f2ff]" />
-                   <p className="text-[9px] text-gray-400">Email for quick support:</p>
-                   <p className="text-[10px] font-bold">notifications.nexusgigs@gmail.com</p>
+                <div className="p-8 bg-white/5 border border-white/10 rounded-[40px] text-center flex flex-col justify-center gap-4 shadow-2xl">
+                   <HelpCircle size={48} className="mx-auto text-[#00f2ff] opacity-40" />
+                   <p className="text-[10px] text-gray-500 uppercase font-bold">Direct Assistance Relay:</p>
+                   <p className="text-xs font-black italic text-white tracking-wide">notifications.nexusgigs@gmail.com</p>
+                   <button onClick={handleSupportEmail} className="mt-4 py-3 bg-[#00f2ff] text-black font-black rounded-2xl text-[10px] uppercase shadow-glow">Initialize Uplink</button>
                 </div>
              </div>
           )}
@@ -350,11 +472,11 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
 
       {/* --- SLIM NAV DOCK --- */}
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-100 w-[94%] max-w-xl">
-        <div className="h-16 bg-black/80 backdrop-blur-3xl border border-white/10 rounded-full flex items-center justify-around px-2 shadow-2xl">
+        <div className="h-16 bg-black/80 backdrop-blur-3xl border border-white/10 rounded-full flex items-center justify-around px-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
           {navItems.map((item) => (
-            <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex flex-col items-center gap-0.5 transition-all ${activeTab === item.id ? 'text-[#00f2ff] scale-110' : 'text-gray-500 hover:text-white'}`}>
-              <div className={activeTab === item.id ? "bg-[#00f2ff]/10 p-1.5 rounded-xl" : ""}>{item.icon}</div>
-              <span className="text-[6px] font-bold uppercase tracking-tighter">{item.label}</span>
+            <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex flex-col items-center gap-0.5 transition-all duration-300 ${activeTab === item.id ? 'text-[#00f2ff] scale-110' : 'text-gray-500 hover:text-white'}`}>
+              <div className={activeTab === item.id ? "bg-[#00f2ff]/10 p-1.5 rounded-xl border border-[#00f2ff]/20 shadow-glow" : ""}>{item.icon}</div>
+              <span className="text-[6px] font-black uppercase tracking-tighter opacity-70">{item.label}</span>
             </button>
           ))}
         </div>
@@ -363,46 +485,65 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
       {/* --- RECONSTRUCTED VERIFICATION MODAL --- */}
       <AnimatePresence>
         {showVerifyModal && (
-          <div className="fixed inset-0 z-200 flex items-center justify-center p-6 backdrop-blur-md">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/60" onClick={() => !isPaying && setShowVerifyModal(false)} />
-            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} className="relative w-full max-w-85 bg-[#0a0f1e] border border-white/10 rounded-[40px] p-10 text-center shadow-3xl">
-              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-[#00f2ff] to-transparent" />
+          <div className="fixed inset-0 z-200 flex items-center justify-center p-6 backdrop-blur-md bg-black/60">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0" onClick={() => !isPaying && setShowVerifyModal(false)} />
+            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} className="relative w-full max-w-87.5 bg-[#0a0f1e] border-2 border-white/10 rounded-[45px] p-10 text-center shadow-[0_0_100px_rgba(0,242,255,0.1)] overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-[#00f2ff] to-transparent shadow-glow" />
               
               {paymentStep === "terms" ? (
                 <div className="space-y-6">
-                  <ShieldCheck size={40} className="text-[#00f2ff] mx-auto" />
-                  <h3 className="text-xl font-bold uppercase">Get Verified</h3>
-                  <div className="bg-white/5 p-4 rounded-2xl text-left border border-white/5 space-y-3">
-                     <p className="text-[10px] text-gray-300 leading-relaxed font-bold">1. Pay $10 Handshake fee.</p>
-                     <p className="text-[10px] text-gray-400 leading-relaxed">2. Complete a technical survey sent via email.</p>
-                     <p className="text-[10px] text-gray-400 leading-relaxed">3. Pass a quick screening Zoom call.</p>
-                     <p className="text-[9px] text-emerald-400 italic pt-2">★ Failed screening? 100% money back guarantee to your original payment method.</p>
+                  <ShieldCheck size={40} className="text-[#00f2ff] mx-auto shadow-glow" />
+                  <h3 className="text-xl font-black italic uppercase tracking-tight">Identity Handshake</h3>
+                  
+                  <div className="bg-white/5 p-5 rounded-3xl text-left border border-white/5 space-y-4 shadow-inner">
+                     <div className="flex gap-3">
+                        <div className="w-5 h-5 bg-[#00f2ff]/10 rounded-full flex items-center justify-center shrink-0 border border-[#00f2ff]/20 text-[10px] font-black text-[#00f2ff]">1</div>
+                        <p className="text-[10px] text-gray-300 font-bold leading-relaxed italic">Pay $10 Handshake fee.</p>
+                     </div>
+                     <div className="flex gap-3">
+                        <div className="w-5 h-5 bg-white/5 rounded-full flex items-center justify-center shrink-0 border border-white/10 text-[10px] font-black text-gray-500">2</div>
+                        <p className="text-[10px] text-gray-400 leading-relaxed italic">Complete a technical survey sent via email.</p>
+                     </div>
+                     <div className="flex gap-3">
+                        <div className="w-5 h-5 bg-white/5 rounded-full flex items-center justify-center shrink-0 border border-white/10 text-[10px] font-black text-gray-500">3</div>
+                        <p className="text-[10px] text-gray-400 leading-relaxed italic">Pass a mandatory screening Zoom call.</p>
+                     </div>
+                     <div className="pt-2 border-t border-white/5">
+                        <p className="text-[9px] text-emerald-400 font-bold italic flex items-center gap-2"><CheckCircle2 size={10}/> 100% Refund if you fail screening.</p>
+                     </div>
                   </div>
                   
                   {/* AGREEMENT CHECKBOX */}
-                  <div className="flex items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/5 cursor-pointer text-left" onClick={() => setAgreedToTerms(!agreedToTerms)}>
-                     <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all shrink-0 ${agreedToTerms ? 'bg-[#00f2ff] border-[#00f2ff]' : 'border-white/20'}`}>
-                        {agreedToTerms && <X size={12} className="text-black font-bold"/>}
+                  <div className="flex items-center gap-4 bg-white/5 p-4 rounded-3xl border border-white/5 cursor-pointer text-left transition-all hover:bg-white/10" onClick={() => setAgreedToTerms(!agreedToTerms)}>
+                     <div className={`w-6 h-6 rounded-xl border-2 flex items-center justify-center transition-all shrink-0 ${agreedToTerms ? 'bg-[#00f2ff] border-[#00f2ff]' : 'border-white/20'}`}>
+                        {agreedToTerms && <X size={12} className="text-black font-black"/>}
                      </div>
-                     <span className="text-[9px] font-bold text-gray-300">I agree to the $10 fee, the email survey, and the screening call policy.</span>
+                     <span className="text-[9px] font-black italic text-gray-400 leading-tight uppercase">I agree to the $10 fee, the survey, and the screening call refund policy.</span>
                   </div>
 
-                  <button disabled={!agreedToTerms} onClick={() => setPaymentStep("choice")} className={`w-full py-4 rounded-2xl font-bold uppercase text-[10px] transition-all ${agreedToTerms ? 'bg-[#00f2ff] text-black shadow-lg hover:scale-[1.02]' : 'bg-gray-800 text-gray-500 cursor-not-allowed'}`}>Initialize Pay</button>
+                  <button disabled={!agreedToTerms} onClick={() => setPaymentStep("choice")} className={`w-full py-5 rounded-[25px] font-black uppercase italic text-[11px] transition-all tracking-[0.2em] ${agreedToTerms ? 'bg-[#00f2ff] text-black shadow-glow hover:scale-[1.02]' : 'bg-gray-800 text-gray-600 cursor-not-allowed'}`}>Accept & Sync</button>
                 </div>
               ) : paymentStep === "choice" ? (
-                <div className="space-y-5">
-                  <h3 className="text-md font-bold uppercase">Pay $10</h3>
-                  <button onClick={() => handleSecurePayment("CARD")} className="w-full py-4 bg-white text-black font-bold rounded-2xl text-[10px] uppercase flex items-center justify-center gap-2 tracking-widest"><CreditCard size={14}/> Card</button>
-                  <button onClick={() => setPaymentStep("mpesa")} className="w-full py-4 bg-emerald-600 text-white font-bold rounded-2xl text-[10px] uppercase flex items-center justify-center gap-2 tracking-widest"><Smartphone size={14}/> M-Pesa</button>
-                  <button onClick={() => setPaymentStep("terms")} className="text-[9px] text-gray-500 uppercase font-bold">Go Back</button>
+                <div className="space-y-6">
+                  <h3 className="text-md font-black uppercase italic tracking-widest text-[#00f2ff]">Select Gateway</h3>
+                  <div className="space-y-3">
+                    <button onClick={() => handleSecurePayment("CARD")} className="w-full py-4 bg-white text-black font-black rounded-2xl text-[10px] uppercase italic flex items-center justify-center gap-3 tracking-widest"><CreditCard size={14}/> Global Card</button>
+                    <button onClick={() => setPaymentStep("mpesa")} className="w-full py-4 bg-emerald-600 text-white font-black rounded-2xl text-[10px] uppercase italic flex items-center justify-center gap-3 tracking-widest shadow-lg shadow-emerald-900/20"><Smartphone size={14}/> M-Pesa Sync</button>
+                  </div>
+                  <button onClick={() => setPaymentStep("terms")} className="text-[9px] text-gray-500 uppercase font-black italic tracking-[0.3em] hover:text-white">Go Back</button>
                 </div>
               ) : (
-                <div className="space-y-6">
-                   <Smartphone size={32} className="text-emerald-500 mx-auto" />
-                   <h3 className="text-lg font-bold uppercase">M-Pesa Number</h3>
-                   <input value={mpesaNumber} onChange={e => setMpesaNumber(e.target.value)} placeholder="2547XXXXXXXX" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-center text-xl font-bold text-white outline-none focus:border-emerald-500" />
-                   <button disabled={isPaying} onClick={() => handleSecurePayment("M-PESA")} className="w-full py-4 bg-emerald-600 text-white font-bold rounded-2xl uppercase text-[10px] shadow-lg">{isPaying ? "Sending..." : "Pay KES 1,300"}</button>
-                   <button onClick={() => setPaymentStep("choice")} className="text-[9px] text-gray-500 uppercase font-bold">Back</button>
+                <div className="space-y-8">
+                   <Smartphone size={32} className="text-emerald-500 mx-auto animate-bounce" />
+                   <div className="space-y-2">
+                     <h3 className="text-lg font-black uppercase italic">M-Pesa Direct</h3>
+                     <p className="text-[10px] text-gray-500 font-bold uppercase">Enter your phone to push STK</p>
+                   </div>
+                   <input value={mpesaNumber} onChange={e => setMpesaNumber(e.target.value)} placeholder="2547XXXXXXXX" className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-center text-2xl font-black text-white outline-none focus:border-emerald-500 shadow-inner" />
+                   <div className="space-y-4">
+                    <button disabled={isPaying} onClick={() => handleSecurePayment("M-PESA")} className="w-full py-5 bg-emerald-600 text-white font-black rounded-2xl uppercase italic text-[11px] shadow-lg shadow-emerald-600/20 tracking-widest">{isPaying ? "ENCRYPTING..." : "Transmit KES 1,300"}</button>
+                    <button onClick={() => setPaymentStep("choice")} className="text-[9px] text-gray-500 uppercase font-black italic tracking-widest">Back</button>
+                   </div>
                 </div>
               )}
             </motion.div>
@@ -410,20 +551,20 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
         )}
       </AnimatePresence>
 
-      {/* --- SMALL ALERT POPUP --- */}
+      {/* --- SMALL ALERT --- */}
       <AnimatePresence>
         {customAlert.show && (
-          <div className="fixed inset-0 z-300 flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">
-             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="w-full max-w-70 bg-[#0a0f1e] border border-white/10 rounded-[35px] p-8 text-center shadow-3xl relative overflow-hidden">
-                <div className={`absolute top-0 left-0 w-full h-1 ${customAlert.type === 'error' ? 'bg-red-500' : customAlert.type === 'success' ? 'bg-emerald-500' : 'bg-[#00f2ff]'}`} />
-                <div className="mb-4 flex justify-center">
-                  {customAlert.type === 'error' && <AlertTriangle size={24} className="text-red-500" />}
-                  {customAlert.type === 'success' && <CheckCircle size={24} className="text-emerald-500" />}
-                  {customAlert.type === 'info' && <Info size={24} className="text-[#00f2ff]" />}
+          <div className="fixed inset-0 z-300 flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm">
+             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="w-full max-w-75 bg-[#0a0f1e] border-2 border-white/10 rounded-[40px] p-8 text-center shadow-3xl relative">
+                <div className={`absolute top-0 left-0 w-full h-1.5 ${customAlert.type === 'error' ? 'bg-red-500' : 'bg-[#00f2ff] shadow-glow'}`} />
+                <div className="mb-6 flex justify-center">
+                  {customAlert.type === 'error' && <AlertTriangle size={32} className="text-red-500 drop-shadow-[0_0_10px_red]" />}
+                  {customAlert.type === 'success' && <CheckCircle size={32} className="text-emerald-500 drop-shadow-[0_0_10px_emerald]" />}
+                  {customAlert.type === 'info' && <Info size={32} className="text-[#00f2ff] shadow-glow" />}
                 </div>
-                <h4 className="text-xs font-bold uppercase mb-2 text-white">{customAlert.title}</h4>
-                <p className="text-[9px] text-gray-400 mb-6 leading-relaxed">{customAlert.msg}</p>
-                <button onClick={() => setCustomAlert({...customAlert, show: false})} className="w-full py-2.5 bg-white/5 border border-white/10 rounded-xl text-[9px] font-bold uppercase hover:bg-white hover:text-black">Dismiss</button>
+                <h4 className="text-md font-black uppercase italic mb-3 text-white tracking-tighter leading-none">{customAlert.title}</h4>
+                <p className="text-[10px] text-gray-400 italic mb-8 leading-relaxed tracking-wide">{customAlert.msg}</p>
+                <button onClick={() => setCustomAlert({...customAlert, show: false})} className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase italic hover:bg-white hover:text-black transition-all">Dismiss Signal</button>
              </motion.div>
           </div>
         )}
@@ -433,6 +574,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .perspective-1000 { perspective: 1000px; }
+        .shadow-glow { box-shadow: 0 0 15px rgba(0, 242, 255, 0.3); }
       `}</style>
     </div>
   );
