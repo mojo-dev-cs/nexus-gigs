@@ -1,53 +1,66 @@
-"use server";
+"server-only";
 
-import { createClerkClient } from "@clerk/nextjs/server";
-
-const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
+import { clerkClient } from "@clerk/nextjs/server";
 
 export async function getAllNexusUsers() {
   try {
-    const response = await clerkClient.users.getUserList({
-      limit: 500,
-      orderBy: '-created_at',
+    const client = await clerkClient();
+    const response = await client.users.getUserList({
+      limit: 100, // Adjust as needed
+      orderBy: '-created_at'
     });
 
-    const users = response.data.map((u) => ({
-      id: u.id,
-      name: `${u.firstName || ""} ${u.lastName || ""}`.trim() || "Unknown Node",
-      email: u.emailAddresses[0]?.emailAddress || "N/A",
-      status: (u.publicMetadata?.status as string) || "Pending",
-      role: (u.publicMetadata?.role as string) || "freelancer",
-      banned: u.banned,
-      createdAt: u.createdAt,
-      joined: new Date(u.createdAt).toLocaleDateString(),
+    const users = response.data.map((user) => ({
+      id: user.id,
+      name: `${user.firstName || ""} ${user.lastName || ""}`.trim() || "Unknown Node",
+      email: user.emailAddresses[0]?.emailAddress || "N/A",
+      status: (user.publicMetadata.status as string) || "Unverified",
+      role: (user.publicMetadata.role as string) || "freelancer",
+      joined: new Date(user.createdAt).toLocaleDateString(),
+      createdAt: user.createdAt,
+      paidBalance: (user.publicMetadata.paidBalance as number) || 0,
+      banned: user.banned
     }));
+
     return { success: true, users };
-  } catch (error) {
-    console.error("Clerk Sync Error:", error);
-    return { success: false, error: "Sync Failed" };
+  } catch (error: any) {
+    console.error("Clerk Fetch Error:", error);
+    return { success: false, message: error.message };
   }
 }
 
 export async function verifyUserNode(userId: string) {
   try {
-    await clerkClient.users.updateUser(userId, {
-      publicMetadata: { status: "Verified" },
+    const client = await clerkClient();
+    await client.users.updateUserMetadata(userId, {
+      publicMetadata: { status: "Verified" }
     });
     return { success: true };
-  } catch (e) { return { success: false }; }
+  } catch (error: any) {
+    return { success: false, message: error.message };
+  }
 }
 
 export async function suspendUserNode(userId: string, ban: boolean) {
   try {
-    if (ban) await clerkClient.users.banUser(userId);
-    else await clerkClient.users.unbanUser(userId);
+    const client = await clerkClient();
+    if (ban) {
+      await client.users.banUser(userId);
+    } else {
+      await client.users.unbanUser(userId);
+    }
     return { success: true };
-  } catch (e) { return { success: false }; }
+  } catch (error: any) {
+    return { success: false, message: error.message };
+  }
 }
 
 export async function terminateUserNode(userId: string) {
   try {
-    await clerkClient.users.deleteUser(userId);
+    const client = await clerkClient();
+    await client.users.deleteUser(userId);
     return { success: true };
-  } catch (e) { return { success: false }; }
+  } catch (error: any) {
+    return { success: false, message: error.message };
+  }
 }
