@@ -10,21 +10,27 @@ export async function getAllNexusUsers() {
       orderBy: '-created_at'
     });
 
-    const users = response.data.map((user) => ({
-      id: user.id,
-      name: `${user.firstName || ""} ${user.lastName || ""}`.trim() || "Unknown Node",
-      email: user.emailAddresses[0]?.emailAddress || "N/A",
-      status: (user.publicMetadata.status as string) || "Unverified",
-      role: (user.publicMetadata.role as string) || "freelancer",
-      joined: new Date(user.createdAt).toLocaleDateString(),
-      createdAt: user.createdAt,
-      paidBalance: (user.publicMetadata.paidBalance as number) || 0,
-      banned: user.banned
-    }));
+    const users = response.data.map((user) => {
+      // DEBUG: Accessing publicMetadata safely
+      const metadata = user.publicMetadata || {};
+      
+      return {
+        id: user.id,
+        name: `${user.firstName || ""} ${user.lastName || ""}`.trim() || "Nexus Node",
+        email: user.emailAddresses[0]?.emailAddress || "N/A",
+        status: (metadata.status as string) || "Unverified",
+        role: (metadata.role as string) || "freelancer",
+        joined: new Date(user.createdAt).toLocaleDateString(),
+        createdAt: user.createdAt,
+        // CRITICAL: Syncing the paidBalance KES 10
+        paidBalance: typeof metadata.paidBalance === 'number' ? metadata.paidBalance : 0,
+        banned: user.banned
+      };
+    });
 
     return { success: true, users };
   } catch (error: any) {
-    console.error("Clerk Fetch Error:", error);
+    console.error("Clerk Sync Error:", error);
     return { success: false, message: error.message };
   }
 }
@@ -35,20 +41,6 @@ export async function verifyUserNode(userId: string) {
     await client.users.updateUserMetadata(userId, {
       publicMetadata: { status: "Verified" }
     });
-    return { success: true };
-  } catch (error: any) {
-    return { success: false, message: error.message };
-  }
-}
-
-export async function suspendUserNode(userId: string, ban: boolean) {
-  try {
-    const client = await clerkClient();
-    if (ban) {
-      await client.users.banUser(userId);
-    } else {
-      await client.users.unbanUser(userId);
-    }
     return { success: true };
   } catch (error: any) {
     return { success: false, message: error.message };

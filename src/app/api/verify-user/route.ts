@@ -10,11 +10,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized Node Access" }, { status: 401 });
     }
 
-    // Clerk v5 Fix: must await clerkClient()
     const client = await clerkClient();
 
-    // 1. UPDATE CLERK METADATA
-    // Promoting the node status and banking the KES 10 for the Admin Dashboard
+    // UPDATE USER METADATA
+    // paidBalance is stored as a number so Admin Dashboard sums it correctly
     await client.users.updateUserMetadata(userId, {
       publicMetadata: {
         status: "Verified",
@@ -24,15 +23,11 @@ export async function POST(req: Request) {
       }
     });
 
-    // 2. LOG FOR ADMIN DASHBOARD
-    console.log(`[SYSTEM UPLINK] Node Verified: ${email} | Amount: KES ${amount} | Gateway: ${method}`);
+    console.log(`[REV SYNC] ${email} paid KES ${amount}. Registry updated.`);
 
-    return NextResponse.json({ 
-      success: true, 
-      message: "Node authentication finalized." 
-    });
+    return NextResponse.json({ success: true, message: "Balance Synchronized." });
   } catch (error: any) {
-    console.error("VERIFICATION ERROR:", error);
+    console.error("METADATA SYNC ERROR:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
