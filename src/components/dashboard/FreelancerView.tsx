@@ -17,7 +17,7 @@ import {
 export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetadata: any }) => {
   const { user } = useUser();
   const [activeTab, setActiveTab] = useState("home");
-  const [isVerified, setIsVerified] = useState(userMetadata?.status === "Verified");
+  const [isVerified] = useState(userMetadata?.status === "Verified");
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [mpesaNumber, setMpesaNumber] = useState("");
   const [isPaying, setIsPaying] = useState(false);
@@ -26,36 +26,47 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
   const [paymentStep, setPaymentStep] = useState<"terms" | "choice" | "card" | "mpesa">("terms");
   const [expandedMsg, setExpandedMsg] = useState<number | null>(null);
 
-  const handleIntasendPayment = async (method: "M-PESA" | "CARD") => {
-    if (method === "M-PESA" && mpesaNumber.length < 10) return alert("Invalid Format. Use 254...");
+  // --- 📲 DIRECT STK PUSH HANDSHAKE ---
+const handleIntasendPayment = async (method: "M-PESA" | "CARD") => {
+    // Strict validation
+    if (method === "M-PESA") {
+      const cleanPhone = mpesaNumber.replace(/\D/g, ''); // Remove all non-digits
+      if (!cleanPhone.startsWith("254") || cleanPhone.length !== 12) {
+        return alert("FORMAT ERROR: Use 2547XXXXXXXX");
+      }
+    }
+
     setIsPaying(true);
-    const uniqueRef = `account_v_${user?.id?.slice(-8)}_${Date.now()}`;
     try {
       const response = await fetch("/api/intasend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: 910,
-          phone: mpesaNumber.replace('+', ''), 
+          phone: mpesaNumber.replace(/\D/g, ''), 
           email: user?.primaryEmailAddress?.emailAddress,
-          firstName: user?.firstName || "Nexus",
-          lastName: user?.lastName || "User",
-          method: method,
-          api_ref: uniqueRef
+          firstName: user?.firstName,
+          lastName: user?.lastName,
+          method: method
         }),
       });
+
       const data = await response.json();
-      if (data.url) window.location.href = data.url;
-      else {
-        alert(`Verification Error: ${data.message}`);
-        setIsPaying(false);
+
+      if (response.ok) {
+        // Successful STK trigger
+        alert("📲 SIGNAL RECEIVED: Check your phone for the M-Pesa PIN prompt.");
+        setShowVerifyModal(false);
+      } else {
+        alert(`Uplink Denied: ${data.message || "Protocol Error"}`);
       }
     } catch (error) {
-      alert("CONNECTION INTERRUPTED: Please check your internet and try again.");
+      alert("CONNECTION LOST: Server is not responding to the handshake.");
+    } finally {
       setIsPaying(false);
     }
   };
-
+  
   const navItems = [
     { id: 'home', icon: <Home size={20}/>, label: 'Home' },
     { id: 'tasks', icon: <Briefcase size={20}/>, label: 'Gigs' },
@@ -153,7 +164,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                   </motion.div>
                 ))}
               </div>
-              <div className="flex justify-center pt-10"><button onClick={() => { setPaymentStep("terms"); setShowVerifyModal(true); }} className="px-12 py-5 border-2 border-[#00f2ff]/30 rounded-full text-xs font-black uppercase italic text-[#00f2ff] hover:bg-[#00f2ff] hover:text-black transition-all shadow-[0_0_30px_rgba(0,242,255,0.1)]">Load Higher Tier Missions (Verify)</button></div>
+              <div className="flex justify-center pt-10"><button onClick={() => { setPaymentStep("terms"); setShowVerifyModal(true); }} className="px-12 py-5 border-2 border-[#00f2ff]/30 rounded-full text-xs font-black uppercase italic text-[#00f2ff] hover:bg-[#00f2ff] hover:text-black transition-all shadow-[0_0_30px_rgba(0,242,255,0.15)]">Load Higher Tier Missions (Verify)</button></div>
             </motion.div>
           )}
 
@@ -344,7 +355,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
         </AnimatePresence>
       </div>
 
-      {/* --- 📱 NAV DOCK (SCROLLABLE ON MOBILE) --- */}
+      {/* --- 📱 NAV DOCK --- */}
       <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-100 w-[94%] max-w-3xl overflow-x-auto no-scrollbar rounded-[45px]">
         <div className="h-24 bg-black/60 backdrop-blur-[50px] border border-white/10 rounded-[45px] shadow-[0_40px_100px_rgba(0,0,0,0.8)] flex items-center px-10 min-w-max gap-8 border-t-white/10">
           {navItems.map((item) => (
@@ -373,7 +384,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 <div className="space-y-10">
                   <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-10 border border-white/10 shadow-[0_0_30px_#00f2ff20]"><ShieldCheck size={48} className="text-[#00f2ff]" /></div>
                   <h3 className="text-4xl font-black italic uppercase text-white tracking-tighter leading-tight">ACCOUNT <br /><span className="text-[#00f2ff]">VALIDATION</span></h3>
-                  
                   <div className="bg-[#00f2ff]/5 border border-[#00f2ff]/20 p-6 rounded-3xl space-y-4 text-left">
                      <p className="text-[10px] font-black text-[#00f2ff] uppercase italic tracking-widest flex items-center justify-center gap-2">
                         <CheckCircle2 size={12}/> Compliance Protocol Handshake
@@ -382,7 +392,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                        Activation requires a mandatory **Account Validation Survey**. If your account profile fails the survey, or activation is unsuccessful, a **100% Automatic Refund** is issued to your source node immediately.
                      </p>
                   </div>
-
                   <div className="space-y-4">
                     <button onClick={() => setPaymentStep("choice")} className="w-full py-6 bg-[#00f2ff] text-black font-black rounded-4xl uppercase text-xs italic shadow-2xl hover:scale-105 active:scale-95 transition-all">Agree & Continue →</button>
                     <button onClick={() => setShowVerifyModal(false)} className="text-[10px] text-gray-600 font-black uppercase italic tracking-[0.4em] hover:text-white transition-colors">Decline Terms</button>

@@ -17,6 +17,7 @@
     "axios": "^1.14.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
+    "intasend-node": "^1.1.2",
     "lucide-react": "^1.7.0",
     "mongoose": "^9.3.3",
     "next": "latest",
