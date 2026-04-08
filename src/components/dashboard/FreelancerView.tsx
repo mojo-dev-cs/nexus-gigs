@@ -54,7 +54,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
           });
 
           if (response.ok) {
-            showAlert("Verified!", "Handshake complete. Check your email for the survey.", "success");
+            showAlert("Done!", "Payment received. You are now verified. Check your email for the survey.", "success");
             setIsVerified(true);
           }
         } catch (error) {
@@ -73,7 +73,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
       const cleanPhone = mpesaNumber.replace(/\D/g, ''); 
       if (!cleanPhone.startsWith("254") || cleanPhone.length !== 12) {
         setIsPaying(false);
-        return showAlert("Format Error", "Use 2547XXXXXXXX.", "error");
+        return showAlert("Phone Error", "Please use 2547XXXXXXXX.", "error");
       }
       try {
         const response = await fetch("/api/intasend", {
@@ -113,7 +113,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
     { id: 'settings', icon: <Settings size={16}/>, label: 'Config' },
   ];
 
-  // --- 💼 UPDATED GIGS (10 MIXED GIGS) ---
   const marketplaceGigs = useMemo(() => [
     { id: "1", title: "Enterprise: Cloud Infrastructure Audit", budget: 850, client: "TechFlow Systems", rating: 5.0, dur: "4 Days", img: "https://i.pravatar.cc/150?u=tech", type: "Company", status: "Active" },
     { id: "2", title: "Assignment: Advanced Calculus Solutions", budget: 60, client: "Mark Thompson", rating: 4.8, dur: "12 Hours", img: "https://i.pravatar.cc/150?u=mark", type: "Academic", status: "Active" },
@@ -141,20 +140,19 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
       <div className="max-w-5xl mx-auto pt-4 px-4 relative z-10">
         <AnimatePresence mode="wait">
           
-          {/* --- HOME --- */}
           {activeTab === "home" && (
             <motion.div key="home" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
               <header className="flex justify-between items-center bg-white/5 backdrop-blur-xl p-5 rounded-[25px] border border-white/10">
                 <h2 className="text-lg font-bold uppercase tracking-widest">{user?.firstName || "Welcome"}</h2>
                 <div className="flex items-center gap-3 bg-black/40 px-3 py-1.5 rounded-xl border border-white/5">
                    <div className={`w-2 h-2 rounded-full ${isVerified ? 'bg-[#00f2ff] shadow-[0_0_10px_#00f2ff]' : 'bg-red-500'}`} />
-                   <span className="text-[8px] font-bold uppercase tracking-widest">{isVerified ? "VERIFIED NODE" : "UNVERIFIED"}</span>
+                   <span className="text-[8px] font-bold uppercase tracking-widest">{isVerified ? "VERIFIED" : "UNVERIFIED"}</span>
                 </div>
               </header>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="p-6 bg-linear-to-br from-[#00f2ff]/10 to-transparent border border-[#00f2ff]/20 rounded-[30px] shadow-2xl">
-                  <p className="text-[8px] font-bold uppercase text-[#00f2ff] mb-1">Available Vault</p>
+                  <p className="text-[8px] font-bold uppercase text-[#00f2ff] mb-1">My Money</p>
                   <h3 className="text-3xl font-black mb-4 tracking-tighter">$0.00</h3>
                   <button onClick={() => setActiveTab("earnings")} className="w-full py-2.5 bg-white text-black font-bold rounded-lg text-[10px] uppercase hover:bg-[#00f2ff] transition-all">My Vault</button>
                 </div>
@@ -162,9 +160,9 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                   <div className="md:col-span-2 p-6 bg-white/5 border border-white/10 rounded-[30px] flex items-center gap-6 backdrop-blur-md">
                     <div className="w-12 h-12 bg-[#00f2ff]/10 rounded-2xl flex items-center justify-center text-[#00f2ff] shadow-inner"><ShieldCheck size={28}/></div>
                     <div className="flex-1">
-                        <h4 className="text-md font-bold uppercase tracking-tight">Identity Required</h4>
-                        <p className="text-[10px] text-gray-400 mb-3">Complete the $10 handshake to unlock high-tier mission access.</p>
-                        <button onClick={() => { setPaymentStep("terms"); setShowVerifyModal(true); }} className="text-[9px] font-bold uppercase text-[#00f2ff] flex items-center gap-1 hover:text-white transition-all">Start Authentication <ChevronRight size={12} /></button>
+                        <h4 className="text-md font-bold uppercase tracking-tight">Identity Check</h4>
+                        <p className="text-[10px] text-gray-400 mb-3">Pay $10 once to unlock high-paying jobs and withdraw money.</p>
+                        <button onClick={() => { setPaymentStep("terms"); setShowVerifyModal(true); }} className="text-[9px] font-black uppercase text-[#00f2ff] flex items-center gap-1 hover:text-white transition-all">Start Now <ChevronRight size={12} /></button>
                     </div>
                   </div>
                 )}
@@ -172,18 +170,17 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             </motion.div>
           )}
 
-          {/* --- GIGS --- */}
           {activeTab === "tasks" && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
               <div className="flex justify-between items-center px-2">
-                <h3 className="text-xl font-bold uppercase tracking-tighter">Mission <span className="text-[#00f2ff]">Feed</span></h3>
-                <div className="flex items-center gap-2 bg-emerald-500/10 px-3 py-1 rounded-full"><div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" /><span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Active</span></div>
+                <h3 className="text-xl font-bold uppercase tracking-tighter">Job <span className="text-[#00f2ff]">Feed</span></h3>
+                <div className="flex items-center gap-2 bg-emerald-500/10 px-3 py-1 rounded-full"><div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" /><span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Live</span></div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {marketplaceGigs.map((g) => (
                   <div key={g.id} className={`p-5 rounded-[25px] bg-white/5 border border-white/10 transition-all ${g.status === 'Expired' ? 'opacity-40 grayscale' : 'hover:border-[#00f2ff]/30 shadow-xl'}`}>
                     <div className="flex justify-between items-start mb-3">
-                       <img src={g.img} className="w-10 h-10 rounded-xl object-cover border border-white/10" alt="client" />
+                       <img src={g.img} className="w-10 h-10 rounded-xl object-cover border border-white/10" alt="cl" />
                        <span className={`text-[8px] font-bold px-2 py-1 rounded-lg uppercase ${g.status === 'Active' ? 'bg-[#00f2ff]/10 text-[#00f2ff]' : 'bg-white/5 text-gray-500'}`}>{g.dur}</span>
                     </div>
                     <h4 className="text-xs font-black uppercase mb-1 line-clamp-2 h-8 leading-tight">{g.title}</h4>
@@ -205,26 +202,24 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             </motion.div>
           )}
 
-          {/* --- WORK --- */}
           {activeTab === "contracts" && (
             <div className="pt-10 px-4">
                <div className="p-10 bg-white/5 border border-red-500/20 rounded-[40px] text-center space-y-4 max-w-md mx-auto shadow-2xl backdrop-blur-xl">
                   <ShieldAlert size={48} className="mx-auto text-red-500" />
-                  <h3 className="text-lg font-bold uppercase tracking-widest">Node Encrypted</h3>
-                  <p className="text-gray-400 text-[10px]">Your history is protected by the Nexus security layer. Complete the $10 handshake to decrypt your profile history.</p>
-                  <button onClick={() => setShowVerifyModal(true)} className="w-full py-4 bg-red-600 text-white font-bold rounded-2xl text-[10px] uppercase shadow-lg hover:scale-105 transition-all">Decrypt Terminal</button>
+                  <h3 className="text-lg font-bold uppercase tracking-widest">Locked</h3>
+                  <p className="text-gray-400 text-[10px]">Your history is safe but hidden. Pay the $10 fee to unlock your profile and work history.</p>
+                  <button onClick={() => setShowVerifyModal(true)} className="w-full py-4 bg-red-600 text-white font-bold rounded-2xl text-[10px] uppercase shadow-lg hover:scale-105 transition-all">Unlock Now</button>
                </div>
             </div>
           )}
 
-          {/* --- CHATS (CLEAN SYSTEM ONLY) --- */}
           {activeTab === "messages" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
                <h3 className="text-xl font-bold uppercase px-2 tracking-[0.3em]">Console <span className="text-[#00f2ff]">Feed</span></h3>
                <div className="space-y-3">
                   {[
-                    { id: 0, t: "Nexus Protocol", m: `Greetings Node_${user?.firstName?.toUpperCase()}. Your identity is in staging. Pay the $10 handshake to start your screening.`, icon: <Shield size={16} className="text-[#00f2ff]"/> },
-                    { id: 1, t: "System Sync", m: "Global data relay is 100% operational. High-budget missions are being routed to verified nodes only.", icon: <Activity size={16} className="text-emerald-500"/> }
+                    { id: 0, t: "Nexus Protocol", m: `Hello Node_${user?.firstName?.toUpperCase()}. Your account is almost ready. Pay the $10 fee to start your screening.`, icon: <Shield size={16} className="text-[#00f2ff]"/> },
+                    { id: 1, t: "System Sync", m: "Global data is working. High-pay jobs are for verified members only.", icon: <Activity size={16} className="text-emerald-500"/> }
                   ].map((msg, i) => (
                     <div key={i} onClick={() => setExpandedMsg(expandedMsg === i ? null : i)} className="p-6 rounded-[30px] bg-white/3 border border-white/5 cursor-pointer hover:bg-white/10 transition-all group">
                        <div className="flex gap-4">
@@ -241,7 +236,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             </motion.div>
           )}
 
-          {/* --- VAULT --- */}
           {activeTab === "earnings" && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
                <div className="flex justify-between items-center px-2">
@@ -267,7 +261,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                           <p className="text-[7px] font-bold text-gray-500 uppercase tracking-widest">Node ID</p>
                           <p className="text-[10px] font-mono text-white/60 tracking-widest">{user?.id?.substring(0, 10).toUpperCase()}</p>
                        </div>
-                       <button onClick={() => showAlert("Access Denied", "Verify node to enable withdrawal relays.", "info")} className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-2xl text-[10px] font-black uppercase italic hover:bg-[#00f2ff] transition-all shadow-xl active:scale-95">
+                       <button onClick={() => showAlert("Access Denied", "Pay $10 to unlock withdrawals.", "info")} className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-2xl text-[10px] font-black uppercase italic hover:bg-[#00f2ff] transition-all shadow-xl active:scale-95">
                           Withdraw <ArrowUpRight size={14}/>
                        </button>
                     </div>
@@ -276,7 +270,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                <div className="grid grid-cols-2 gap-4">
                   <div className="p-6 bg-white/5 border border-white/10 rounded-[30px] flex items-center gap-4 group hover:bg-white/10 transition-all">
                      <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500 border border-emerald-500/20 group-hover:scale-110 transition-transform"><History size={18}/></div>
-                     <div><p className="text-[7px] font-black text-gray-500 uppercase tracking-widest">Revenue</p><p className="text-sm font-black">$0.00</p></div>
+                     <div><p className="text-[7px] font-black text-gray-500 uppercase tracking-widest">Earnings</p><p className="text-sm font-black">$0.00</p></div>
                   </div>
                   <div className="p-6 bg-white/5 border border-white/10 rounded-[30px] flex items-center gap-4 group hover:bg-white/10 transition-all">
                      <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-500 border border-amber-500/20 group-hover:scale-110 transition-transform"><Clock size={18}/></div>
@@ -286,10 +280,9 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             </motion.div>
           )}
 
-          {/* --- STATS --- */}
           {activeTab === "analytics" && (
-            <div className="space-y-6">
-               <h3 className="text-xl font-bold uppercase px-2 tracking-widest">Node <span className="text-[#00f2ff]">Pulse</span></h3>
+            <div className="space-y-8">
+               <h3 className="text-xl font-bold uppercase px-2 tracking-widest">My <span className="text-[#00f2ff]">Stats</span></h3>
                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[
                     { l: "Success Rate", v: "0%", i: <CheckCircle2 size={16} className="text-emerald-500"/> },
@@ -306,12 +299,11 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                </div>
                <div className="p-12 bg-white/2 border border-white/10 rounded-[40px] text-center group">
                   <Activity size={32} className="mx-auto text-[#00f2ff] opacity-10 mb-4 group-hover:opacity-40 transition-opacity" />
-                  <p className="text-[9px] text-gray-600 uppercase font-black tracking-widest leading-loose">Sync your identity node to<br/>unlock live performance tracking</p>
+                  <p className="text-[9px] text-gray-600 uppercase font-black tracking-widest leading-loose">Verify your account to see<br/>your live job performance</p>
                </div>
             </div>
           )}
 
-          {/* --- ME --- */}
           {activeTab === "account" && (
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="max-w-3xl mx-auto space-y-6 pb-10">
                <div className="p-12 bg-linear-to-br from-white/10 to-white/5 border border-white/20 rounded-[50px] text-center shadow-3xl relative overflow-hidden">
@@ -322,7 +314,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                   </div>
                   <h3 className="text-4xl font-black italic uppercase tracking-tighter mb-2">{user?.fullName}</h3>
                   <div className="inline-flex items-center gap-2 bg-black/40 px-4 py-2 rounded-full border border-white/5 mb-10">
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#00f2ff]">Identity Tier 1</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#00f2ff]">Nexus Tier 1</span>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                      <button onClick={() => setActiveTab('earnings')} className="py-5 bg-white text-black rounded-[28px] font-black uppercase italic text-[11px] hover:bg-[#00f2ff] transition-all shadow-xl">Vault Sync</button>
@@ -330,28 +322,27 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                   </div>
                </div>
                <div className="flex justify-center pt-4">
-                  <SignOutButton><button className="px-10 py-5 bg-red-500/5 border-2 border-red-500/10 text-red-500 font-black italic rounded-[30px] uppercase text-[10px] hover:bg-red-500 hover:text-white transition-all shadow-2xl active:scale-95">Terminate Session</button></SignOutButton>
+                  <SignOutButton><button className="px-10 py-5 bg-red-500/5 border-2 border-red-500/10 text-red-500 font-black italic rounded-[30px] uppercase text-[10px] hover:bg-red-500 hover:text-white transition-all tracking-[0.5em] shadow-2xl active:scale-95">Log Out</button></SignOutButton>
                </div>
             </motion.div>
           )}
 
-          {/* --- SETTINGS (HIGH-FIDELITY) --- */}
           {activeTab === "settings" && (
             <div className="space-y-6 max-w-xl mx-auto">
-               <h3 className="text-2xl font-bold uppercase px-2 tracking-widest">Node <span className="text-[#00f2ff]">Terminal</span></h3>
+               <h3 className="text-2xl font-bold uppercase px-2 tracking-widest">Settings</h3>
                <div className="p-10 bg-white/3 border border-white/10 rounded-[45px] space-y-8 shadow-3xl backdrop-blur-2xl">
                   <div className="flex justify-between items-center group cursor-pointer">
                      <div className="flex items-center gap-4">
                         <div className="p-4 bg-white/5 rounded-[22px] group-hover:bg-[#00f2ff]/10 transition-colors shadow-inner"><Moon size={22} className="text-[#00f2ff]"/></div>
-                        <div><h4 className="text-xs font-black uppercase tracking-widest">Stealth Protocol</h4><p className="text-[9px] text-gray-500 italic">Invisible mission routing</p></div>
+                        <div><h4 className="text-xs font-black uppercase tracking-widest">Stealth</h4><p className="text-[9px] text-gray-500 italic">Hide profile from others</p></div>
                      </div>
                      <div className="w-10 h-5 bg-white/10 rounded-full p-1 flex justify-end items-center"><div className="w-3 h-3 bg-[#00f2ff] rounded-full shadow-glow" /></div>
                   </div>
                   
-                  <div className="flex justify-between items-center group cursor-pointer" onClick={() => showAlert("Interface Signal", "Accent palette synchronized.", "info")}>
+                  <div className="flex justify-between items-center group cursor-pointer" onClick={() => showAlert("Saved", "Primary color changed.", "info")}>
                      <div className="flex items-center gap-4">
                         <div className="p-4 bg-white/5 rounded-[22px] group-hover:bg-[#00f2ff]/10 transition-colors shadow-inner"><Palette size={22} className="text-[#00f2ff]"/></div>
-                        <div><h4 className="text-xs font-black uppercase tracking-widest">Neon Interface</h4><p className="text-[9px] text-gray-500 italic">Toggle core holographic accent</p></div>
+                        <div><h4 className="text-xs font-black uppercase tracking-widest">Neon</h4><p className="text-[9px] text-gray-500 italic">Change site colors</p></div>
                      </div>
                      <ChevronRight size={16} className="text-gray-600 group-hover:translate-x-2 transition-transform"/>
                   </div>
@@ -359,25 +350,24 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                   <div className="flex justify-between items-center opacity-40 cursor-not-allowed border-t border-white/5 pt-8">
                      <div className="flex items-center gap-4">
                         <div className="p-4 bg-white/5 rounded-[22px] shadow-inner"><Fingerprint size={22}/></div>
-                        <div><h4 className="text-xs font-black uppercase tracking-widest">Biometric Relay</h4><p className="text-[9px] text-gray-500 italic">Verify node identity to unlock</p></div>
+                        <div><h4 className="text-xs font-black uppercase tracking-widest">Face ID</h4><p className="text-[9px] text-gray-500 italic">Verify to use face login</p></div>
                      </div>
                      <Lock size={16} className="text-gray-600"/>
                   </div>
 
                   <div className="pt-6 border-t border-white/5">
-                    <button onClick={() => showAlert("System Saved", "Global configuration saved.", "success")} className="w-full py-5 bg-white text-black font-black italic rounded-3xl text-[11px] uppercase hover:bg-[#00f2ff] transition-all shadow-xl tracking-widest">Apply Handshake</button>
-                    <p className="w-full text-[8px] font-bold text-gray-700 uppercase tracking-[0.5em] text-center mt-6">Build Revision 4.0.2 - STABLE</p>
+                    <button onClick={() => showAlert("Saved", "Settings saved.", "success")} className="w-full py-5 bg-white text-black font-black italic rounded-3xl text-[11px] uppercase hover:bg-[#00f2ff] transition-all shadow-xl tracking-widest">Save Settings</button>
+                    <p className="w-full text-[8px] font-bold text-gray-700 uppercase tracking-[0.5em] text-center mt-6">Build 4.0.2 - STABLE</p>
                   </div>
                </div>
             </div>
           )}
 
-          {/* --- HELP --- */}
           {activeTab === "support" && (
              <div className="grid md:grid-cols-2 gap-4">
                 <div className="p-8 bg-white/5 border border-white/10 rounded-[40px] shadow-2xl">
-                   <h4 className="text-xs font-black uppercase text-[#00f2ff] mb-6 tracking-widest italic">Protocol FAQ</h4>
-                   {['Vault Safety Matrix', 'Settlement Latency', 'Screening Protocol'].map(q => (
+                   <h4 className="text-xs font-black uppercase text-[#00f2ff] mb-6 tracking-widest italic">FAQs</h4>
+                   {['Is my money safe?', 'How fast is pay?', 'Help with screening'].map(q => (
                      <button key={q} onClick={handleSupportEmail} className="w-full flex justify-between items-center p-4 bg-black/40 rounded-2xl mb-3 text-left hover:bg-white/5 border border-transparent hover:border-white/5 transition-all">
                         <span className="text-[10px] font-bold italic">{q}</span>
                         <ChevronRight size={14} className="text-[#00f2ff]" />
@@ -386,9 +376,9 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 </div>
                 <div className="p-10 bg-white/5 border border-white/10 rounded-[40px] text-center flex flex-col justify-center gap-4 shadow-2xl">
                    <HelpCircle size={48} className="mx-auto text-[#00f2ff] opacity-40" />
-                   <p className="text-[10px] text-gray-500 uppercase font-bold">Assistance Relay:</p>
+                   <p className="text-[10px] text-gray-500 uppercase font-bold">Quick Email:</p>
                    <p className="text-xs font-black italic text-white">notifications.nexusgigs@gmail.com</p>
-                   <button onClick={handleSupportEmail} className="mt-4 py-4 bg-[#00f2ff] text-black font-black rounded-2xl text-[10px] uppercase shadow-glow active:scale-95 transition-transform">Initialize Uplink</button>
+                   <button onClick={handleSupportEmail} className="mt-4 py-4 bg-[#00f2ff] text-black font-black rounded-2xl text-[10px] uppercase shadow-glow active:scale-95 transition-transform">Get Help</button>
                 </div>
              </div>
           )}
@@ -396,7 +386,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
         </AnimatePresence>
       </div>
 
-      {/* --- NAV DOCK --- */}
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-100 w-[94%] max-w-xl">
         <div className="h-16 bg-black/80 backdrop-blur-3xl border border-white/10 rounded-full flex items-center justify-around px-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
           {navItems.map((item) => (
@@ -408,7 +397,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
         </div>
       </div>
 
-      {/* --- VERIFICATION MODAL --- */}
       <AnimatePresence>
         {showVerifyModal && (
           <div className="fixed inset-0 z-200 flex items-center justify-center p-6 backdrop-blur-md bg-black/60">
@@ -419,32 +407,31 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
               {paymentStep === "terms" ? (
                 <div className="space-y-6">
                   <ShieldCheck size={40} className="text-[#00f2ff] mx-auto shadow-glow" />
-                  <h3 className="text-xl font-black italic uppercase tracking-tight">Identity Sync</h3>
+                  <h3 className="text-xl font-black italic uppercase tracking-tight">Identity Check</h3>
                   
                   <div className="bg-white/5 p-5 rounded-3xl text-left border border-white/5 space-y-4">
-                     <p className="text-[10px] text-gray-300 font-bold italic leading-relaxed">1. Pay $10 Handshake fee.</p>
-                     <p className="text-[10px] text-gray-400 italic leading-tight">2. Pass the technical survey and screening Zoom call.</p>
+                     <p className="text-[10px] text-gray-300 font-bold italic leading-relaxed">1. Pay $10 fee.</p>
+                     <p className="text-[10px] text-gray-400 italic leading-tight">2. Pass the email survey and Zoom call.</p>
                      <div className="pt-2 border-t border-white/5">
-                        <p className="text-[9px] text-emerald-400 font-bold italic flex items-center gap-2"><CheckCircle2 size={10}/> 100% Refund if you fail screening.</p>
+                        <p className="text-[9px] text-emerald-400 font-bold italic flex items-center gap-2"><CheckCircle2 size={10}/> 100% Refund if you fail the call.</p>
                      </div>
                   </div>
                   
-                  {/* AGREEMENT CHECKBOX */}
                   <div className="flex items-center gap-4 bg-white/5 p-4 rounded-3xl border border-white/5 cursor-pointer text-left transition-all hover:bg-white/10" onClick={() => setAgreedToTerms(!agreedToTerms)}>
                      <div className={`w-6 h-6 rounded-xl border-2 flex items-center justify-center transition-all shrink-0 ${agreedToTerms ? 'bg-[#00f2ff] border-[#00f2ff]' : 'border-white/20'}`}>
                         {agreedToTerms && <X size={12} className="text-black font-black"/>}
                      </div>
-                     <span className="text-[9px] font-black italic text-gray-400 leading-tight uppercase">I agree to the $10 fee, survey, and screening refund policy.</span>
+                     <span className="text-[9px] font-black italic text-gray-400 leading-tight uppercase">I agree to the $10 fee, survey, and screening refund rules.</span>
                   </div>
 
-                  <button disabled={!agreedToTerms} onClick={() => setPaymentStep("choice")} className={`w-full py-5 rounded-[25px] font-black uppercase italic text-[11px] transition-all tracking-[0.2em] ${agreedToTerms ? 'bg-[#00f2ff] text-black shadow-glow hover:scale-[1.02]' : 'bg-gray-800 text-gray-600 cursor-not-allowed'}`}>Accept & Sync</button>
+                  <button disabled={!agreedToTerms} onClick={() => setPaymentStep("choice")} className={`w-full py-5 rounded-[25px] font-black uppercase italic text-[11px] transition-all tracking-[0.2em] ${agreedToTerms ? 'bg-[#00f2ff] text-black shadow-glow hover:scale-[1.02]' : 'bg-gray-800 text-gray-600 cursor-not-allowed'}`}>Pay & Sync</button>
                 </div>
               ) : paymentStep === "choice" ? (
                 <div className="space-y-6">
-                  <h3 className="text-md font-black uppercase italic tracking-widest text-[#00f2ff]">Select Relay</h3>
+                  <h3 className="text-md font-black uppercase italic tracking-widest text-[#00f2ff]">Pay $10</h3>
                   <div className="space-y-3">
-                    <button onClick={() => handleSecurePayment("CARD")} className="w-full py-4 bg-white text-black font-black rounded-2xl text-[10px] uppercase italic flex items-center justify-center gap-3 tracking-widest"><CreditCard size={14}/> Global Card</button>
-                    <button onClick={() => setPaymentStep("mpesa")} className="w-full py-4 bg-emerald-600 text-white font-black rounded-2xl text-[10px] uppercase italic flex items-center justify-center gap-3 tracking-widest shadow-lg"><Smartphone size={14}/> M-Pesa Direct</button>
+                    <button onClick={() => handleSecurePayment("CARD")} className="w-full py-4 bg-white text-black font-black rounded-2xl text-[10px] uppercase italic flex items-center justify-center gap-3 tracking-widest"><CreditCard size={14}/> Card</button>
+                    <button onClick={() => setPaymentStep("mpesa")} className="w-full py-4 bg-emerald-600 text-white font-black rounded-2xl text-[10px] uppercase italic flex items-center justify-center gap-3 tracking-widest shadow-lg"><Smartphone size={14}/> M-Pesa</button>
                   </div>
                   <button onClick={() => setPaymentStep("terms")} className="text-[9px] text-gray-500 uppercase font-black italic tracking-[0.3em]">Go Back</button>
                 </div>
@@ -453,7 +440,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                    <Smartphone size={32} className="text-emerald-500 mx-auto animate-bounce" />
                    <input value={mpesaNumber} onChange={e => setMpesaNumber(e.target.value)} placeholder="2547XXXXXXXX" className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-center text-2xl font-black text-white outline-none focus:border-emerald-500 shadow-inner" />
                    <div className="space-y-4">
-                    <button disabled={isPaying} onClick={() => handleSecurePayment("M-PESA")} className={`w-full py-5 bg-emerald-600 text-white font-black rounded-2xl uppercase italic text-[11px] shadow-lg tracking-widest`}>{isPaying ? "ENCRYPTING..." : "Transmit KES 1,300"}</button>
+                    <button disabled={isPaying} onClick={() => handleSecurePayment("M-PESA")} className={`w-full py-5 bg-emerald-600 text-white font-black rounded-2xl uppercase italic text-[11px] shadow-lg tracking-widest`}>{isPaying ? "Sending..." : "Pay KES 1,300"}</button>
                     <button onClick={() => setPaymentStep("choice")} className="text-[9px] text-gray-500 uppercase font-black italic tracking-widest">Back</button>
                    </div>
                 </div>
@@ -463,7 +450,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
         )}
       </AnimatePresence>
 
-      {/* --- ALERT POPUP --- */}
       <AnimatePresence>
         {customAlert.show && (
           <div className="fixed inset-0 z-300 flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm">
@@ -474,7 +460,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 </div>
                 <h4 className="text-md font-black uppercase italic mb-3 text-white tracking-tighter leading-none">{customAlert.title}</h4>
                 <p className="text-[10px] text-gray-400 italic mb-8 leading-relaxed tracking-wide">{customAlert.msg}</p>
-                <button onClick={() => setCustomAlert({...customAlert, show: false})} className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase italic hover:bg-white hover:text-black transition-all">Dismiss Signal</button>
+                <button onClick={() => setCustomAlert({...customAlert, show: false})} className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase italic hover:bg-white hover:text-black transition-all">Dismiss</button>
              </motion.div>
           </div>
         )}
