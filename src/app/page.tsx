@@ -1,308 +1,264 @@
 "use client";
 
-import { useUser, SignInButton, SignUpButton } from "@clerk/nextjs";
-import { useEffect, useState, useCallback, useMemo } from "react";
-import { FreelancerView } from "@/components/dashboard/FreelancerView";
-import { ClientView } from "@/components/dashboard/ClientView";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Zap, Globe, Cpu, Lock, Rocket, MousePointer2, Sparkles, Layers, Box, Terminal, Target, Users, DollarSign, Briefcase, ZapIcon } from "lucide-react";
+import { 
+  Shield, Users, DollarSign, Activity, Settings, 
+  UserCheck, Ban, Trash2, Globe, TrendingUp, 
+  Search, Lock, Zap, Server, BarChart, ChevronRight,
+  Smartphone, Landmark, Bitcoin, UserPlus, Briefcase, MousePointer2,
+  Cpu, Power, AlertCircle, Copy, UserCog, Terminal, X
+} from "lucide-react";
 
-// --- ROCKET WARP ANIMATION ---
-const RocketWarp = ({ active }: { active: boolean }) => (
-  <AnimatePresence>
-    {active && (
-      <motion.div 
-        initial={{ opacity: 0 }} 
-        animate={{ opacity: 1 }} 
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-100 flex items-center justify-center pointer-events-none"
-      >
-        <motion.div
-          initial={{ y: 800, scale: 0.5, opacity: 1 }}
-          animate={{ y: -1500, scale: 3, opacity: [1, 1, 0] }}
-          transition={{ duration: 0.8, ease: "easeIn" }}
-          className="relative"
-        >
-          <Rocket size={100} className="text-[#00f2ff] fill-[#00f2ff] drop-shadow-[0_0_50px_#00f2ff]" />
-          <div className="absolute top-full left-1/2 -translate-x-1/2 w-10 h-60 bg-linear-to-t from-transparent via-blue-500 to-[#00f2ff] blur-xl" />
-        </motion.div>
-      </motion.div>
-    )}
-  </AnimatePresence>
-);
+// --- 🛡️ INTERNAL SYSTEM ACTIONS (Bypassing missing files) ---
+// These functions simulate the database handshake until you link your real DB
+const getAllNexusUsers = async () => {
+  return { success: true, users: [] }; 
+};
+const verifyUserNode = async (id: string) => ({ success: true });
+const terminateUserNode = async (id: string) => ({ success: true });
+const suspendUserNode = async (id: string, state: boolean) => ({ success: true });
 
-export default function Home() {
-  const { isLoaded, isSignedIn, user } = useUser();
-  const [mounted, setMounted] = useState(false);
-  const [isWarping, setIsWarping] = useState(false);
-  const [step, setStep] = useState<"checking" | "landing" | "path" | "survey" | "loading" | "dashboard">("checking");
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [loadingProgress, setLoadingProgress] = useState(0);
+interface NexusUser {
+  id: string;
+  name: string;
+  email: string;
+  status: string;
+  role: string;
+  banned: boolean;
+  joined: string;
+  createdAt: number;
+  paidBalance?: number; 
+}
 
-  const reviews = useMemo(() => [
-    { name: "Alex K.", role: "Fullstack Node", img: "https://i.pravatar.cc/150?u=1", stars: 5 },
-    { name: "Sarah M.", role: "UI/UX Architect", img: "https://i.pravatar.cc/150?u=2", stars: 5 },
-    { name: "John D.", role: "Python Specialist", img: "https://i.pravatar.cc/150?u=3", stars: 4 },
-  ], []);
+export default function AdminPage() {
+  const [passInput, setPassInput] = useState("");
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [operators, setOperators] = useState<NexusUser[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [fetching, setFetching] = useState(false);
+  const [visitCount, setVisitCount] = useState(1402);
 
-  // --- UPDATED SURVEY QUESTIONS ---
-  const surveyQuestions = useMemo(() => [
-    { 
-      q: "What is your main reason for joining NexusGigs?", 
-      options: ["I want to find freelance work and earn money", "I want to hire freelancers for my projects", "I want to do both (freelance and hire)", "Just exploring the platform for now"] 
-    },
-    { 
-      q: "What is your primary goal on NexusGigs?", 
-      options: ["Find and apply for gigs quickly", "Build long-term client relationships", "Earn more income from freelance work", "Hire reliable freelancers for my projects", "Explore opportunities (just browsing)"] 
-    },
-    { 
-      q: "How experienced are you as a freelancer?", 
-      options: ["Beginner (just starting)", "Intermediate (have done a few projects)", "Experienced (regular freelance work)", "Professional (full-time freelancer)"] 
-    },
-    { 
-      q: "Which categories are you most interested in?", 
-      options: ["Web & App Development", "Graphic Design & UI/UX", "Writing & Content Creation", "Digital Marketing & SEO", "Video Editing & Animation", "Data Entry & Virtual Assistance", "Other"] 
-    },
-    { 
-      q: "What is your preferred way of working?", 
-      options: ["Short-term gigs (1–7 days)", "Medium projects (1–4 weeks)", "Long-term or ongoing work", "One-off tasks"] 
-    },
-    { 
-      q: "Where are you located?", 
-      options: ["Kenya", "Other African country", "Europe", "North America", "Asia", "Other"] 
-    },
-    { 
-      q: "How did you hear about NexusGigs?", 
-      options: ["Instagram / TikTok", "WhatsApp / Friend referral", "Google Search", "Facebook", "Other"] 
-    },
-    { 
-      q: "What payment method do you prefer?", 
-      options: ["M-Pesa (Kenya)", "Binance / Crypto", "Bank Transfer", "PayPal or International", "No preference"] 
-    },
-    { 
-      q: "Would you like personalized gig recommendations?", 
-      options: ["Yes, show me relevant gigs right away", "Yes, but only after I complete my profile", "No thanks"] 
-    },
-    { 
-      q: "Anything else we should know? (Optional)", 
-      options: [], // Empty options indicates a text area for the final step
-      isOptional: true 
-    },
-  ], []);
+  // System Settings States
+  const [isMaintenance, setIsMaintenance] = useState(false);
+  const [commissionRelay, setCommissionRelay] = useState(15);
+
+  // --- 📈 REAL-TIME CALCULATIONS (Error-Free Rendering) ---
+  const metrics = useMemo(() => {
+    const verified = operators.filter(o => o.status === "Verified");
+    const clients = operators.filter(o => o.role === "client");
+    const startOfToday = new Date().setHours(0, 0, 0, 0);
+    const startOfYesterday = startOfToday - 86400000;
+    
+    const todaySignups = operators.filter(o => o.createdAt >= startOfToday).length;
+    const todayVerified = verified.filter(o => o.createdAt >= startOfToday);
+
+    // Summing real revenue from user metadata balance
+    const revenueSum = operators.reduce((acc, curr) => acc + (curr.paidBalance || 0), 0);
+    const todayRevSum = todayVerified.reduce((acc, curr) => acc + (curr.paidBalance || 0), 0);
+
+    return {
+      verifiedNodes: verified,
+      totalUsers: operators.length,
+      activeUsers: verified.length,
+      totalClients: clients.length,
+      todaySignups,
+      totalRevenue: revenueSum,
+      todayTransactions: todayRevSum,
+    };
+  }, [operators]);
+
+  const loadData = useCallback(async () => {
+    if (!isAuthorized) return;
+    setFetching(true);
+    const res = await getAllNexusUsers();
+    if (res.success && res.users) setOperators(res.users as NexusUser[]);
+    setFetching(false);
+  }, [isAuthorized]);
 
   useEffect(() => {
-    setMounted(true);
-    if (isLoaded) {
-      if (!isSignedIn) setStep("landing");
-      else if (user?.id) {
-        const savedRole = localStorage.getItem(`nexus_user_role_${user.id}`);
-        if (savedRole) { setSelectedRole(savedRole); setStep("dashboard"); }
-        else setStep("path");
-      }
-    }
-  }, [isLoaded, isSignedIn, user]);
+    if (sessionStorage.getItem("nexus_admin_session") === "true") setIsAuthorized(true);
+    const interval = setInterval(() => setVisitCount(v => v + Math.floor(Math.random() * 3)), 8000);
+    return () => clearInterval(interval);
+  }, []);
 
-  const triggerWarp = (callback: () => void) => {
-    setIsWarping(true);
-    setTimeout(() => { callback(); setIsWarping(false); }, 700);
+  useEffect(() => {
+    if (isAuthorized) {
+      loadData();
+      const heartbeat = setInterval(() => loadData(), 20000); 
+      return () => clearInterval(heartbeat);
+    }
+  }, [isAuthorized, loadData]);
+
+  const handleAction = async (actionFn: any, id: string, extraArg?: any) => {
+    if (confirm("Execute high-tier command?")) {
+      setFetching(true);
+      const res = await actionFn(id, extraArg);
+      if (res.success) await loadData();
+      setFetching(false);
+    }
   };
 
-  const handleRoleSelect = (role: string) => {
-    triggerWarp(() => { setSelectedRole(role); setStep("survey"); });
-  };
-
-  const handleSurveyAnswer = useCallback(() => {
-    if (currentQuestion < surveyQuestions.length - 1) {
-      setCurrentQuestion(prev => prev + 1);
-    } else {
-      triggerWarp(() => {
-        setStep("loading");
-        let p = 0;
-        const inv = setInterval(() => {
-          p += 2;
-          setLoadingProgress(p);
-          if (p >= 100) {
-            clearInterval(inv);
-            if (user?.id) localStorage.setItem(`nexus_user_role_${user.id}`, selectedRole!);
-            setStep("dashboard");
-          }
-        }, 30);
-      });
-    }
-  }, [currentQuestion, selectedRole, user?.id, surveyQuestions.length]);
-
-  if (!mounted || !isLoaded || step === "checking") return <div className="min-h-screen bg-[#020617]" />;
-
-  if (step === "landing") {
+  if (!isAuthorized) {
     return (
-      <motion.div 
-        animate={isWarping ? { scale: 1.2, filter: "blur(20px)", opacity: 0 } : { scale: 1, filter: "blur(0px)", opacity: 1 }}
-        className="min-h-screen text-white relative font-sans overflow-x-hidden bg-[#020617]"
-      >
-        <RocketWarp active={isWarping} />
-        
-        <div className="fixed inset-0 z-0 pointer-events-none">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,242,255,0.05)_0%,transparent_70%)]" />
-          <div className="stars-animation" />
-        </div>
-
-        <header className="fixed top-0 w-full h-20 z-50 flex items-center justify-between px-8 bg-[#020617]/60 backdrop-blur-xl border-b border-white/5">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-linear-to-br from-[#00f2ff] to-blue-600 rounded-lg rotate-45 flex items-center justify-center shadow-[0_0_15px_#00f2ff]">
-              <Terminal size={16} className="text-[#020617] -rotate-45" />
-            </div>
-            <h1 className="text-xl font-black italic uppercase tracking-tighter">NEXUS<span className="text-[#00f2ff]">GIGS</span></h1>
-          </div>
-          <div className="flex gap-6 items-center">
-             <SignInButton mode="modal">
-               <button onClick={() => triggerWarp(() => {})} className="text-[10px] font-black uppercase italic tracking-widest text-gray-400 hover:text-[#00f2ff] transition-all">Login</button>
-             </SignInButton>
-             <SignUpButton mode="modal">
-               <button onClick={() => triggerWarp(() => {})} className="px-8 py-2.5 bg-white text-black text-[10px] font-black uppercase italic rounded-full shadow-lg hover:bg-[#00f2ff] hover:text-black transition-all">Get Started</button>
-             </SignUpButton>
-          </div>
-        </header>
-
-        <main className="relative z-10 max-w-7xl mx-auto px-6 pt-24 space-y-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
-              <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#00f2ff]/10 border border-[#00f2ff]/20 rounded-full">
-                  <Sparkles size={12} className="text-[#00f2ff]" />
-                  <p className="text-[#00f2ff] text-[8px] font-black uppercase italic">V4.0 Uplink Active</p>
-                </div>
-                <h2 className="text-8xl md:text-[9.5rem] font-black italic uppercase leading-[0.75] tracking-tighter">
-                  EVOLVE <br /> <span className="text-transparent bg-clip-text bg-linear-to-r from-[#00f2ff] to-blue-400">BEYOND</span>
-                </h2>
-                <p className="text-gray-400 max-w-md text-lg leading-relaxed font-medium italic border-l-2 border-[#00f2ff]/40 pl-6">Command high-tier code. Secure global settlements. The future is your mission.</p>
-              </div>
-            </div>
-
-            <div className="relative">
-              <div className="relative z-10 rounded-[60px] overflow-hidden border border-white/10 shadow-2xl bg-[#020617]">
-                <img src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=1200" alt="Tech Command" className="w-full h-125 object-cover opacity-70" />
-                <div className="absolute inset-0 bg-linear-to-t from-[#020617] via-transparent to-transparent" />
-              </div>
-              
-              <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[110%] grid grid-cols-2 md:grid-cols-4 gap-4 z-20">
-                {[
-                  { icon: <Users size={16}/>, label: "Total Nodes", val: "1.5M+", color: "text-[#00f2ff]" },
-                  { icon: <DollarSign size={16}/>, label: "Transacted", val: "$42M+", color: "text-emerald-400" },
-                  { icon: <Briefcase size={16}/>, label: "Ready Gigs", val: "850+", color: "text-purple-400" },
-                  { icon: <ZapIcon size={16}/>, label: "Freelancers", val: "12K+", color: "text-orange-400" }
-                ].map((stat, i) => (
-                  <motion.div key={i} whileHover={{ y: -5 }} className="bg-black/60 backdrop-blur-2xl border border-white/10 p-5 rounded-3xl shadow-2xl">
-                    <div className={`${stat.color} mb-2`}>{stat.icon}</div>
-                    <p className="text-[14px] font-black text-white">{stat.val}</p>
-                    <p className="text-[8px] font-bold text-gray-500 uppercase tracking-widest">{stat.label}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <section className="grid md:grid-cols-3 gap-8 pt-20 pb-32">
-            {[
-              { icon: <Shield size={32} />, title: "Secure Escrow", desc: "Military-grade protection." },
-              { icon: <Zap size={32} />, title: "Instant Relay", desc: "M-Pesa cleared in 60s." },
-              { icon: <Globe size={32} />, title: "Global Gigs", desc: "High-command missions." }
-            ].map((card, i) => (
-              <div key={i} className="p-10 bg-white/2 border border-white/5 rounded-[50px] hover:border-[#00f2ff]/40 transition-all group backdrop-blur-sm">
-                <div className="w-14 h-14 bg-[#00f2ff]/10 rounded-2xl flex items-center justify-center text-[#00f2ff] mb-6 group-hover:scale-110 transition-transform">{card.icon}</div>
-                <h3 className="text-xl font-black italic uppercase text-white mb-2">{card.title}</h3>
-                <p className="text-gray-500 text-[10px] font-bold uppercase italic">{card.desc}</p>
-              </div>
-            ))}
-          </section>
-        </main>
-        
-        <style jsx global>{`
-          .stars-animation {
-            position: absolute; inset: 0;
-            background-image: radial-gradient(circle at center, white 1px, transparent 1px);
-            background-size: 80px 80px;
-            animation: move-stars 200s linear infinite;
-            opacity: 0.2;
-          }
-          @keyframes move-stars { from { transform: translateY(0); } to { transform: translateY(-1000px); } }
-        `}</style>
-      </motion.div>
-    );
-  }
-
-  if (step === "path") {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#020617] p-6 relative">
-        <RocketWarp active={isWarping} />
-        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-10 max-w-5xl w-full">
-           <button onClick={() => handleRoleSelect('freelancer')} className="p-16 bg-white/5 border border-white/10 rounded-[60px] text-left group hover:border-[#00f2ff] transition-all backdrop-blur-xl">
-              <div className="w-20 h-20 bg-[#00f2ff]/10 rounded-3xl flex items-center justify-center text-4xl mb-10 group-hover:bg-[#00f2ff] group-hover:text-black transition-all"><Box size={40}/></div>
-              <h3 className="text-4xl font-black italic uppercase text-white mb-2 tracking-tighter">Freelancer</h3>
-              <p className="text-xs text-gray-500 uppercase font-black italic tracking-widest">Execute Missions & Earn USD.</p>
-           </button>
-           <button onClick={() => handleRoleSelect('client')} className="p-16 bg-white/5 border border-white/10 rounded-[60px] text-left group hover:border-purple-500 transition-all backdrop-blur-xl">
-              <div className="w-20 h-20 bg-purple-500/10 rounded-3xl flex items-center justify-center text-4xl mb-10 group-hover:bg-purple-500 transition-all"><Target size={40}/></div>
-              <h3 className="text-4xl font-black italic uppercase text-white mb-2 tracking-tighter">Client</h3>
-              <p className="text-xs text-gray-500 uppercase font-black italic tracking-widest">Deploy Gigs & Recruit Talent.</p>
-           </button>
-        </div>
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center p-4">
+        <motion.form 
+          initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+          onSubmit={(e) => { 
+            e.preventDefault(); 
+            if(passInput === "Nexus123!") { 
+              sessionStorage.setItem("nexus_admin_session", "true"); 
+              setIsAuthorized(true); 
+            } else { alert("Handshake Denied."); }
+          }} 
+          className="w-full max-w-sm bg-black border-2 border-red-500/20 p-12 rounded-[60px] text-center shadow-[0_0_100px_rgba(239,68,68,0.15)]"
+        >
+          <Lock size={48} className="mx-auto mb-10 text-red-500" />
+          <h1 className="text-3xl font-black italic text-white uppercase tracking-tighter mb-8">NEXUS <span className="text-red-600">HQ</span></h1>
+          <input type="password" value={passInput} onChange={(e) => setPassInput(e.target.value)} placeholder="PROTOCOL KEY" className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-white text-center font-black mb-8 outline-none focus:border-red-600 transition-all tracking-[0.5em]" />
+          <button className="w-full py-5 bg-red-600 text-white font-black rounded-2xl uppercase text-[11px] italic tracking-widest hover:bg-red-700 transition-all">Unlock Command</button>
+        </motion.form>
       </div>
     );
   }
 
-  // --- UPDATED SURVEY RENDERER ---
-  if (step === "survey") {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#020617] p-6">
-        <RocketWarp active={isWarping} />
-        <div className="max-w-md w-full bg-black/60 backdrop-blur-3xl border border-white/10 p-12 rounded-[50px] relative z-10">
-           <p className="text-[10px] font-black text-[#00f2ff] uppercase italic mb-8 tracking-widest">Step {currentQuestion + 1} / {surveyQuestions.length}</p>
-           <h2 className="text-2xl font-black italic uppercase text-white mb-10 border-l-4 border-[#00f2ff] pl-6 leading-tight">{surveyQuestions[currentQuestion].q}</h2>
-           
-           {surveyQuestions[currentQuestion].options.length > 0 ? (
-             <div className="grid gap-4">
-                {surveyQuestions[currentQuestion].options.map(o => (
-                  <button key={o} onClick={handleSurveyAnswer} className="w-full py-5 px-8 bg-white/5 border border-white/10 rounded-2xl text-left text-[10px] font-black uppercase italic hover:bg-white hover:text-black transition-all">{o}</button>
-                ))}
-             </div>
-           ) : (
-             <div className="space-y-6">
-                <textarea 
-                  placeholder="Type your response here..." 
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-white text-xs font-bold outline-none focus:border-[#00f2ff] transition-all"
-                  rows={4}
-                />
-                <div className="grid grid-cols-2 gap-4">
-                  <button onClick={handleSurveyAnswer} className="py-5 bg-white/5 border border-white/10 rounded-2xl text-center text-[10px] font-black uppercase italic hover:text-[#00f2ff] transition-all">Skip</button>
-                  <button onClick={handleSurveyAnswer} className="py-5 bg-[#00f2ff] text-black rounded-2xl text-center text-[10px] font-black uppercase italic hover:scale-105 transition-all">Complete Sync</button>
+  return (
+    <div className="flex min-h-screen bg-[#020617] text-white font-sans overflow-x-hidden">
+      
+      {/* --- 📟 SIDEBAR --- */}
+      <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-black border-r border-white/5 transform transition-transform duration-500 md:translate-x-0 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
+        <div className="p-10 border-b border-white/5 mb-8 flex items-center gap-3">
+            <Shield className="text-red-600" size={24}/>
+            <h2 className="font-black italic text-white uppercase tracking-tighter text-xl">Nexus<span className="text-red-600">HQ</span></h2>
+        </div>
+        <nav className="px-6 space-y-3">
+          {[
+            { id: "dashboard", label: "Dashboard", icon: <BarChart size={20}/> },
+            { id: "users", label: "Nodes", icon: <Users size={20}/> },
+            { id: "payments", label: "Vault", icon: <DollarSign size={20}/> },
+            { id: "settings", label: "Config", icon: <Settings size={20}/> }
+          ].map(m => (
+            <button key={m.id} onClick={() => { setActiveTab(m.id); setIsMobileMenuOpen(false); }} className={`w-full flex items-center gap-5 px-6 py-5 rounded-3xl transition-all relative group ${activeTab === m.id ? 'bg-red-600 text-white shadow-2xl shadow-red-600/30' : 'text-gray-500 hover:bg-white/5 hover:text-white'}`}>
+              {m.icon} <span className="text-[11px] font-black uppercase tracking-widest">{m.label}</span>
+              {activeTab === m.id && <motion.div layoutId="navInd" className="absolute left-0 w-1 h-8 bg-white rounded-r-full" />}
+            </button>
+          ))}
+        </nav>
+      </aside>
+
+      <main className="flex-1 p-6 md:p-16 md:pl-80 pt-24 md:pt-16 max-w-7xl w-full">
+        
+        {/* --- DASHBOARD TAB --- */}
+        {activeTab === "dashboard" && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-12">
+            <h3 className="text-4xl font-black uppercase italic tracking-tighter leading-none">System <span className="text-red-600">Pulse</span></h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                { label: "Total Nodes", val: metrics.totalUsers, icon: <Users/>, bg: "bg-blue-500" },
+                { label: "Active Nodes", val: metrics.activeUsers, icon: <UserCheck/>, bg: "bg-emerald-500" },
+                { label: "Total Clients", val: metrics.totalClients, icon: <Briefcase/>, bg: "bg-purple-500" },
+                { label: "Today Uplinks", val: metrics.todaySignups, icon: <UserPlus/>, bg: "bg-orange-500" },
+                { label: "Vault Revenue", val: `KES ${metrics.totalRevenue.toLocaleString()}`, icon: <DollarSign/>, bg: "bg-emerald-600" },
+                { label: "Today Inflow", val: `KES ${metrics.todayTransactions.toLocaleString()}`, icon: <TrendingUp/>, bg: "bg-cyan-500" },
+              ].map((s, i) => (
+                <div key={i} className="bg-white p-8 rounded-[40px] flex flex-col justify-between hover:scale-105 transition-transform shadow-xl">
+                  <div className={`w-12 h-12 ${s.bg} rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg`}>{s.icon}</div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-1 leading-none">{s.label}</p>
+                    <h4 className="text-2xl font-black text-slate-900 tracking-tighter leading-none">{s.val}</h4>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="p-16 bg-white/2 border border-white/10 rounded-[70px] relative overflow-hidden shadow-2xl">
+               <div className="flex justify-between items-center mb-10"><p className="text-xs font-black uppercase italic text-red-600 tracking-widest">Real-Time Inflow Monitor</p><Cpu size={20} className="text-gray-800" /></div>
+               <div className="flex items-end justify-between h-48 gap-4 px-4">
+                  {[40, 70, 45, 90, 65, 100, 80, 50, 95, 30].map((h, i) => (
+                    <motion.div key={i} animate={{ height: [`0%`, `${h}%`, `${h-10}%`, `${h}%`] }} transition={{ repeat: Infinity, duration: 4, delay: i * 0.1 }} className="w-full bg-linear-to-t from-red-600 to-orange-500 rounded-t-2xl" />
+                  ))}
+               </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* --- REGISTRY TAB --- */}
+        {activeTab === "users" && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-10">
+             <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                <h3 className="text-3xl font-black uppercase italic tracking-tighter leading-none">Node <span className="text-red-600">Registry</span></h3>
+                <div className="relative w-full md:w-96">
+                   <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                   <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder="FILTER IDENTITIES..." className="w-full bg-white/5 border border-white/10 rounded-full px-16 py-4 text-xs font-black text-white outline-none focus:border-red-600 transition-all uppercase italic" />
                 </div>
              </div>
-           )}
-        </div>
-      </div>
-    );
-  }
 
-  if (step === "loading") {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#020617] p-6 relative">
-        <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} className="w-24 h-24 border-t-2 border-[#00f2ff] rounded-full mb-10 shadow-[0_0_40px_rgba(0,242,255,0.3)]" />
-        <h2 className="text-2xl font-black italic uppercase text-[#00f2ff] animate-pulse tracking-widest">Syncing Node...</h2>
-        <div className="w-full max-w-xs h-1 bg-white/5 rounded-full overflow-hidden mt-6">
-           <div className="h-full bg-linear-to-r from-[#00f2ff] to-blue-500" style={{ width: `${loadingProgress}%` }} />
-        </div>
-      </div>
-    );
-  }
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {operators.length === 0 ? (
+                  <div className="col-span-full p-20 border-2 border-dashed border-white/5 rounded-[50px] text-center text-gray-500 uppercase font-black text-xs tracking-widest italic">
+                    No nodes synchronized to current session.
+                  </div>
+                ) : (
+                  operators.filter(o => o.name.toLowerCase().includes(searchTerm.toLowerCase())).map((op, idx) => (
+                    <motion.div key={op.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }} className="p-8 bg-white/5 border border-white/10 rounded-[45px] hover:border-red-500/40 transition-all group relative overflow-hidden shadow-2xl">
+                      <div className="flex justify-between items-start mb-6">
+                         <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center font-black text-xl text-red-500 border border-white/10">{op.name.charAt(0)}</div>
+                         <span className={`px-4 py-1 rounded-full text-[8px] font-black border ${op.banned ? 'border-red-600 text-red-600' : 'border-emerald-500 text-emerald-500'}`}>{op.status.toUpperCase()}</span>
+                      </div>
+                      <div className="mb-8">
+                         <h4 className="text-lg font-black uppercase italic text-white leading-tight">{op.name}</h4>
+                         <p className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-1">REV_SYNC: KES {op.paidBalance || 0}</p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 leading-none">
+                         <button onClick={() => handleAction(verifyUserNode, op.id)} className="py-3 bg-emerald-600 text-white rounded-2xl text-[9px] font-black uppercase italic hover:bg-emerald-700 transition-colors leading-none">Verify</button>
+                         <button onClick={() => handleAction(suspendUserNode as any, op.id, !op.banned)} className="py-3 bg-amber-600 text-white rounded-2xl text-[9px] font-black uppercase italic hover:bg-amber-700 transition-colors leading-none">{op.banned ? 'Restore' : 'Suspend'}</button>
+                         <button onClick={() => { navigator.clipboard.writeText(op.id); alert("ID Copied"); }} className="py-3 bg-white/5 border border-white/10 text-white rounded-2xl text-[9px] font-black uppercase italic leading-none">Copy ID</button>
+                         <button onClick={() => handleAction(terminateUserNode, op.id)} className="py-3 bg-red-600 text-white rounded-2xl text-[9px] font-black uppercase italic hover:bg-red-700 transition-colors leading-none">Kill</button>
+                      </div>
+                    </motion.div>
+                  ))
+                )}
+             </div>
+          </motion.div>
+        )}
 
-  if (step === "dashboard") {
-    return (
-      <main className="min-h-screen bg-[#020617]">
-        {selectedRole === "freelancer" ? <FreelancerView jobs={[]} userMetadata={user?.publicMetadata || {}} /> : <ClientView jobs={[]} />}
+        {/* --- SETTINGS TAB --- */}
+        {activeTab === "settings" && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-2xl space-y-10">
+             <h3 className="text-3xl font-black uppercase italic tracking-tighter leading-none">System <span className="text-red-600">Core</span></h3>
+             <div className="p-12 bg-white/5 border border-white/10 rounded-[60px] space-y-12 shadow-3xl">
+                <div className="flex justify-between items-center">
+                   <div><h4 className="text-sm font-black uppercase italic tracking-wider">Maintenance Protocol</h4><p className="text-[10px] text-gray-500 italic mt-1">Global bidding lock enabled</p></div>
+                   <button onClick={() => setIsMaintenance(!isMaintenance)} className={`w-14 h-7 rounded-full relative transition-all ${isMaintenance ? 'bg-red-600' : 'bg-white/10'}`}>
+                      <motion.div animate={{ x: isMaintenance ? 28 : 4 }} className="absolute top-1 w-5 h-5 bg-white rounded-full shadow-lg" />
+                   </button>
+                </div>
+                <div className="space-y-6 pt-10 border-t border-white/5">
+                   <div className="flex justify-between font-black text-[10px] uppercase italic text-gray-500 tracking-widest"><span>Global Fee Relay</span><span className="text-red-500">{commissionRelay}%</span></div>
+                   <input type="range" min="1" max="50" value={commissionRelay} onChange={e => setCommissionRelay(parseInt(e.target.value))} className="w-full h-1 bg-white/10 rounded-full appearance-none accent-red-600 cursor-pointer" />
+                </div>
+                <button onClick={() => alert("Global configuration synced.")} className="w-full py-6 bg-white text-black font-black rounded-3xl uppercase text-[11px] italic tracking-widest shadow-2xl hover:scale-[1.02] active:scale-95 transition-all">Synchronize Config</button>
+             </div>
+             <div className="p-10 border-2 border-red-900/30 bg-red-900/10 rounded-[50px] text-center space-y-6 shadow-xl">
+                <p className="text-[10px] font-black text-red-500 uppercase italic tracking-widest flex items-center justify-center gap-4"><AlertCircle size={14}/> Destructive Zone</p>
+                <button className="w-full py-5 bg-red-600 text-white font-black rounded-3xl text-[10px] uppercase italic tracking-widest">Execute Wipe Sequence</button>
+             </div>
+          </motion.div>
+        )}
       </main>
-    );
-  }
 
-  return null;
+      {/* MOBILE TRIGGER */}
+      <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden fixed bottom-10 right-8 z-100 w-18 h-18 bg-red-600 text-white rounded-[2.5rem] shadow-2xl flex items-center justify-center border-4 border-[#020617] active:scale-90 leading-none">
+         {isMobileMenuOpen ? <X size={28}/> : <Terminal size={28}/>}
+      </button>
+
+      <style jsx global>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
+    </div>
+  );
 }
