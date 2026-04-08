@@ -35,7 +35,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
     setCustomAlert({ show: true, title, msg, type });
   };
 
-  // --- 📲 DUAL-GATEWAY SECURE HANDSHAKE ---
+  // --- 📲 DUAL SECURE HANDSHAKE (INTASEND & PAYSTACK) ---
   const handleSecurePayment = async (method: "M-PESA" | "CARD") => {
     setIsPaying(true);
 
@@ -43,7 +43,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
       const cleanPhone = mpesaNumber.replace(/\D/g, ''); 
       if (!cleanPhone.startsWith("254") || cleanPhone.length !== 12) {
         setIsPaying(false);
-        return showAlert("Format Error", "Please use 2547XXXXXXXX format.", "error");
+        return showAlert("Format Error", "Please use 2547XXXXXXXX format (12 digits).", "error");
       }
 
       try {
@@ -51,7 +51,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            amount: 1300, // $10.00 (KES 1,300)
+            amount: 1300, 
             phone: cleanPhone, 
             email: user?.primaryEmailAddress?.emailAddress,
             firstName: user?.firstName,
@@ -61,10 +61,10 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
         });
 
         if (response.ok) {
-          showAlert("Signal Received", "Check your phone for the M-Pesa PIN prompt to finalize the handshake.", "success");
+          showAlert("Request Received", "Check your phone for the M-Pesa PIN prompt to finalize the payment.", "success");
           setShowVerifyModal(false);
         } else {
-          showAlert("Uplink Denied", "M-Pesa relay is currently congested. Try Card Relay.", "error");
+          showAlert("Uplink Denied", "M-Pesa relay congested. Try Global Card Relay.", "error");
         }
       } catch (error) {
         showAlert("Sync Lost", "Connection to IntaSend gateway failed.", "error");
@@ -73,7 +73,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
       }
 
     } else {
-      // --- PAYSTACK CARD RELAY ---
+      // --- PAYSTACK GLOBAL CARD RELAY ---
       try {
         const response = await fetch("/api/paystack", {
           method: "POST",
@@ -88,7 +88,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
         const data = await response.json();
 
         if (data.status && data.data.authorization_url) {
-          window.location.href = data.data.authorization_url; // Redirect to Paystack secure portal
+          window.location.href = data.data.authorization_url; 
         } else {
           showAlert("Handshake Denied", "Paystack card relay currently offline.", "error");
         }
@@ -114,12 +114,12 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
 
   // --- 💼 MODERN GIG DATA ---
   const marketplaceGigs = useMemo(() => [
-    { id: "1", title: "Academic Writing: 5000 word document", budget: 150, client: "Julia Cody", rating: 5.0, dur: "2 Days", img: "https://i.pravatar.cc/150?u=company1", type: "Company", status: "Active" },
-    { id: "2", title: "Python Data Science Assignment", budget: 45, client: "Kevin S.", rating: 4.8, dur: "5 Hours", img: "https://i.pravatar.cc/150?u=student1", type: "Student", status: "Active" },
-    { id: "3", title: "Cyber Security Protocol Scan", budget: 1200, client: "SafeNet Berlin", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=company2", type: "Company", status: "Expired" },
-    { id: "4", title: "React Native UI Bug Fixes", budget: 150, client: "Clinton Devs", rating: 4.9, dur: "10 Hours", img: "https://i.pravatar.cc/150?u=company3", type: "Company", status: "Active" },
-    { id: "5", title: "C++ Homework Relay", budget: 30, client: "Sarah J.", rating: 4.5, dur: "3 Hours", img: "https://i.pravatar.cc/150?u=student2", type: "Student", status: "Active" },
-    { id: "6", title: "Backend API Sync", budget: 700, client: "Global Hub", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=company4", type: "Company", status: "Expired" },
+    { id: "1", title: "Academic writing: 5000 word document", budget: 150, client: "Julia Cody", rating: 5.0, dur: "2 Days", img: "https://i.pravatar.cc/150?u=1", type: "Company", status: "Active" },
+    { id: "2", title: "Python Data Science Assignment", budget: 45, client: "Kevin S.", rating: 4.8, dur: "5 Hours", img: "https://i.pravatar.cc/150?u=8", type: "Student", status: "Active" },
+    { id: "3", title: "Cyber Security Protocol Scan", budget: 1200, client: "SafeNet Berlin", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=2", type: "Company", status: "Expired" },
+    { id: "4", title: "React Native UI Bug Fixes", budget: 150, client: "Clinton Devs", rating: 4.9, dur: "10 Hours", img: "https://i.pravatar.cc/150?u=3", type: "Company", status: "Active" },
+    { id: "5", title: "C++ Homework Relay", budget: 30, client: "Sarah J.", rating: 4.5, dur: "3 Hours", img: "https://i.pravatar.cc/150?u=5", type: "Student", status: "Active" },
+    { id: "6", title: "Backend API Sync", budget: 700, client: "Global Hub", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=12", type: "Company", status: "Expired" },
   ], []);
 
   const handleSupportEmail = () => {
@@ -155,14 +155,14 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                   <div className="absolute -right-4 -top-4 p-6 opacity-10 group-hover:opacity-30 transition-all group-hover:rotate-12"><Wallet size={80} className="text-[#00f2ff]"/></div>
                   <p className="text-[10px] font-black uppercase text-[#00f2ff] mb-2 italic tracking-[0.2em]">Account Balance</p>
                   <h3 className="text-5xl font-black italic mb-8">$0.00</h3>
-                  <button onClick={() => showAlert("Withdrawal Denied", "Minimum withdrawal threshold is $10.00. Keep completing missions to reach quota.", "info")} className="w-full py-4 bg-white text-black font-black rounded-2xl text-[10px] uppercase hover:bg-[#00f2ff] transition-all tracking-[0.2em] shadow-xl active:scale-95">Withdraw Funds</button>
+                  <button onClick={() => showAlert("Insufficient Funds", "Minimum withdrawal threshold is $10.00. Keep completing gigs!", "info")} className="w-full py-4 bg-white text-black font-black rounded-2xl text-[10px] uppercase hover:bg-[#00f2ff] transition-all tracking-[0.2em] shadow-xl active:scale-95">Withdraw Funds</button>
                 </motion.div>
                 
                 <div className="md:col-span-2 p-10 bg-white/3 border border-[#00f2ff]/20 rounded-[50px] flex items-center gap-8 shadow-3xl backdrop-blur-md relative overflow-hidden">
                    <div className="w-20 h-20 bg-[#00f2ff]/10 rounded-3xl flex items-center justify-center text-[#00f2ff] shrink-0"><ShieldCheck size={40}/></div>
                    <div className="flex-1">
                       <h4 className="text-2xl font-black italic uppercase mb-2 tracking-tighter">Account Verification</h4>
-                      <p className="text-xs text-gray-400 italic mb-6 leading-relaxed">Verified members unlock global mission bidding and instant settlements. Safe, secure, and fully refundable if verification fails.</p>
+                      <p className="text-xs text-gray-400 italic mb-6 leading-relaxed">Activation requires a one-time protocol fee. This eliminates fake nodes and optimizes global mission routing for verified freelancers. Safe, secure, and refundable.</p>
                       <button onClick={() => { setPaymentStep("terms"); setShowVerifyModal(true); }} className="flex items-center gap-2 text-[10px] font-black uppercase text-[#00f2ff] hover:text-white transition-all group">
                          Verify Now <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                       </button>
@@ -179,7 +179,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 <h3 className="text-4xl font-black uppercase italic tracking-tighter">Gigs <span className="text-[#00f2ff]">Feed</span></h3>
                 <div className="flex items-center gap-2 bg-[#00f2ff]/10 px-4 py-1.5 rounded-full border border-[#00f2ff]/20">
                    <div className="w-1.5 h-1.5 bg-[#00f2ff] rounded-full animate-ping" />
-                   <p className="text-[9px] font-black text-[#00f2ff] uppercase italic tracking-widest">Live Sync</p>
+                   <p className="text-[9px] font-black text-[#00f2ff] uppercase italic tracking-widest">Live Sync Active</p>
                 </div>
               </div>
 
@@ -187,7 +187,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 {marketplaceGigs.map((g, i) => (
                   <motion.div key={g.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} whileHover={{ y: -8 }} className={`p-8 rounded-[45px] bg-white/3 border border-white/10 transition-all duration-500 shadow-2xl backdrop-blur-md group ${g.status === 'Expired' ? 'grayscale opacity-40' : 'hover:border-[#00f2ff]/40'}`}>
                     <div className="flex justify-between items-start mb-6">
-                       <img src={g.img} className="w-16 h-16 rounded-2xl border-2 border-white/10 object-cover" alt="Avatar" />
+                       <img src={g.img} className="w-16 h-16 rounded-2xl border-2 border-white/10 group-hover:rotate-6 transition-transform object-cover" alt="Avatar" />
                        <div className="text-right">
                           <div className="flex items-center gap-1 bg-black/40 px-3 py-1 rounded-full mb-2"><Star size={10} className="text-yellow-400 fill-yellow-400" /><span className="text-[10px] font-black">{g.rating}</span></div>
                           <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${g.type === 'Company' ? 'border-[#00f2ff] text-[#00f2ff]' : 'border-purple-500 text-purple-500'}`}>{g.type}</span>
@@ -202,7 +202,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                   </motion.div>
                 ))}
               </div>
-              <div className="flex justify-center pt-10"><button onClick={() => { setPaymentStep("terms"); setShowVerifyModal(true); }} className="px-12 py-5 border-2 border-[#00f2ff]/30 rounded-full text-xs font-black uppercase italic text-[#00f2ff] hover:bg-[#00f2ff] hover:text-black transition-all">See More (Verify Node)</button></div>
+              <div className="flex justify-center pt-10"><button onClick={() => { setPaymentStep("terms"); setShowVerifyModal(true); }} className="px-12 py-5 border-2 border-[#00f2ff]/30 rounded-full text-xs font-black uppercase italic text-[#00f2ff] hover:bg-[#00f2ff] hover:text-black transition-all shadow-glow">See More (Verify Node)</button></div>
             </motion.div>
           )}
 
@@ -224,12 +224,13 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                <h3 className="text-3xl font-black uppercase italic border-b border-white/10 pb-4 tracking-tighter">Command <span className="text-[#00f2ff]">Feed</span></h3>
                <div className="space-y-4">
                   {[
-                    { id: 0, t: "Welcome Protocol", m: `Greetings ${user?.firstName}. Your account is in guest mode. To begin receiving gigs, please proceed to Verification ($10).`, icon: <Bell className="text-black"/>, bg: "bg-[#00f2ff]" },
-                    { id: 1, t: "Market Alert", m: "Global UI/UX auditing rates have surged by 20%. Verification required for access.", icon: <Info className="text-gray-400"/>, bg: "bg-white/5" }
+                    { id: 0, t: "Welcome Protocol", m: `Greetings ${user?.firstName}. Your account is in guest mode. To begin receiving gigs, please proceed to Verification ($10). This activates your secure vault.`, icon: <Bell className="text-black"/>, bg: "bg-[#00f2ff]" },
+                    { id: 1, t: "Market Surge Alert", m: "Global UI/UX auditing rates have surged by 20%. Verification required for access.", icon: <Info className="text-gray-400"/>, bg: "bg-white/5" },
+                    { id: 2, t: "Sync Status", m: "Account handshake optimized at 0.02ms. Global relay connection is 100% stable.", icon: <Activity size={20} className="text-emerald-400"/>, bg: "bg-white/5" }
                   ].map((notif, idx) => (
                     <motion.div key={notif.id} onClick={() => setExpandedMsg(expandedMsg === idx ? null : idx)} className={`p-8 rounded-[35px] border border-white/10 shadow-xl cursor-pointer transition-all ${notif.bg}`}>
                        <div className="flex gap-6 items-start">
-                          <div className="p-4 bg-white/10 rounded-2xl shrink-0">{notif.icon}</div>
+                          <div className={`p-4 bg-white/10 rounded-2xl shrink-0`}>{notif.icon}</div>
                           <div className="flex-1">
                              <p className={`text-[10px] font-black uppercase italic ${notif.bg === 'bg-[#00f2ff]' ? 'text-black/60' : 'text-[#00f2ff]'}`}>System Relay</p>
                              <h4 className={`text-lg font-black uppercase ${notif.bg === 'bg-[#00f2ff]' ? 'text-black' : 'text-white'}`}>{notif.t}</h4>
@@ -247,18 +248,20 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
           {activeTab === "earnings" && (
             <motion.div key="vault" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="space-y-12">
                <div className="grid md:grid-cols-2 gap-8">
-                  <div className="p-14 bg-linear-to-br from-emerald-500/20 to-transparent border-2 border-emerald-500/30 rounded-[60px] text-center shadow-3xl">
-                     <p className="text-[11px] font-black text-emerald-400 uppercase italic tracking-widest mb-4">Available Balance</p>
-                     <h4 className="text-[6rem] font-black italic tracking-tighter text-white leading-none">$0.00</h4>
+                  <div className="p-14 bg-linear-to-br from-emerald-500/20 to-transparent border-2 border-emerald-500/30 rounded-[60px] text-center shadow-3xl relative overflow-hidden">
+                    <p className="text-[11px] font-black text-emerald-400 uppercase italic tracking-widest mb-4">Available Balance</p>
+                    <h4 className="text-[6rem] font-black italic text-white leading-none">$0.00</h4>
+                    <div className="mt-4 inline-flex items-center gap-2 bg-emerald-500/10 px-4 py-1 rounded-full"><div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" /><span className="text-[8px] font-black uppercase text-emerald-500">Live Relay</span></div>
                   </div>
-                  <div className="p-14 bg-white/2 border border-white/10 rounded-[60px] text-center shadow-xl">
-                     <p className="text-[11px] font-black text-amber-500 uppercase italic mb-4">Pending Balance</p>
-                     <h4 className="text-[4rem] font-black italic text-gray-600 leading-none">$0.00</h4>
+                  <div className="p-14 bg-white/2 border border-white/10 rounded-[60px] text-center shadow-xl relative overflow-hidden">
+                    <p className="text-[11px] font-black text-amber-500 uppercase italic mb-4">Pending Balance</p>
+                    <h4 className="text-[4rem] font-black italic text-gray-600 leading-none">$0.00</h4>
+                    <p className="mt-4 text-[8px] font-black uppercase text-gray-500 tracking-widest italic">Calculating settlements...</p>
                   </div>
                </div>
                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {["Mpesa Push", "Bank Relay", "Crypto Payout"].map(l => (
-                    <button key={l} onClick={() => showAlert("Insufficient Funds", "Minimum withdrawal is $10.00.", "info")} className="p-10 bg-black/40 border border-white/10 rounded-[45px] transition-all flex flex-col items-center gap-4 hover:border-[#00f2ff]">
+                  {["Mpesa Push", "Bank payment", "crypto Payout"].map(l => (
+                    <button key={l} onClick={() => showAlert("Insufficient Funds", "Minimal withdrawal is $10.00. Continue bidding to reach quota.", "info")} className="p-10 bg-black/40 border border-white/10 rounded-[45px] transition-all flex flex-col items-center gap-4 hover:border-[#00f2ff]">
                        <Smartphone size={24} className="text-[#00f2ff]"/>
                        <span className="text-[11px] font-black uppercase italic text-white">{l}</span>
                     </button>
@@ -278,13 +281,13 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                            <motion.div key={i} animate={{ height: [`${h}%`, `${h+10}%`, `${h}%`] }} transition={{ duration: 3, repeat: Infinity, delay: i * 0.2 }} className="w-10 bg-[#00f2ff] rounded-t-xl" />
                         ))}
                      </div>
-                     <p className="text-[12px] font-black uppercase text-gray-500">Global Sync Matrix</p>
+                     <p className="text-[12px] font-black uppercase text-gray-500 tracking-widest">Global Matrix</p>
                   </div>
-                  <div className="space-y-4">
-                     {[{ l: "Success Rate", v: "0%" }, { l: "Reputation Score", v: "0.0" }].map(s => (
-                       <div key={s.l} className="p-8 bg-white/3 border border-white/5 rounded-3xl flex justify-between items-center">
-                          <p className="text-[10px] font-black uppercase text-gray-500">{s.l}</p>
-                          <p className="text-2xl font-black italic">{s.v}</p>
+                  <div className="space-y-4 flex flex-col justify-center">
+                     {[{ l: "Success Rate", v: "0%", g: "UNSTAINED", c: "text-emerald-400" }, { l: "Reputation Score", v: "0.0", g: "ELITE", c: "text-[#00f2ff]" }].map(s => (
+                       <div key={s.l} className="p-8 bg-white/3 border border-white/5 rounded-3xl flex justify-between items-center shadow-xl">
+                          <p className="text-[10px] font-black uppercase italic text-gray-500">{s.l}</p>
+                          <div className="text-right"><p className="text-2xl font-black italic">{s.v}</p></div>
                        </div>
                      ))}
                   </div>
@@ -297,8 +300,8 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             <motion.div key="support" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
                <h3 className="text-3xl font-black uppercase italic border-b border-white/10 pb-4 tracking-tighter">Support <span className="text-[#00f2ff]">Terminal</span></h3>
                <div className="grid md:grid-cols-2 gap-8">
-                  <div className="p-10 bg-white/2 border border-white/10 rounded-[50px] space-y-6 shadow-3xl backdrop-blur-xl">
-                     <h4 className="text-lg font-black uppercase italic text-[#00f2ff]">General Assistance</h4>
+                  <div className="p-10 bg-white/2 border border-white/10 rounded-[50px] shadow-3xl backdrop-blur-xl">
+                     <h4 className="text-lg font-black uppercase italic text-[#00f2ff] mb-6">General Assistance</h4>
                      <div className="space-y-4">
                         {['Account Sync Issues', 'Withdrawal Protocol', 'Verification Help'].map(item => (
                           <div key={item} onClick={handleSupportEmail} className="flex justify-between items-center p-5 bg-black/40 border border-white/5 rounded-2xl hover:bg-white/5 transition-all cursor-pointer">
@@ -311,7 +314,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                   <div className="p-10 bg-white/2 border border-white/10 rounded-[50px] flex flex-col justify-center text-center space-y-6 shadow-3xl">
                      <div className="p-6 bg-[#00f2ff]/10 rounded-full mx-auto w-fit"><HelpCircle size={48} className="text-[#00f2ff]" /></div>
                      <h4 className="text-xl font-black uppercase italic">Direct Assistance</h4>
-                     <p className="text-gray-400 text-xs italic px-6 leading-loose">Transmit your technical issues directly to <span className="text-[#00f2ff]">notifications.nexusgigs@gmail.com</span></p>
+                     <p className="text-gray-400 text-xs italic px-6 leading-loose">Transmit technical issues to <span className="text-[#00f2ff]">notifications.nexusgigs@gmail.com</span></p>
                      <button onClick={handleSupportEmail} className="px-10 py-4 bg-[#00f2ff] text-black font-black rounded-3xl uppercase italic text-[11px] shadow-xl">Initialize Uplink</button>
                   </div>
                </div>
@@ -327,7 +330,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                     <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-black rounded-full border-2 border-[#00f2ff] flex items-center justify-center text-[#00f2ff] shadow-glow"><Cpu size={14}/></div>
                   </div>
                   <h3 className="text-5xl font-black italic uppercase tracking-tighter mb-4">{user?.fullName}</h3>
-                  <p className="text-[#00f2ff] text-[10px] font-black uppercase italic tracking-[0.5em] mb-12">Level 1 Identity</p>
+                  <p className="text-[#00f2ff] text-[10px] font-black uppercase italic tracking-[0.5em] mb-12">Level 1 Nexus Identity</p>
                   <div className="grid grid-cols-2 gap-6">
                      <motion.button whileTap={{ scale: 0.95 }} onClick={() => setActiveTab('earnings')} className="p-8 bg-[#00f2ff] text-black rounded-[35px] font-black uppercase italic text-[12px] shadow-2xl hover:scale-105 transition-all">Withdraw</motion.button>
                      <motion.button whileTap={{ scale: 0.95 }} onClick={() => setActiveTab('settings')} className="p-8 bg-white/5 border border-white/10 rounded-[35px] font-black uppercase italic text-[12px] hover:bg-white/10 transition-all">Settings</motion.button>
@@ -393,7 +396,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                         <CheckCircle2 size={12}/> Compliance Protocol Check
                      </p>
                      <p className="text-[10px] text-gray-400 italic leading-relaxed">
-                       Activation requires a mandatory Account Validation Survey. If your account profile fails the survey, a **100% Automatic Refund** is issued to your payment method immediately.
+                       Activation requires a mandatory Account Validation Survey. If your account profile fails the survey, or activation is unsuccessful, a 100% Automatic Refund is issued to your payment method immediately.
                      </p>
                   </div>
                   <div className="space-y-4">

@@ -4,7 +4,6 @@ export async function POST(req: Request) {
   try {
     const { amount, email, firstName, lastName } = await req.json();
 
-    // Paystack amount is in cents (KES 1,300 * 100)
     const amountInCents = amount * 100;
 
     const response = await fetch("https://api.paystack.co/transaction/initialize", {
@@ -16,7 +15,9 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         email: email,
         amount: amountInCents,
-        currency: "KES", 
+        currency: "USD", 
+
+        channels: ["card"], 
         callback_url: "https://www.nexusgigs.me/dashboard?payment=success",
         metadata: {
           first_name: firstName,
