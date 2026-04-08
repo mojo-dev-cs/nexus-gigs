@@ -52,13 +52,12 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
               method: "Nexus Global Relay"
             }),
           });
-
           if (response.ok) {
-            showAlert("Done!", "Money received. Check your email for the survey.", "success");
+            showAlert("Verified!", "Account sync complete. Check email for survey.", "success");
             setIsVerified(true);
           }
         } catch (error) {
-          console.error("error:", error);
+          console.error("sync error:", error);
         }
       }
     };
@@ -66,33 +65,46 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
   }, [searchParams, isLoaded, user, isVerified]);
 
   const handleSecurePayment = async (method: "M-PESA" | "CARD") => {
-    if (!agreedToTerms) return showAlert("Notice", "Please agree to the screening terms.", "info");
+    if (!agreedToTerms) return showAlert("Notice", "Please agree to the screening rules.", "info");
     setIsPaying(true);
 
     if (method === "M-PESA") {
       const cleanPhone = mpesaNumber.replace(/\D/g, ''); 
       if (!cleanPhone.startsWith("254") || cleanPhone.length !== 12) {
         setIsPaying(false);
-        return showAlert("Phone Error", "Please use 2547XXXXXXXX.", "error");
+        return showAlert("Format Error", "Use 2547XXXXXXXX format.", "error");
       }
       try {
         const response = await fetch("/api/intasend", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount: 10, phone: cleanPhone, email: user?.primaryEmailAddress?.emailAddress, firstName: user?.firstName, lastName: user?.lastName, method: "M-PESA" }),
+          body: JSON.stringify({ 
+            amount: 1300, // FIXED TO 1300 KES
+            phone: cleanPhone, 
+            email: user?.primaryEmailAddress?.emailAddress, 
+            firstName: user?.firstName, 
+            lastName: user?.lastName, 
+            method: "M-PESA" 
+          }),
         });
         if (response.ok) {
-          showAlert("PIN Sent", "Enter your PIN on your phone.", "success");
+          showAlert("PIN Prompt Sent", "Check your phone to enter PIN.", "success");
           setShowVerifyModal(false);
         }
-      } catch (error) { showAlert("Error", "Link lost.", "error"); }
+      } catch (error) { showAlert("Error", "Relay failed.", "error"); }
       finally { setIsPaying(false); }
     } else {
       try {
         const response = await fetch("/api/paystack", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount: 10, email: user?.primaryEmailAddress?.emailAddress, firstName: user?.firstName, lastName: user?.lastName }),
+          body: JSON.stringify({ 
+            amount: 1000, // $10 in cents
+            currency: "USD",
+            email: user?.primaryEmailAddress?.emailAddress, 
+            firstName: user?.firstName, 
+            lastName: user?.lastName 
+          }),
         });
         const data = await response.json();
         if (data.status && data.data.authorization_url) window.location.href = data.data.authorization_url; 
@@ -114,16 +126,16 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
   ];
 
   const marketplaceGigs = useMemo(() => [
-    { id: "1", title: "Enterprise: Cloud Infrastructure Audit", budget: 850, client: "TechFlow Systems", rating: 5.0, dur: "4 Days", img: "https://i.pravatar.cc/150?u=tech", type: "Company", status: "Active" },
-    { id: "2", title: "Assignment: Advanced Calculus Solutions", budget: 60, client: "Mark Thompson", rating: 4.8, dur: "12 Hours", img: "https://i.pravatar.cc/150?u=mark", type: "Academic", status: "Active" },
-    { id: "3", title: "Startup: MVP Mobile App UI Design", budget: 1200, client: "Nova Labs", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=nova", type: "Agency", status: "Expired" },
-    { id: "4", title: "Company: Fullstack React Dev (Hotfix)", budget: 350, client: "Julia Cody", rating: 4.9, dur: "24 Hours", img: "https://i.pravatar.cc/150?u=julia", type: "Startup", status: "Active" },
+    { id: "1", title: "Enterprise: Cloud Network Audit", budget: 850, client: "TechFlow Systems", rating: 5.0, dur: "4 Days", img: "https://i.pravatar.cc/150?u=tech", type: "Company", status: "Active" },
+    { id: "2", title: "Assignment: Advanced Math Solutions", budget: 60, client: "Mark Thompson", rating: 4.8, dur: "12 Hours", img: "https://i.pravatar.cc/150?u=mark", type: "Academic", status: "Active" },
+    { id: "3", title: "Startup: Mobile App UI/UX Design", budget: 1200, client: "Nova Labs", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=nova", type: "Agency", status: "Expired" },
+    { id: "4", title: "Company: Fullstack React Fixes", budget: 350, client: "Julia Cody", rating: 4.9, dur: "24 Hours", img: "https://i.pravatar.cc/150?u=julia", type: "Startup", status: "Active" },
     { id: "5", title: "Technical: Rust Smart Contract Audit", budget: 2000, client: "Polygon Hub", rating: 5.0, dur: "3 Days", img: "https://i.pravatar.cc/150?u=poly", type: "Web3", status: "Active" },
-    { id: "6", title: "Assignment: 10 Page Literature Review", budget: 100, client: "Liam G.", rating: 4.7, dur: "Expired", img: "https://i.pravatar.cc/150?u=liam", type: "Academic", status: "Expired" },
-    { id: "7", title: "Startup: Python Backend API Sync", budget: 500, client: "CloudX", rating: 5.0, dur: "2 Days", img: "https://i.pravatar.cc/150?u=cloud", type: "Company", status: "Active" },
-    { id: "8", title: "Design: Cinematic 4K Drone Edit", budget: 250, client: "Vogue Visuals", rating: 4.9, dur: "2 Days", img: "https://i.pravatar.cc/150?u=vogue", type: "Studio", status: "Active" },
+    { id: "6", title: "Assignment: Psychology Case Study", budget: 100, client: "Liam G.", rating: 4.7, dur: "Expired", img: "https://i.pravatar.cc/150?u=liam", type: "Academic", status: "Expired" },
+    { id: "7", title: "Startup: Python Backend Sync", budget: 500, client: "CloudX", rating: 5.0, dur: "2 Days", img: "https://i.pravatar.cc/150?u=cloud", type: "Company", status: "Active" },
+    { id: "8", title: "Design: Cinematic 4K Video Edit", budget: 250, client: "Vogue Visuals", rating: 4.9, dur: "2 Days", img: "https://i.pravatar.cc/150?u=vogue", type: "Studio", status: "Active" },
     { id: "9", title: "Enterprise: Cybersecurity Protocol v2", budget: 3500, client: "SafeVault", rating: 5.0, dur: "Active", img: "https://i.pravatar.cc/150?u=safe", type: "Enterprise", status: "Active" },
-    { id: "10", title: "Technical: C++ Legacy Migration", budget: 1800, client: "Old Guard", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=old", type: "Company", status: "Expired" },
+    { id: "10", title: "Technical: Database Migration", budget: 1800, client: "Old Guard", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=old", type: "Company", status: "Expired" },
   ], []);
 
   const handleSupportEmail = () => {
@@ -131,7 +143,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] text-white font-sans selection:bg-[#00f2ff]/30 pb-20 overflow-x-hidden">
+    <div className="min-h-screen bg-[#020617] text-white font-sans selection:bg-[#00f2ff]/30 pb-24 overflow-x-hidden">
       
       <div className="fixed inset-0 pointer-events-none">
         <motion.div animate={{ opacity: [0.1, 0.15, 0.1] }} transition={{ repeat: Infinity, duration: 5 }} className="absolute top-0 right-0 w-80 h-80 bg-blue-600/10 blur-[100px] rounded-full" />
@@ -140,62 +152,56 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
       <div className="max-w-5xl mx-auto pt-4 px-4 relative z-10">
         <AnimatePresence mode="wait">
           
-          {/* --- MODERNIZED HOME TAB --- */}
+          {/* --- 🏠 HOME TAB --- */}
           {activeTab === "home" && (
-            <motion.div key="home" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
+            <motion.div key="home" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
               <header className="flex justify-between items-center bg-white/5 backdrop-blur-xl p-5 rounded-[25px] border border-white/10 shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-1 h-full bg-[#00f2ff]" />
                 <div className="space-y-1">
                   <p className="text-[10px] font-black uppercase text-gray-500 tracking-widest">Operator</p>
-                  <h2 className="text-2xl font-black italic uppercase tracking-tighter">{user?.firstName || "Welcome"}</h2>
+                  <h2 className="text-2xl font-black italic uppercase tracking-tighter">{user?.firstName || "Nexus Node"}</h2>
                 </div>
-                <div className="flex items-center gap-3 bg-black/40 px-3 py-1.5 rounded-xl border border-white/5 shadow-inner">
-                   <div className={`w-2 h-2 rounded-full ${isVerified ? 'bg-[#00f2ff] shadow-[0_0_10px_#00f2ff]' : 'bg-red-500'}`} />
-                   <span className="text-[8px] font-bold uppercase tracking-widest">{isVerified ? "VERIFIED NODE" : "UNVERIFIED"}</span>
+                <div className="flex items-center gap-3 bg-black/40 px-3 py-1.5 rounded-xl border border-white/5">
+                   <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 2 }} className={`w-2 h-2 rounded-full ${isVerified ? 'bg-[#00f2ff] shadow-[0_0_10px_#00f2ff]' : 'bg-red-500'}`} />
+                   <span className="text-[8px] font-bold uppercase tracking-widest">{isVerified ? "AUTHENTICATED" : "SYNC PENDING"}</span>
                 </div>
               </header>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                {/* Balance Card */}
                 <div className="p-8 bg-linear-to-br from-[#00f2ff]/10 to-transparent border border-[#00f2ff]/20 rounded-[30px] shadow-2xl flex flex-col justify-between">
                   <div>
-                    <p className="text-[8px] font-bold uppercase text-[#00f2ff] mb-1">My Money</p>
+                    <p className="text-[8px] font-bold uppercase text-[#00f2ff] mb-1">My Assets</p>
                     <h3 className="text-4xl font-black mb-4 tracking-tighter">$0.00</h3>
                   </div>
-                  <button onClick={() => setActiveTab("earnings")} className="w-full py-2.5 bg-white text-black font-bold rounded-lg text-[10px] uppercase hover:bg-[#00f2ff] transition-all">Vault</button>
+                  <button onClick={() => setActiveTab("earnings")} className="w-full py-2.5 bg-white text-black font-bold rounded-lg text-[10px] uppercase hover:bg-[#00f2ff] transition-all">Vault Hub</button>
                 </div>
 
-                {/* Identity Check Card - MOVED AFTER BALANCE */}
                 {!isVerified && (
                   <div className="md:col-span-2 p-8 bg-white/5 border border-white/10 rounded-[30px] flex items-center gap-6 backdrop-blur-md relative overflow-hidden shadow-2xl border-l-4 border-l-[#00f2ff]">
-                    <div className="w-12 h-12 bg-[#00f2ff]/10 rounded-2xl flex items-center justify-center text-[#00f2ff] shadow-inner"><ShieldCheck size={28}/></div>
+                    <div className="w-14 h-14 bg-[#00f2ff]/10 rounded-2xl flex items-center justify-center text-[#00f2ff] shadow-inner shrink-0 border border-[#00f2ff]/20"><ShieldCheck size={32}/></div>
                     <div className="flex-1">
-                        <h4 className="text-md font-bold uppercase tracking-tight">Identity Check Required</h4>
-                        <p className="text-[10px] text-gray-400 mb-3 leading-relaxed">Pay $10 once to unlock high-paying jobs and withdraw money.</p>
-                        <button onClick={() => { setPaymentStep("terms"); setShowVerifyModal(true); }} className="text-[9px] font-black uppercase text-[#00f2ff] flex items-center gap-1 hover:text-white transition-all">Authenticate Node <ChevronRight size={12} /></button>
+                        <h4 className="text-md font-bold uppercase tracking-tight">Identity Handshake</h4>
+                        <p className="text-[10px] text-gray-400 mb-4 leading-relaxed">Pay $10 once to unlock high-paying jobs and withdraw money. (100% Refundable Policy).</p>
+                        <button onClick={() => { setPaymentStep("terms"); setShowVerifyModal(true); }} className="px-8 py-3 bg-[#00f2ff] text-black rounded-xl text-[9px] font-black uppercase italic tracking-widest hover:scale-105 active:scale-95 transition-all shadow-glow">Start Verification</button>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Protocol Visual Content */}
               <div className="p-8 bg-white/3 border border-white/5 rounded-[40px] shadow-2xl">
-                 <div className="flex justify-between items-center mb-6">
-                    <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Node Syncing</h4>
-                    <span className="text-[10px] font-black text-[#00f2ff]">40% Progress</span>
-                 </div>
-                 <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden mb-6">
-                    <motion.div initial={{ width: 0 }} animate={{ width: "40%" }} className="h-full bg-[#00f2ff] shadow-glow" />
+                 <div className="flex justify-between items-center mb-6 px-2">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Mission Progress</h4>
+                    <span className="text-[10px] font-black text-[#00f2ff]">Beta Phase</span>
                  </div>
                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {[
-                      { l: "Jobs", v: "0", i: <Target size={14}/> },
-                      { l: "Uptime", v: "99.9%", i: <Activity size={14}/> },
-                      { l: "Node", v: "Tier 1", i: <Cpu size={14}/> },
-                      { l: "Score", v: "0.0", i: <Star size={14}/> }
+                      { l: "Jobs", v: "0", i: <Target size={14} className="text-[#00f2ff]"/> },
+                      { l: "Uptime", v: "99.9%", i: <Activity size={14} className="text-emerald-500"/> },
+                      { l: "Trust", v: "0.0", i: <Star size={14} className="text-amber-500"/> },
+                      { l: "Score", v: "Beta", i: <Award size={14} className="text-purple-500"/> }
                     ].map((st, i) => (
-                      <div key={i} className="bg-black/20 p-4 rounded-2xl border border-white/5">
-                         <div className="text-gray-500 mb-1">{st.i}</div>
+                      <div key={i} className="bg-black/20 p-4 rounded-2xl border border-white/5 text-center">
+                         <div className="mb-1 flex justify-center">{st.i}</div>
                          <p className="text-xs font-black">{st.v}</p>
                          <p className="text-[7px] font-bold text-gray-600 uppercase">{st.l}</p>
                       </div>
@@ -205,11 +211,11 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             </motion.div>
           )}
 
-          {/* --- GIGS --- */}
+          {/* --- 💼 GIGS TAB --- */}
           {activeTab === "tasks" && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
               <div className="flex justify-between items-center px-2">
-                <h3 className="text-xl font-bold uppercase tracking-tighter">Job <span className="text-[#00f2ff]">Feed</span></h3>
+                <h3 className="text-xl font-bold uppercase tracking-tighter">Mission <span className="text-[#00f2ff]">Feed</span></h3>
                 <div className="flex items-center gap-2 bg-emerald-500/10 px-3 py-1 rounded-full"><div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" /><span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Live</span></div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -238,26 +244,26 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             </motion.div>
           )}
 
-          {/* --- WORK --- */}
+          {/* --- 📜 WORK TAB --- */}
           {activeTab === "contracts" && (
             <div className="pt-10 px-4">
                <div className="p-10 bg-white/5 border border-red-500/20 rounded-[40px] text-center space-y-4 max-w-md mx-auto shadow-2xl backdrop-blur-xl">
                   <ShieldAlert size={48} className="mx-auto text-red-500" />
-                  <h3 className="text-lg font-bold uppercase tracking-widest">Node Encrypted</h3>
-                  <p className="text-gray-400 text-[10px]">Your history is protected by the Nexus security layer. Complete the $10 handshake to decrypt your profile history.</p>
+                  <h3 className="text-lg font-bold uppercase tracking-widest text-white">History Locked</h3>
+                  <p className="text-gray-400 text-[11px]">Your history is protected by the Nexus security layer. Complete the $10 handshake to decrypt your profile history.</p>
                   <button onClick={() => setShowVerifyModal(true)} className="w-full py-4 bg-red-600 text-white font-bold rounded-2xl text-[10px] uppercase shadow-lg hover:scale-105 transition-all">Decrypt Terminal</button>
                </div>
             </div>
           )}
 
-          {/* --- CHATS --- */}
+          {/* --- 💬 CHATS TAB --- */}
           {activeTab === "messages" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
                <h3 className="text-xl font-bold uppercase px-2 tracking-[0.3em]">Console <span className="text-[#00f2ff]">Feed</span></h3>
                <div className="space-y-3">
                   {[
-                    { id: 0, t: "Nexus Protocol", m: `Hello Node_${user?.firstName?.toUpperCase()}. Your account is almost ready. Pay the $10 fee to start your screening.`, icon: <Shield size={16} className="text-[#00f2ff]"/> },
-                    { id: 1, t: "System Sync", m: "Global data is working. High-pay jobs are for verified members only.", icon: <Activity size={16} className="text-emerald-500"/> }
+                    { id: 0, t: "Nexus Protocol", m: `Greetings Node_${user?.firstName?.toUpperCase()}. Your identity is in staging. Pay the $10 handshake to start your screening.`, icon: <Shield size={16} className="text-[#00f2ff]"/> },
+                    { id: 1, t: "System Sync", m: "Global data relay is 100% operational. High-budget missions are being routed to verified nodes only.", icon: <Activity size={16} className="text-emerald-500"/> }
                   ].map((msg, i) => (
                     <div key={i} onClick={() => setExpandedMsg(expandedMsg === i ? null : i)} className="p-6 rounded-[30px] bg-white/3 border border-white/5 cursor-pointer hover:bg-white/10 transition-all group">
                        <div className="flex gap-4">
@@ -274,10 +280,162 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             </motion.div>
           )}
 
+          {/* --- 💰 VAULT TAB --- */}
+          {activeTab === "earnings" && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
+               <div className="flex justify-between items-center px-2">
+                  <h3 className="text-xl font-bold uppercase tracking-widest">My <span className="text-[#00f2ff]">Vault</span></h3>
+                  <div className="p-1.5 bg-white/5 rounded-xl flex gap-1 border border-white/5">
+                     <button onClick={() => setCurrency("USD")} className={`px-4 py-1.5 rounded-lg text-[8px] font-black transition-all ${currency === "USD" ? "bg-[#00f2ff] text-black shadow-lg" : "text-gray-500"}`}>USD</button>
+                     <button onClick={() => setCurrency("KES")} className={`px-4 py-1.5 rounded-lg text-[8px] font-black transition-all ${currency === "KES" ? "bg-[#00f2ff] text-black shadow-lg" : "text-gray-500"}`}>KES</button>
+                  </div>
+               </div>
+
+               <div className="relative group perspective-1000">
+                  <div className="w-full h-52 bg-linear-to-br from-white/15 to-white/5 backdrop-blur-3xl border border-white/20 rounded-[45px] p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden ring-1 ring-white/10">
+                    <div className="absolute -top-10 -right-10 w-48 h-48 bg-[#00f2ff]/5 rounded-full blur-3xl group-hover:bg-[#00f2ff]/10 transition-all duration-1000" />
+                    <div className="flex justify-between items-start relative z-10">
+                       <div className="space-y-1">
+                          <p className="text-[9px] font-bold text-[#00f2ff] uppercase tracking-[0.3em]">Available Assets</p>
+                          <h4 className="text-5xl font-black italic tracking-tighter">{currency === "USD" ? "$0.00" : "KES 0"}</h4>
+                       </div>
+                       <div className="w-12 h-12 bg-white/5 rounded-[20px] flex items-center justify-center border border-white/10 shadow-inner"><Zap className="text-[#00f2ff]" size={20} /></div>
+                    </div>
+                    <div className="flex justify-between items-end relative z-10">
+                       <div className="space-y-1">
+                          <p className="text-[7px] font-bold text-gray-500 uppercase tracking-widest">Node ID</p>
+                          <p className="text-[10px] font-mono text-white/60 tracking-widest">{user?.id?.substring(0, 10).toUpperCase()}</p>
+                       </div>
+                       <button onClick={() => showAlert("Access Denied", "Pay $10 to unlock withdrawals.", "info")} className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-2xl text-[10px] font-black uppercase italic hover:bg-[#00f2ff] transition-all shadow-xl active:scale-95">
+                          Withdraw <ArrowUpRight size={14}/>
+                       </button>
+                    </div>
+                  </div>
+               </div>
+               <div className="grid grid-cols-2 gap-4">
+                  <div className="p-6 bg-white/5 border border-white/10 rounded-[30px] flex items-center gap-4 group hover:bg-white/10 transition-all">
+                     <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500 border border-emerald-500/20 group-hover:scale-110 transition-transform"><History size={18}/></div>
+                     <div><p className="text-[7px] font-black text-gray-500 uppercase tracking-widest">Revenue</p><p className="text-sm font-black">$0.00</p></div>
+                  </div>
+                  <div className="p-6 bg-white/5 border border-white/10 rounded-[30px] flex items-center gap-4 group hover:bg-white/10 transition-all">
+                     <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-500 border border-amber-500/20 group-hover:scale-110 transition-transform"><Clock size={18}/></div>
+                     <div><p className="text-[7px] font-black text-gray-500 uppercase tracking-widest">Pending</p><p className="text-sm font-black">$0.00</p></div>
+                  </div>
+               </div>
+            </motion.div>
+          )}
+
+          {/* --- 📊 STATS TAB --- */}
+          {activeTab === "analytics" && (
+            <div className="space-y-8">
+               <h3 className="text-xl font-bold uppercase px-2 tracking-widest">My <span className="text-[#00f2ff]">Stats</span></h3>
+               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[
+                    { l: "Success Rate", v: "0%", i: <CheckCircle2 size={16} className="text-emerald-500"/> },
+                    { l: "Missions", v: "0", i: <Briefcase size={16} className="text-blue-500"/> },
+                    { l: "Trust score", v: "N/A", i: <ShieldCheck size={16} className="text-purple-500"/> },
+                    { l: "Total Paid", v: "$0.00", i: <DollarSign size={16} className="text-yellow-500"/> }
+                  ].map(stat => (
+                    <div key={stat.l} className="p-6 bg-white/5 border border-white/10 rounded-[25px] text-center hover:bg-white/10 transition-all border-b-2 border-b-transparent hover:border-b-[#00f2ff]">
+                       <div className="mb-2 flex justify-center">{stat.i}</div>
+                       <p className="text-[8px] font-bold text-gray-500 uppercase mb-1 tracking-widest">{stat.l}</p>
+                       <p className="text-lg font-black">{stat.v}</p>
+                    </div>
+                  ))}
+               </div>
+               <div className="p-12 bg-white/2 border border-white/10 rounded-[40px] text-center group shadow-xl">
+                  <Activity size={32} className="mx-auto text-[#00f2ff] opacity-10 mb-4 group-hover:opacity-40 transition-opacity" />
+                  <p className="text-[9px] text-gray-600 uppercase font-black tracking-widest leading-loose">Verify your account to see<br/>your live job performance</p>
+               </div>
+            </div>
+          )}
+
+          {/* --- 👤 ME TAB --- */}
+          {activeTab === "account" && (
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="max-w-3xl mx-auto space-y-6 pb-10">
+               <div className="p-12 bg-linear-to-br from-white/10 to-white/5 border border-white/20 rounded-[50px] text-center shadow-3xl relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-[#00f2ff] to-transparent opacity-50 shadow-glow" />
+                  <div className="relative w-32 h-32 mx-auto mb-6">
+                    <img src={user?.imageUrl} className="w-full h-full rounded-[40px] object-cover border-4 border-white/10 shadow-2xl" alt="Node" />
+                    <div className="absolute -bottom-2 -right-2 bg-black border-2 border-[#00f2ff] p-2 rounded-2xl text-[#00f2ff] shadow-glow"><Fingerprint size={16}/></div>
+                  </div>
+                  <h3 className="text-4xl font-black italic uppercase tracking-tighter mb-2">{user?.fullName}</h3>
+                  <div className="inline-flex items-center gap-2 bg-black/40 px-4 py-2 rounded-full border border-white/5 mb-10 shadow-inner">
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#00f2ff]">Identity Tier 1</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                     <button onClick={() => setActiveTab('earnings')} className="py-5 bg-white text-black rounded-[28px] font-black uppercase italic text-[11px] hover:bg-[#00f2ff] transition-all shadow-xl">Vault Sync</button>
+                     <button onClick={() => setActiveTab('settings')} className="py-5 bg-white/5 border border-white/10 rounded-[28px] font-black uppercase italic text-[11px] hover:bg-white/10 transition-all">Config Hub</button>
+                  </div>
+               </div>
+               <div className="flex justify-center pt-4">
+                  <SignOutButton><button className="px-10 py-5 bg-red-500/5 border-2 border-red-500/10 text-red-500 font-black italic rounded-[30px] uppercase text-[10px] hover:bg-red-500 hover:text-white transition-all tracking-[0.5em] shadow-2xl active:scale-95">Terminate Session</button></SignOutButton>
+               </div>
+            </motion.div>
+          )}
+
+          {/* --- ⚙️ SETTINGS TAB --- */}
+          {activeTab === "settings" && (
+            <div className="space-y-6 max-w-xl mx-auto">
+               <h3 className="text-2xl font-bold uppercase px-2 tracking-widest text-[#00f2ff]">Terminal <span className="text-white">Settings</span></h3>
+               <div className="p-10 bg-white/3 border border-white/10 rounded-[45px] space-y-8 shadow-3xl backdrop-blur-2xl">
+                  <div className="flex justify-between items-center group cursor-pointer">
+                     <div className="flex items-center gap-4">
+                        <div className="p-4 bg-white/5 rounded-[22px] group-hover:bg-[#00f2ff]/10 transition-colors shadow-inner"><Moon size={22} className="text-[#00f2ff]"/></div>
+                        <div><h4 className="text-xs font-black uppercase tracking-widest">Stealth</h4><p className="text-[9px] text-gray-500 italic">Hide profile from others</p></div>
+                     </div>
+                     <div className="w-10 h-5 bg-white/10 rounded-full p-1 flex justify-end items-center"><div className="w-3 h-3 bg-[#00f2ff] rounded-full shadow-glow" /></div>
+                  </div>
+                  
+                  <div className="flex justify-between items-center group cursor-pointer" onClick={() => showAlert("Saved", "Primary color changed.", "info")}>
+                     <div className="flex items-center gap-4">
+                        <div className="p-4 bg-white/5 rounded-[22px] group-hover:bg-[#00f2ff]/10 transition-colors shadow-inner"><Palette size={22} className="text-[#00f2ff]"/></div>
+                        <div><h4 className="text-xs font-black uppercase tracking-widest">Neon</h4><p className="text-[9px] text-gray-500 italic">Change site colors</p></div>
+                     </div>
+                     <ChevronRight size={16} className="text-gray-600 group-hover:translate-x-2 transition-transform"/>
+                  </div>
+
+                  <div className="flex justify-between items-center opacity-40 cursor-not-allowed border-t border-white/5 pt-8">
+                     <div className="flex items-center gap-4">
+                        <div className="p-4 bg-white/5 rounded-[22px] shadow-inner"><Fingerprint size={22}/></div>
+                        <div><h4 className="text-xs font-black uppercase tracking-widest">Face ID</h4><p className="text-[9px] text-gray-500 italic">Verify account to use face login</p></div>
+                     </div>
+                     <Lock size={16} className="text-gray-600"/>
+                  </div>
+
+                  <div className="pt-6 border-t border-white/5">
+                    <button onClick={() => showAlert("Saved", "Settings saved.", "success")} className="w-full py-5 bg-white text-black font-black italic rounded-3xl text-[11px] uppercase hover:bg-[#00f2ff] transition-all shadow-xl tracking-widest">Save Settings</button>
+                    <p className="w-full text-[8px] font-bold text-gray-700 uppercase tracking-[0.5em] text-center mt-6">Build 4.0.2 - STABLE</p>
+                  </div>
+               </div>
+            </div>
+          )}
+
+          {/* --- 🛠️ HELP TAB --- */}
+          {activeTab === "support" && (
+             <div className="grid md:grid-cols-2 gap-4">
+                <div className="p-8 bg-white/5 border border-white/10 rounded-[40px] shadow-2xl">
+                   <h4 className="text-xs font-black uppercase text-[#00f2ff] mb-6 tracking-widest italic text-center">Protocol FAQ</h4>
+                   {['Is my money safe?', 'How fast is pay?', 'Help with screening'].map(q => (
+                     <button key={q} onClick={handleSupportEmail} className="w-full flex justify-between items-center p-4 bg-black/40 rounded-2xl mb-3 text-left hover:bg-white/5 border border-transparent hover:border-white/5 transition-all">
+                        <span className="text-[10px] font-bold italic">{q}</span>
+                        <ChevronRight size={14} className="text-[#00f2ff]" />
+                     </button>
+                   ))}
+                </div>
+                <div className="p-10 bg-white/5 border border-white/10 rounded-[40px] text-center flex flex-col justify-center gap-4 shadow-2xl">
+                   <HelpCircle size={48} className="mx-auto text-[#00f2ff] opacity-40" />
+                   <p className="text-[10px] text-gray-400 uppercase font-bold">Quick Email Support:</p>
+                   <p className="text-xs font-black italic text-white leading-loose">notifications.nexusgigs@gmail.com</p>
+                   <button onClick={handleSupportEmail} className="mt-4 py-4 bg-[#00f2ff] text-black font-black rounded-2xl text-[10px] uppercase shadow-glow active:scale-95 transition-transform tracking-widest">Get Help</button>
+                </div>
+             </div>
+          )}
+
         </AnimatePresence>
       </div>
 
-      {/* --- SLIM NAV --- */}
+      {/* --- SLIM NAV BAR --- */}
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-100 w-[94%] max-w-xl">
         <div className="h-16 bg-black/80 backdrop-blur-3xl border border-white/10 rounded-full flex items-center justify-around px-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
           {navItems.map((item) => (
@@ -300,7 +458,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
               {paymentStep === "terms" ? (
                 <div className="space-y-6">
                   <ShieldCheck size={40} className="text-[#00f2ff] mx-auto shadow-glow" />
-                  <h3 className="text-xl font-black italic uppercase tracking-tight">Identity Check</h3>
+                  <h3 className="text-xl font-black italic uppercase tracking-tight text-white">Identity Check</h3>
                   
                   <div className="bg-white/5 p-5 rounded-3xl text-left border border-white/5 space-y-4">
                      <p className="text-[10px] text-gray-300 font-bold italic leading-relaxed">1. Pay $10 fee.</p>
@@ -323,7 +481,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 <div className="space-y-6">
                   <h3 className="text-md font-black uppercase italic tracking-widest text-[#00f2ff]">Pay $10</h3>
                   <div className="space-y-3">
-                    <button onClick={() => handleSecurePayment("CARD")} className="w-full py-4 bg-white text-black font-black rounded-2xl text-[10px] uppercase italic flex items-center justify-center gap-3 tracking-widest"><CreditCard size={14}/> Card</button>
+                    <button onClick={() => handleSecurePayment("CARD")} className="w-full py-4 bg-white text-black font-black rounded-2xl text-[10px] uppercase italic flex items-center justify-center gap-3 tracking-widest"><CreditCard size={14}/> Global Card</button>
                     <button onClick={() => setPaymentStep("mpesa")} className="w-full py-4 bg-emerald-600 text-white font-black rounded-2xl text-[10px] uppercase italic flex items-center justify-center gap-3 tracking-widest shadow-lg"><Smartphone size={14}/> M-Pesa</button>
                   </div>
                   <button onClick={() => setPaymentStep("terms")} className="text-[9px] text-gray-500 uppercase font-black italic tracking-[0.3em]">Go Back</button>
@@ -332,12 +490,11 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 <div className="space-y-8">
                    <Smartphone size={32} className="text-emerald-500 mx-auto animate-bounce" />
                    <div className="space-y-2">
-                     <h3 className="text-lg font-black uppercase italic">M-Pesa Sync</h3>
+                     <h3 className="text-lg font-black uppercase italic text-white">M-Pesa Sync</h3>
                      <p className="text-[10px] text-gray-500 font-bold uppercase">Enter phone for protocol relay</p>
                    </div>
                    <input value={mpesaNumber} onChange={e => setMpesaNumber(e.target.value)} placeholder="2547XXXXXXXX" className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-center text-2xl font-black text-white outline-none focus:border-emerald-500 shadow-inner" />
                    <div className="space-y-4">
-                    {/* FIXED TEXT: PAY $10 (1300) */}
                     <button disabled={isPaying} onClick={() => handleSecurePayment("M-PESA")} className={`w-full py-5 bg-emerald-600 text-white font-black rounded-2xl uppercase italic text-[11px] shadow-lg tracking-widest`}>{isPaying ? "ENCRYPTING..." : "Transmit $10 (1,300 KES)"}</button>
                     <button onClick={() => setPaymentStep("choice")} className="text-[9px] text-gray-500 uppercase font-black italic tracking-widest">Back</button>
                    </div>
@@ -358,7 +515,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 </div>
                 <h4 className="text-md font-black uppercase italic mb-3 text-white tracking-tighter leading-none">{customAlert.title}</h4>
                 <p className="text-[10px] text-gray-400 italic mb-8 leading-relaxed tracking-wide">{customAlert.msg}</p>
-                <button onClick={() => setCustomAlert({...customAlert, show: false})} className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase italic hover:bg-white hover:text-black transition-all">Dismiss</button>
+                <button onClick={() => setCustomAlert({...customAlert, show: false})} className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase italic hover:bg-white hover:text-black transition-all">Dismiss Signal</button>
              </motion.div>
           </div>
         )}
