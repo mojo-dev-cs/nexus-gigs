@@ -54,7 +54,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
           });
 
           if (response.ok) {
-            showAlert("Done!", "Money received. Check your email for the survey.", "success");
+            showAlert("Verified!", "Handshake complete. Check your email for the survey.", "success");
             setIsVerified(true);
           }
         } catch (error) {
@@ -66,7 +66,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
   }, [searchParams, isLoaded, user, isVerified]);
 
   const handleSecurePayment = async (method: "M-PESA" | "CARD") => {
-    if (!agreedToTerms) return showAlert("Wait", "Please check the box to agree to the rules.", "info");
+    if (!agreedToTerms) return showAlert("Notice", "Please agree to the screening terms.", "info");
     setIsPaying(true);
 
     if (method === "M-PESA") {
@@ -114,16 +114,16 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
   ];
 
   const marketplaceGigs = useMemo(() => [
-    { id: "1", title: "Enterprise: Network Security Audit", budget: 850, client: "SafeFlow Tech", rating: 5.0, dur: "4 Days", img: "https://i.pravatar.cc/150?u=1", type: "Company", status: "Active" },
-    { id: "2", title: "Assignment: 5000 Word Business Law Paper", budget: 150, client: "Julia Cody", rating: 5.0, dur: "2 Days", img: "https://i.pravatar.cc/150?u=julia", type: "Academic", status: "Active" },
-    { id: "3", title: "Technical: Python Data Cleanup Script", budget: 45, client: "Mark T.", rating: 4.8, dur: "5 Hours", img: "https://i.pravatar.cc/150?u=2", type: "Individual", status: "Active" },
-    { id: "4", title: "Startup: MVP Branding & Logo Design", budget: 1200, client: "Nova Labs", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=3", type: "Startup", status: "Expired" },
-    { id: "5", title: "Assignment: Advanced React UI Fixes", budget: 120, client: "Liam G.", rating: 4.9, dur: "10 Hours", img: "https://i.pravatar.cc/150?u=4", type: "Individual", status: "Active" },
-    { id: "6", title: "Design: 4K Video Drone Montage", budget: 300, client: "Vogue Visuals", rating: 5.0, dur: "2 Days", img: "https://i.pravatar.cc/150?u=5", type: "Company", status: "Active" },
-    { id: "7", title: "Technical: Rust Smart Contract Proxy", budget: 2000, client: "Polygon Hub", rating: 5.0, dur: "Active", img: "https://i.pravatar.cc/150?u=6", type: "Web3", status: "Active" },
-    { id: "8", title: "Assignment: Literature Review Essay", budget: 80, client: "Emily R.", rating: 4.7, dur: "Expired", img: "https://i.pravatar.cc/150?u=7", type: "Academic", status: "Expired" },
-    { id: "9", title: "Company: API Integration (Rust/Go)", budget: 500, client: "CloudX", rating: 5.0, dur: "2 Days", img: "https://i.pravatar.cc/150?u=8", type: "Company", status: "Active" },
-    { id: "10", title: "Enterprise: C++ Database Migration", budget: 3500, client: "Oracle HQ", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=9", type: "Enterprise", status: "Expired" },
+    { id: "1", title: "Enterprise: Cloud Infrastructure Audit", budget: 850, client: "TechFlow Systems", rating: 5.0, dur: "4 Days", img: "https://i.pravatar.cc/150?u=tech", type: "Company", status: "Active" },
+    { id: "2", title: "Assignment: Advanced Calculus Solutions", budget: 60, client: "Mark Thompson", rating: 4.8, dur: "12 Hours", img: "https://i.pravatar.cc/150?u=mark", type: "Academic", status: "Active" },
+    { id: "3", title: "Startup: MVP Mobile App UI Design", budget: 1200, client: "Nova Labs", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=nova", type: "Agency", status: "Expired" },
+    { id: "4", title: "Company: Fullstack React Dev (Hotfix)", budget: 350, client: "Julia Cody", rating: 4.9, dur: "24 Hours", img: "https://i.pravatar.cc/150?u=julia", type: "Startup", status: "Active" },
+    { id: "5", title: "Technical: Rust Smart Contract Audit", budget: 2000, client: "Polygon Hub", rating: 5.0, dur: "3 Days", img: "https://i.pravatar.cc/150?u=poly", type: "Web3", status: "Active" },
+    { id: "6", title: "Assignment: 10 Page Literature Review", budget: 100, client: "Liam G.", rating: 4.7, dur: "Expired", img: "https://i.pravatar.cc/150?u=liam", type: "Academic", status: "Expired" },
+    { id: "7", title: "Startup: Python Backend API Sync", budget: 500, client: "CloudX", rating: 5.0, dur: "2 Days", img: "https://i.pravatar.cc/150?u=cloud", type: "Company", status: "Active" },
+    { id: "8", title: "Design: Cinematic 4K Drone Edit", budget: 250, client: "Vogue Visuals", rating: 4.9, dur: "2 Days", img: "https://i.pravatar.cc/150?u=vogue", type: "Studio", status: "Active" },
+    { id: "9", title: "Enterprise: Cybersecurity Protocol v2", budget: 3500, client: "SafeVault", rating: 5.0, dur: "Active", img: "https://i.pravatar.cc/150?u=safe", type: "Enterprise", status: "Active" },
+    { id: "10", title: "Technical: C++ Legacy Migration", budget: 1800, client: "Old Guard", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=old", type: "Company", status: "Expired" },
   ], []);
 
   const handleSupportEmail = () => {
@@ -140,9 +140,9 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
       <div className="max-w-5xl mx-auto pt-4 px-4 relative z-10">
         <AnimatePresence mode="wait">
           
-          {/* --- HOME --- */}
+          {/* --- MODERNIZED HOME TAB --- */}
           {activeTab === "home" && (
-            <motion.div key="home" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
+            <motion.div key="home" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6 pb-12">
               <header className="flex justify-between items-center bg-white/5 backdrop-blur-xl p-5 rounded-[25px] border border-white/10 shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-1 h-full bg-[#00f2ff]" />
                 <div className="space-y-1">
@@ -151,11 +151,13 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 </div>
                 <div className="flex items-center gap-3 bg-black/40 px-3 py-1.5 rounded-xl border border-white/5 shadow-inner">
                    <div className={`w-2 h-2 rounded-full ${isVerified ? 'bg-[#00f2ff] shadow-[0_0_10px_#00f2ff]' : 'bg-red-500'}`} />
-                   <span className="text-[8px] font-bold uppercase tracking-widest">{isVerified ? "VERIFIED" : "UNVERIFIED"}</span>
+                   <span className="text-[8px] font-bold uppercase tracking-widest">{isVerified ? "VERIFIED NODE" : "UNVERIFIED"}</span>
                 </div>
               </header>
 
+              {/* TOP ROW: BALANCE & VERIFICATION (FIXED ORDER) */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {/* Balance Card */}
                 <div className="p-8 bg-linear-to-br from-[#00f2ff]/10 to-transparent border border-[#00f2ff]/20 rounded-[30px] shadow-2xl flex flex-col justify-between">
                   <div>
                     <p className="text-[8px] font-bold uppercase text-[#00f2ff] mb-1">My Money</p>
@@ -164,39 +166,45 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                   <button onClick={() => setActiveTab("earnings")} className="w-full py-2.5 bg-white text-black font-bold rounded-lg text-[10px] uppercase hover:bg-[#00f2ff] transition-all">Vault</button>
                 </div>
 
+                {/* Verification Check Card - Just after balance */}
                 {!isVerified && (
-                  <div className="md:col-span-2 p-8 bg-white/5 border border-white/10 rounded-[30px] flex items-center gap-6 backdrop-blur-md relative overflow-hidden">
-                    <div className="w-12 h-12 bg-[#00f2ff]/10 rounded-2xl flex items-center justify-center text-[#00f2ff] shadow-inner"><ShieldCheck size={28}/></div>
+                  <div className="md:col-span-2 p-8 bg-white/5 border border-white/10 rounded-[30px] flex items-center gap-6 backdrop-blur-md relative overflow-hidden shadow-2xl">
+                    <div className="absolute top-0 right-0 p-6 opacity-5"><ShieldCheck size={80} /></div>
+                    <div className="w-14 h-14 bg-[#00f2ff]/10 rounded-2xl flex items-center justify-center text-[#00f2ff] shadow-inner shrink-0 border border-[#00f2ff]/20"><ShieldCheck size={32}/></div>
                     <div className="flex-1">
-                        <h4 className="text-md font-bold uppercase tracking-tight">Identity Check</h4>
-                        <p className="text-[10px] text-gray-400 mb-3 leading-relaxed">Pay $10 once to unlock high-paying jobs and withdraw money. (Email survey + Screen call required).</p>
-                        <button onClick={() => { setPaymentStep("terms"); setShowVerifyModal(true); }} className="text-[9px] font-black uppercase text-[#00f2ff] flex items-center gap-1 hover:text-white transition-all">Start Now <ChevronRight size={12} /></button>
+                        <h4 className="text-lg font-black italic uppercase tracking-tight">Identity Check</h4>
+                        <p className="text-[10px] text-gray-400 mb-4 leading-relaxed">Pay $10 once to unlock high-paying jobs and withdraw money. (Email survey + Screen call required).</p>
+                        <button onClick={() => { setPaymentStep("terms"); setShowVerifyModal(true); }} className="px-8 py-3 bg-[#00f2ff] text-black rounded-xl text-[10px] font-black uppercase italic tracking-widest hover:scale-105 active:scale-95 transition-all shadow-glow">Start Verification</button>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Progress Summary Widget */}
-              <div className="p-8 bg-white/5 border border-white/10 rounded-[40px] shadow-2xl">
+              {/* QUICK INSIGHTS SECTION */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                 {[
+                   { l: "Success Rate", v: "0%", i: <Target size={16} className="text-[#00f2ff]"/> },
+                   { l: "Sync Progress", v: "40%", i: <Activity size={16} className="text-emerald-500"/> },
+                   { l: "Security Hub", v: "Active", i: <Shield size={16} className="text-purple-500"/> },
+                   { l: "Current Tier", v: "Beta", i: <Cpu size={16} className="text-amber-500"/> }
+                 ].map((stat, i) => (
+                   <div key={i} className="p-5 bg-white/3 border border-white/5 rounded-[25px] text-center hover:bg-white/5 transition-all shadow-xl">
+                      <div className="mb-2 flex justify-center">{stat.i}</div>
+                      <p className="text-[10px] font-black italic">{stat.v}</p>
+                      <p className="text-[7px] font-bold text-gray-500 uppercase tracking-widest">{stat.l}</p>
+                   </div>
+                 ))}
+              </div>
+
+              {/* Performance Graph Placeholder */}
+              <div className="p-8 bg-white/3 border border-white/5 rounded-[40px] shadow-2xl relative overflow-hidden group">
                  <div className="flex justify-between items-center mb-6">
-                    <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Mission Status</h4>
-                    <span className="text-[10px] font-black text-[#00f2ff]">40% Sync</span>
+                    <p className="text-[9px] font-black uppercase text-gray-500 tracking-[0.2em]">Node Performance Stream</p>
+                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
                  </div>
-                 <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden mb-6">
-                    <motion.div initial={{ width: 0 }} animate={{ width: "40%" }} className="h-full bg-[#00f2ff] shadow-glow" />
-                 </div>
-                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {[
-                      { l: "Jobs", v: "0", i: <Target size={14}/> },
-                      { l: "Uptime", v: "99.9%", i: <Activity size={14}/> },
-                      { l: "Node", v: "Tier 1", i: <Cpu size={14}/> },
-                      { l: "Growth", v: "+0%", i: <TrendingUp size={14}/> }
-                    ].map((st, i) => (
-                      <div key={i} className="bg-black/20 p-4 rounded-2xl border border-white/5">
-                         <div className="text-gray-500 mb-1">{st.i}</div>
-                         <p className="text-xs font-black">{st.v}</p>
-                         <p className="text-[7px] font-bold text-gray-600 uppercase">{st.l}</p>
-                      </div>
+                 <div className="flex items-end justify-between h-20 gap-2 opacity-30 group-hover:opacity-60 transition-opacity">
+                    {[30, 70, 45, 90, 60, 100, 80, 50, 75, 40].map((h, i) => (
+                      <motion.div key={i} initial={{ height: 0 }} animate={{ height: `${h}%` }} className="w-full bg-white/10 rounded-t-md" />
                     ))}
                  </div>
               </div>
@@ -295,7 +303,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                     </div>
                     <div className="flex justify-between items-end relative z-10">
                        <div className="space-y-1">
-                          <p className="text-[7px] font-bold text-gray-500 uppercase tracking-widest">Node Signature</p>
+                          <p className="text-[7px] font-bold text-gray-500 uppercase tracking-widest">Node ID</p>
                           <p className="text-[10px] font-mono text-white/60 tracking-widest">{user?.id?.substring(0, 10).toUpperCase()}</p>
                        </div>
                        <button onClick={() => showAlert("Access Denied", "Pay $10 to unlock withdrawals.", "info")} className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-2xl text-[10px] font-black uppercase italic hover:bg-[#00f2ff] transition-all shadow-xl active:scale-95">
@@ -416,7 +424,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 </div>
                 <div className="p-10 bg-white/5 border border-white/10 rounded-[40px] text-center flex flex-col justify-center gap-4 shadow-2xl">
                    <HelpCircle size={48} className="mx-auto text-[#00f2ff] opacity-40" />
-                   <p className="text-[10px] text-gray-500 uppercase font-bold">Quick Email:</p>
+                   <p className="text-[10px] text-gray-400 uppercase font-bold">Quick Email:</p>
                    <p className="text-xs font-black italic text-white">notifications.nexusgigs@gmail.com</p>
                    <button onClick={handleSupportEmail} className="mt-4 py-4 bg-[#00f2ff] text-black font-black rounded-2xl text-[10px] uppercase shadow-glow active:scale-95 transition-transform">Get Help</button>
                 </div>
@@ -428,7 +436,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
 
       {/* --- SLIM NAV --- */}
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-100 w-[94%] max-w-xl">
-        <div className="h-16 bg-black/80 backdrop-blur-3xl border border-white/10 rounded-full flex items-center justify-around px-2 shadow-2xl">
+        <div className="h-16 bg-black/80 backdrop-blur-3xl border border-white/10 rounded-full flex items-center justify-around px-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
           {navItems.map((item) => (
             <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex flex-col items-center gap-0.5 transition-all duration-300 ${activeTab === item.id ? 'text-[#00f2ff] scale-110' : 'text-gray-500 hover:text-white'}`}>
               <div className={activeTab === item.id ? "bg-[#00f2ff]/10 p-1.5 rounded-xl border border-[#00f2ff]/20 shadow-glow" : ""}>{item.icon}</div>
@@ -438,7 +446,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
         </div>
       </div>
 
-      {/* --- VERIFICATION MODAL --- */}
+      {/* --- VERIFICATION MODAL (UPDATED FEE PROMPT) --- */}
       <AnimatePresence>
         {showVerifyModal && (
           <div className="fixed inset-0 z-200 flex items-center justify-center p-6 backdrop-blur-md bg-black/60">
@@ -451,7 +459,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                   <ShieldCheck size={40} className="text-[#00f2ff] mx-auto shadow-glow" />
                   <h3 className="text-xl font-black italic uppercase tracking-tight">Identity Check</h3>
                   
-                  <div className="bg-white/5 p-5 rounded-3xl text-left border border-white/5 space-y-4 shadow-inner">
+                  <div className="bg-white/5 p-5 rounded-3xl text-left border border-white/5 space-y-4">
                      <p className="text-[10px] text-gray-300 font-bold italic leading-relaxed">1. Pay $10 fee.</p>
                      <p className="text-[10px] text-gray-400 italic leading-tight">2. Pass the email survey and Zoom call.</p>
                      <div className="pt-2 border-t border-white/5">
@@ -480,13 +488,10 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
               ) : (
                 <div className="space-y-8">
                    <Smartphone size={32} className="text-emerald-500 mx-auto animate-bounce" />
-                   <div className="space-y-2">
-                     <h3 className="text-lg font-black uppercase italic">M-Pesa Sync</h3>
-                     <p className="text-[10px] text-gray-500 font-bold uppercase">Enter phone for protocol relay</p>
-                   </div>
                    <input value={mpesaNumber} onChange={e => setMpesaNumber(e.target.value)} placeholder="2547XXXXXXXX" className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-center text-2xl font-black text-white outline-none focus:border-emerald-500 shadow-inner" />
                    <div className="space-y-4">
-                    <button disabled={isPaying} onClick={() => handleSecurePayment("M-PESA")} className={`w-full py-5 bg-emerald-600 text-white font-black rounded-2xl uppercase italic text-[11px] shadow-lg tracking-widest`}>{isPaying ? "ENCRYPTING..." : "Transmit KES 1,300"}</button>
+                    {/* FIXED TEXT: PAY $10 (1300) */}
+                    <button disabled={isPaying} onClick={() => handleSecurePayment("M-PESA")} className={`w-full py-5 bg-emerald-600 text-white font-black rounded-2xl uppercase italic text-[11px] shadow-lg tracking-widest`}>{isPaying ? "ENCRYPTING..." : "Transmit $10 (1,300 KES)"}</button>
                     <button onClick={() => setPaymentStep("choice")} className="text-[9px] text-gray-500 uppercase font-black italic tracking-widest">Back</button>
                    </div>
                 </div>
