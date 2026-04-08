@@ -410,8 +410,8 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                   <h3 className="text-4xl font-black italic uppercase text-white tracking-tighter leading-tight">SELECT <br /><span className="text-[#00f2ff]">METHOD</span></h3>
                   <div className="space-y-4 text-center">
                     <p className="text-[10px] font-black text-gray-500 uppercase italic mb-4">Activation Fee: KES 1,300 ($10.00)</p>
-                    <button onClick={() => handleSecurePayment("CARD")} className="w-full py-6 bg-white text-black font-black rounded-4xl uppercase text-xs italic shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2">💳 Global Card Relay</button>
-                    <button onClick={() => setPaymentStep("mpesa")} className="w-full py-6 bg-emerald-600 text-white font-black rounded-4xl uppercase text-xs italic shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2">📱 M-Pesa Direct Sync</button>
+                    <button onClick={() => handleSecurePayment("CARD")} className="w-full py-6 bg-white text-black font-black rounded-4xl uppercase text-xs italic shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2">💳  Card payment</button>
+                    <button onClick={() => setPaymentStep("mpesa")} className="w-full py-6 bg-emerald-600 text-white font-black rounded-4xl uppercase text-xs italic shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2">📱 M-Pesa Direct</button>
                   </div>
                   <button onClick={() => setPaymentStep("terms")} className="text-[10px] text-gray-500 font-black uppercase italic tracking-widest hover:text-white transition-colors">Back to Terms</button>
                 </div>
