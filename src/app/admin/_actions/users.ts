@@ -1,4 +1,4 @@
-"server-only";
+"use server";
 
 import { clerkClient } from "@clerk/nextjs/server";
 
@@ -6,7 +6,7 @@ export async function getAllNexusUsers() {
   try {
     const client = await clerkClient();
     const response = await client.users.getUserList({
-      limit: 100, // Adjust as needed
+      limit: 100,
       orderBy: '-created_at'
     });
 
