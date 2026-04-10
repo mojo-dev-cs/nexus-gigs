@@ -193,7 +193,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
       <div>
         <h4 className="text-xl font-black uppercase italic tracking-tighter text-white mb-1">Verify Account</h4>
         <p className="text-[11px] text-gray-400 font-medium leading-relaxed">
-          Finish your one-time <span className="text-[#00f2ff] font-bold">$10 handshake</span> to unlock all features.
+          Finish your one-time <span className="text-[#00f2ff] font-bold">$10 fee</span> to unlock all features.
         </p>
       </div>
 
@@ -221,7 +221,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             : "bg-[#00f2ff] text-black hover:scale-105"
           }`}
         >
-          {isUnderReview ? "Node Under Review" : "Start Verify Now"}
+          {isUnderReview ? "Account Under Review" : "Start Verification"}
         </button>
         
         {isUnderReview && (
@@ -233,7 +233,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
 )}
 <div className="p-8 bg-white/3 border border-white/5 rounded-[40px] shadow-2xl">
                  <div className="flex justify-between items-center mb-6 px-2">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Node Progress</h4>
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Account Progress</h4>
                     <span className="text-[10px] font-black text-[#00f2ff]">Phase 1 Sync</span>
                  </div>
                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
