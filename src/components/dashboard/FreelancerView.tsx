@@ -172,33 +172,66 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 </div>
               </header>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div className="p-8 bg-linear-to-br from-[#00f2ff]/10 to-transparent border border-[#00f2ff]/20 rounded-[30px] shadow-2xl flex flex-col justify-between">
-                  <div><p className="text-[8px] font-bold uppercase text-[#00f2ff] mb-1">My Balance</p><h3 className="text-4xl font-black mb-4 tracking-tighter">$0.00</h3></div>
-                  <button onClick={() => setActiveTab("earnings")} className="w-full py-3 bg-white text-black font-black rounded-xl text-[10px] uppercase hover:bg-[#00f2ff] transition-all">Wallet</button>
-                </div>
+<div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+  <div className="p-8 bg-linear-to-br from-[#00f2ff]/10 to-transparent border border-[#00f2ff]/20 rounded-[30px] shadow-2xl flex flex-col justify-between">
+    <div><p className="text-[8px] font-bold uppercase text-[#00f2ff] mb-1">My Balance</p><h3 className="text-4xl font-black mb-4 tracking-tighter">$0.00</h3></div>
+    <button onClick={() => setActiveTab("earnings")} className="w-full py-3 bg-white text-black font-black rounded-xl text-[10px] uppercase hover:bg-[#00f2ff] transition-all">Wallet</button>
+  </div>
 
-                {!isVerified && (
-                  <div className="md:col-span-2 p-8 bg-white/5 border border-white/10 rounded-[30px] flex items-center gap-6 backdrop-blur-md relative overflow-hidden shadow-2xl border-l-4 border-l-[#00f2ff]">
-                    <div className="w-14 h-14 bg-[#00f2ff]/10 rounded-2xl flex items-center justify-center text-[#00f2ff] shadow-inner shrink-0"><ShieldCheck size={32}/></div>
-                    <div className="flex-1">
-                        <h4 className="text-md font-bold uppercase tracking-tight">Verification</h4>
-                        <p className="text-[10px] text-gray-400 mb-4 leading-relaxed italic">🔒 Account Verification Required
+  {!isVerified && (
+  <div className="md:col-span-2 p-8 bg-white/5 border border-white/10 rounded-[40px] flex flex-col md:flex-row items-center gap-8 backdrop-blur-xl relative overflow-hidden shadow-2xl border-l-4 border-l-[#00f2ff] group transition-all hover:bg-white/[0.07]">
+    {/* Animated Background Glow */}
+    <div className="absolute -top-24 -left-24 w-48 h-48 bg-[#00f2ff]/10 blur-[80px] rounded-full pointer-events-none group-hover:bg-[#00f2ff]/20 transition-all" />
+    
+    {/* Icon Hub */}
+    <div className="w-20 h-20 bg-[#00f2ff]/10 rounded-[30px] flex items-center justify-center text-[#00f2ff] shadow-inner shrink-0 border border-[#00f2ff]/20 relative z-10">
+      <ShieldCheck size={40} className="drop-shadow-[0_0_10px_rgba(0,242,255,0.5)]" />
+    </div>
 
-To maintain a secure and high-quality platform, all users are required to complete a one-time $10 verification fee.
+    {/* Content Hub */}
+    <div className="flex-1 relative z-10 space-y-4">
+      <div>
+        <h4 className="text-xl font-black uppercase italic tracking-tighter text-white mb-1">Verify Account</h4>
+        <p className="text-[11px] text-gray-400 font-medium leading-relaxed">
+          Finish your one-time <span className="text-[#00f2ff] font-bold">$10 handshake</span> to unlock all features.
+        </p>
+      </div>
 
-This process helps us:
+      {/* Feature List */}
+      <div className="grid grid-cols-1 gap-3 border-y border-white/5 py-5">
+        {[
+          { text: "Stop fake accounts and scammers", color: "text-emerald-400" },
+          { text: "Connect with serious clients only", color: "text-blue-400" },
+          { text: "Safety for all your payments", color: "text-[#00f2ff]" }
+        ].map((item, idx) => (
+          <div key={idx} className="flex items-center gap-3">
+            <div className={`w-1.5 h-1.5 rounded-full bg-current ${item.color} shadow-[0_0_8px_currentColor]`} />
+            <p className="text-[10px] font-bold uppercase tracking-wide text-gray-300">{item.text}</p>
+          </div>
+        ))}
+      </div>
 
-✅ Prevent fraud and fake accounts
-✅ Ensure serious clients and freelancers only
-✅ Protect payments and transactions on the platforms.</p>
-                        <button onClick={handleVerifyClick} className="px-8 py-3 bg-[#00f2ff] text-black rounded-xl text-[9px] font-black uppercase italic tracking-widest hover:scale-105 active:scale-95 transition-all shadow-glow">{isUnderReview ? "Status: Pending" : "Start Handshake"}</button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="p-8 bg-white/3 border border-white/5 rounded-[40px] shadow-2xl">
+      {/* Action Hub */}
+      <div className="pt-2 flex items-center gap-4">
+        <button 
+          onClick={handleVerifyClick} 
+          className={`px-10 py-4 rounded-2xl text-[10px] font-black uppercase italic tracking-widest transition-all shadow-glow active:scale-95 ${
+            isUnderReview 
+            ? "bg-amber-500 text-black animate-pulse cursor-wait" 
+            : "bg-[#00f2ff] text-black hover:scale-105"
+          }`}
+        >
+          {isUnderReview ? "Node Under Review" : "Start Verify Now"}
+        </button>
+        
+        {isUnderReview && (
+          <span className="text-[9px] font-black text-amber-500 uppercase animate-pulse">Reviewing...</span>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+<div className="p-8 bg-white/3 border border-white/5 rounded-[40px] shadow-2xl">
                  <div className="flex justify-between items-center mb-6 px-2">
                     <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Node Progress</h4>
                     <span className="text-[10px] font-black text-[#00f2ff]">Phase 1 Sync</span>
@@ -216,7 +249,8 @@ This process helps us:
                          <p className="text-[7px] font-bold text-gray-600 uppercase leading-none">{st.l}</p>
                       </div>
                     ))}
-                 </div>
+                   </div>
+                </div>
               </div>
             </motion.div>
           )}
