@@ -139,7 +139,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
   ], []);
 
   const handleSupportEmail = () => {
-    window.location.href = `mailto:notifications.nexusgigs@gmail.com?subject=Help&body=ID: ${user?.id}`;
+    window.location.href = `mailto:support.nexusgigs@gmail.com?subject=Help&body=ID: ${user?.id}`;
   };
 
   return (
