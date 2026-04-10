@@ -426,7 +426,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 <div className="p-10 bg-white/5 border border-white/10 rounded-[40px] text-center flex flex-col justify-center gap-4 shadow-2xl">
                    <HelpCircle size={48} className="mx-auto text-[#00f2ff] opacity-40" />
                    <p className="text-[10px] text-gray-400 uppercase font-bold">Quick Email Support:</p>
-                   <p className="text-xs font-black italic text-white leading-loose">notifications.nexusgigs@gmail.com</p>
+                   <p className="text-xs font-black italic text-white leading-loose">support.nexusgigs@gmail.com</p>
                    <button onClick={handleSupportEmail} className="mt-4 py-4 bg-[#00f2ff] text-black font-black rounded-2xl text-[10px] uppercase shadow-glow active:scale-95 transition-transform tracking-widest">Get Help</button>
                 </div>
              </div>

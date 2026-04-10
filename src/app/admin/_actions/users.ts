@@ -11,9 +11,7 @@ export async function getAllNexusUsers() {
     });
 
     const users = response.data.map((user) => {
-      // DEBUG: Accessing publicMetadata safely
       const metadata = user.publicMetadata || {};
-      
       return {
         id: user.id,
         name: `${user.firstName || ""} ${user.lastName || ""}`.trim() || "Nexus Node",
@@ -22,13 +20,15 @@ export async function getAllNexusUsers() {
         role: (metadata.role as string) || "freelancer",
         joined: new Date(user.createdAt).toLocaleDateString(),
         createdAt: user.createdAt,
-        // CRITICAL: Syncing the paidBalance KES 10
         paidBalance: typeof metadata.paidBalance === 'number' ? metadata.paidBalance : 0,
         banned: user.banned
       };
     });
 
-    return { success: true, users };
+    // Also get total count for traffic metrics
+    const totalCount = await (await clerkClient()).users.getCount();
+
+    return { success: true, users, totalCount };
   } catch (error: any) {
     console.error("Clerk Sync Error:", error);
     return { success: false, message: error.message };
