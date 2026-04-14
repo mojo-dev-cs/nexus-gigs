@@ -217,9 +217,9 @@ export default function Home() {
 
                <div className="absolute -bottom-14 left-1/2 -translate-x-1/2 w-[90%] grid grid-cols-2 md:grid-cols-4 gap-4 z-20">
                   {[
-                    { l: "Nodes Online", v: "1.2M+", i: <Users size={16}/> },
-                    { l: "Paid Assets", v: "KES 3.8B", i: <DollarSign size={16}/> },
-                    { l: "Missions", v: "85K+", i: <Briefcase size={14}/> },
+                    { l: "Freelancers Online", v: "1.2M+", i: <Users size={16}/> },
+                    { l: "MoneyPaid", v: "USD 3.8B", i: <DollarSign size={16}/> },
+                    { l: "Gigs", v: "85K+", i: <Briefcase size={14}/> },
                     { l: "Latency", v: "0.02ms", i: <Activity size={14}/> }
                   ].map((item, i) => (
                     <motion.div key={i} animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 4, delay: i * 0.5 }} className="bg-black/90 backdrop-blur-3xl border border-white/10 p-7 rounded-[35px] text-center shadow-3xl">

@@ -385,7 +385,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 <div className="grid md:grid-cols-2 gap-5">
                    <div className="p-8 bg-white/5 border border-white/10 rounded-[40px] space-y-6 shadow-2xl backdrop-blur-xl">
                       <div className="space-y-1"><p className="text-[9px] font-black text-gray-500 uppercase leading-none mb-1">Support Email</p><p className="text-xs font-black italic text-white underline cursor-pointer" onClick={() => window.location.href="mailto:support.nexusgigs@gmail.com"}>support.nexusgigs@gmail.com</p></div>
-                      <div className="space-y-1"><p className="text-[9px] font-black text-gray-500 uppercase leading-none mb-1">WhatsApp Direct</p><p className="text-xs italic text-[#00f2ff] font-bold">+254 113 637325</p></div>
+                      <div className="space-y-1"><p className="text-[9px] font-black text-gray-500 uppercase leading-none mb-1">WhatsApp Direct</p><p className="text-xs italic text-[#00f2ff] font-bold">+1 (500) 555-0006</p></div>
                       <div className="pt-6 border-t border-white/5">
                         <p className="text-[10px] font-bold text-gray-500 uppercase mb-4 tracking-widest">Type your problem here:</p>
                         <textarea value={supportMsg} onChange={e => setSupportMsg(e.target.value)} placeholder="How can we help?" className="w-full bg-black/40 border border-white/10 rounded-2xl p-5 text-xs font-bold outline-none focus:border-[#00f2ff] h-32 mb-4 shadow-inner text-white resize-none" />
