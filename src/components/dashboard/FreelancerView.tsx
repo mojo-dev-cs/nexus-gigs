@@ -140,20 +140,21 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
 const marketplaceGigs = useMemo(() => [
     { id: "1", title: "Enterprise: Cloud Infrastructure Security Audit", budget: 1450, client: "Aegis Data", rating: 5.0, dur: "10 Days", img: "https://i.pravatar.cc/150?u=aegis", type: "Security", status: "Active" },
     { id: "2", title: "Web3: Smart Contract Vulnerability Scan (Solidity)", budget: 2200, client: "Nexus Protocol", rating: 4.9, dur: "5 Days", img: "https://i.pravatar.cc/150?u=crypto", type: "Web3", status: "Active" },
-    { id: "3", title: "Backend: Node.js Memory Leak Investigation", budget: 400, client: "StreamSync", rating: 5.0, dur: "24 Hours", img: "https://i.pravatar.cc/150?u=node", type: "Startup", status: "Active" },
+    { id: "3", title: "Backend: Node.js Memory Leak Investigation", budget: 400, client: "StreamSync", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=node", type: "Startup", status: "Expired" },
     { id: "4", title: "UI/UX: Fintech Dashboard Design System", budget: 3200, client: "Vertex Pay", rating: 4.8, dur: "14 Days", img: "https://i.pravatar.cc/150?u=pay", type: "Fintech", status: "Active" },
-    { id: "5", title: "DevOps: Kubernetes Cluster Optimization", budget: 950, client: "CloudScale", rating: 5.0, dur: "3 Days", img: "https://i.pravatar.cc/150?u=devops", type: "Agency", status: "Active" },
+    { id: "5", title: "DevOps: Kubernetes Cluster Optimization", budget: 950, client: "CloudScale", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=devops", type: "Agency", status: "Expired" },
     { id: "6", title: "Database: PostgreSQL Query Performance Tuning", budget: 600, client: "DataLake Inc", rating: 4.7, dur: "48 Hours", img: "https://i.pravatar.cc/150?u=db", type: "Enterprise", status: "Active" },
     { id: "7", title: "AI: Custom LLM Integration (OpenAI API)", budget: 1800, client: "MindGraph AI", rating: 5.0, dur: "7 Days", img: "https://i.pravatar.cc/150?u=ai", type: "Research", status: "Active" },
     { id: "8", title: "Frontend: Next.js SSR & SEO Refactor", budget: 1100, client: "EcoShop", rating: 4.9, dur: "6 Days", img: "https://i.pravatar.cc/150?u=next", type: "E-commerce", status: "Active" },
-    { id: "9", title: "Mobile: Flutter Push Notification Debugging", budget: 250, client: "GoMove App", rating: 4.6, dur: "12 Hours", img: "https://i.pravatar.cc/150?u=mobile", type: "Startup", status: "Active" },
+    { id: "9", title: "Mobile: Flutter Push Notification Debugging", budget: 250, client: "GoMove App", rating: 4.6, dur: "Expired", img: "https://i.pravatar.cc/150?u=mobile", type: "Startup", status: "Expired" },
     { id: "10", title: "Security: Penetration Test (External API)", budget: 2500, client: "VaultCore", rating: 5.0, dur: "10 Days", img: "https://i.pravatar.cc/150?u=vault", type: "Banking", status: "Active" },
     { id: "11", title: "Python: Automated Web Scraping & Data Pipeline", budget: 850, client: "MarketSense", rating: 4.8, dur: "4 Days", img: "https://i.pravatar.cc/150?u=py", type: "Analytics", status: "Active" },
     { id: "12", title: "Architect: Microservices Migration Strategy", budget: 4500, client: "Global Logistics", rating: 5.0, dur: "21 Days", img: "https://i.pravatar.cc/150?u=arch", type: "Enterprise", status: "Active" },
-    { id: "13", title: "Shopify: Liquid Theme Customization (Premium)", budget: 550, client: "Luxe Label", rating: 4.9, dur: "3 Days", img: "https://i.pravatar.cc/150?u=luxe", type: "Retail", status: "Active" },
+    { id: "13", title: "Shopify: Liquid Theme Customization (Premium)", budget: 550, client: "Luxe Label", rating: 4.9, dur: "Expired", img: "https://i.pravatar.cc/150?u=luxe", type: "Retail", status: "Expired" },
     { id: "14", title: "Technical Writing: API Documentation (Swagger)", budget: 700, client: "DevDocs Hub", rating: 5.0, dur: "5 Days", img: "https://i.pravatar.cc/150?u=doc", type: "SaaS", status: "Active" },
     { id: "15", title: "Testing: Cypress E2E Automation Suite", budget: 1200, client: "SafeBet Ltd", rating: 4.7, dur: "8 Days", img: "https://i.pravatar.cc/150?u=test", type: "QA", status: "Active" },
   ], []);
+
   const navItems = [
     { id: 'home', icon: <Home size={16}/>, label: 'Home' },
     { id: 'tasks', icon: <Briefcase size={16}/>, label: 'Gigs' },
@@ -393,8 +394,8 @@ const marketplaceGigs = useMemo(() => [
                 <h3 className="text-xl font-bold uppercase px-2 tracking-widest text-[#00f2ff]">Help <span className="text-white">Center</span></h3>
                 <div className="grid md:grid-cols-2 gap-5">
                    <div className="p-8 bg-white/5 border border-white/10 rounded-[40px] space-y-6 shadow-2xl backdrop-blur-xl">
-                      <div className="space-y-1"><p className="text-[9px] font-black text-gray-500 uppercase leading-none mb-1">Support Email</p><p className="text-xs font-black italic text-white underline cursor-pointer" onClick={() => window.location.href="mailto:support.nexusgigs@gmail.com"}>support@nexusgigs.me</p></div>
-                      <div className="space-y-1"><p className="text-[9px] font-black text-gray-500 uppercase leading-none mb-1">WhatsApp Direct</p><p className="text-xs italic text-[#00f2ff] font-bold">+1 (500) 555-0006</p></div>
+                      <div className="space-y-1"><p className="text-[9px] font-black text-gray-500 uppercase leading-none mb-1">Support Email</p><p className="text-xs font-black italic text-white underline cursor-pointer" onClick={() => window.location.href="mailto:support@nexusgigs.me"}>support@nexusgigs.me</p></div>
+                      <div className="space-y-1"><p className="text-[9px] font-black text-gray-500 uppercase leading-none mb-1">WhatsApp Direct</p><p className="text-xs italic text-[#00f2ff] font-bold">+254 113 637325</p></div>
                       <div className="pt-6 border-t border-white/5">
                         <p className="text-[10px] font-bold text-gray-500 uppercase mb-4 tracking-widest">Type your problem here:</p>
                         <textarea value={supportMsg} onChange={e => setSupportMsg(e.target.value)} placeholder="How can we help?" className="w-full bg-black/40 border border-white/10 rounded-2xl p-5 text-xs font-bold outline-none focus:border-[#00f2ff] h-32 mb-4 shadow-inner text-white resize-none" />
@@ -493,6 +494,21 @@ const marketplaceGigs = useMemo(() => [
                 <div className="space-y-6 text-sm">
                   <h3 className="text-md font-black uppercase italic tracking-widest text-[#00f2ff]">SELECT PAYMENT METHOD</h3>
                   <div className="space-y-3 text-left">
+                    {/* CARD / BANK */}
+                    <button onClick={() => handleSecurePayment("CARD")} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group hover:bg-white/10 transition-all">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                          <Landmark size={22} className="text-white" />
+                        </div>
+                        <div>
+                          <p className="font-black text-white text-[12px]">Credit / Debit Card <span className="ml-2 text-[8px] px-2 py-0.5 bg-amber-500/10 text-amber-500/60 rounded-full font-bold uppercase border border-amber-500/20">Bank</span></p>
+                          <p className="text-[10px] text-gray-500 font-bold uppercase">Visa, Mastercard, Amex</p>
+                        </div>
+                      </div>
+                      <ChevronRight size={18} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
+                    </button>
+
+                    {/* M-PESA */}
                     <button onClick={() => setPaymentStep("mpesa")} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group hover:bg-white/10 transition-all">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center font-black text-white shadow-lg shadow-emerald-500/20">M</div>
@@ -503,6 +519,8 @@ const marketplaceGigs = useMemo(() => [
                       </div>
                       <ChevronRight size={18} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
                     </button>
+
+                    {/* BINANCE USDT */}
                     <button onClick={() => setPaymentStep("binance")} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group hover:bg-white/10 transition-all">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20">
@@ -515,16 +533,8 @@ const marketplaceGigs = useMemo(() => [
                       </div>
                       <ChevronRight size={18} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
                     </button>
-                    <button onClick={() => handleSecurePayment("CARD")} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group hover:bg-white/10 transition-all">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center font-black text-white shadow-lg shadow-indigo-500/20">S</div>
-                        <div>
-                          <p className="font-black text-white text-[12px]">Credit / Debit Card <span className="ml-2 text-[8px] px-2 py-0.5 bg-amber-500/10 text-amber-500/60 rounded-full font-bold uppercase border border-amber-500/20">Bank payment</span></p>
-                          <p className="text-[10px] text-gray-500 font-bold uppercase">Visa, Mastercard, Amex</p>
-                        </div>
-                      </div>
-                      <Info size={18} className="text-gray-600" />
-                    </button>
+
+                    {/* PAYPAL */}
                     <button disabled className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group opacity-50 cursor-not-allowed">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center font-black text-white">PP</div>
