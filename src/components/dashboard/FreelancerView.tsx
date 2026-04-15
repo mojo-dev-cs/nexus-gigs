@@ -179,7 +179,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
           {/* --- 🏠 HOME --- */}
           {activeTab === "home" && (
             <motion.div key="home" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-4">
-              <header className="flex justify-between items-center bg-white/5 backdrop-blur-xl p-4 rounded-[20px] border border-white/10 shadow-2xl relative">
+              <header className="flex justify-between items-center bg-white/5 backdrop-blur-xl p-4 rounded-[15px] border border-white/10 shadow-2xl relative">
                 <div className="absolute top-0 left-0 w-1 h-full bg-[#00f2ff]" />
                 <div className="space-y-0.5">
                   <p className="text-[9px] font-black uppercase text-gray-500">Welcome</p>
@@ -192,47 +192,47 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
               </header>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-6 bg-linear-to-br from-[#00f2ff]/10 to-transparent border border-[#00f2ff]/20 rounded-[25px] shadow-2xl flex flex-col justify-between h-40">
+                <div className="p-5 bg-linear-to-br from-[#00f2ff]/10 to-transparent border border-[#00f2ff]/20 rounded-[20px] shadow-2xl flex flex-col justify-between h-36">
                   <div><p className="text-[7px] font-bold uppercase text-[#00f2ff] mb-0.5">My Balance</p><h3 className="text-3xl font-black tracking-tighter">$0.00</h3></div>
                   <button onClick={() => setActiveTab("earnings")} className="w-full py-2 bg-white text-black font-black rounded-lg text-[9px] uppercase hover:bg-[#00f2ff] transition-all">Wallet</button>
                 </div>
 
                 {!isVerified && (
-                  <div className="md:col-span-2 p-6 bg-white/5 border border-white/10 rounded-[30px] flex flex-col md:flex-row items-center gap-6 backdrop-blur-xl relative overflow-hidden shadow-2xl border-l-4 border-l-[#00f2ff] group transition-all hover:bg-white/[0.07]">
+                  <div className="md:col-span-2 p-5 bg-white/5 border border-white/10 rounded-[25px] flex flex-col md:flex-row items-center gap-5 backdrop-blur-xl relative overflow-hidden shadow-2xl border-l-4 border-l-[#00f2ff] group transition-all hover:bg-white/[0.07]">
                     <div className="absolute -top-24 -left-24 w-48 h-48 bg-[#00f2ff]/10 blur-[80px] rounded-full pointer-events-none group-hover:bg-[#00f2ff]/20 transition-all" />
-                    <div className="w-16 h-16 bg-[#00f2ff]/10 rounded-[25px] flex items-center justify-center text-[#00f2ff] shadow-inner shrink-0 border border-[#00f2ff]/20 relative z-10">
-                      <ShieldCheck size={32} className="drop-shadow-[0_0_10px_rgba(0,242,255,0.5)]" />
+                    <div className="w-14 h-14 bg-[#00f2ff]/10 rounded-[20px] flex items-center justify-center text-[#00f2ff] shadow-inner shrink-0 border border-[#00f2ff]/20 relative z-10">
+                      <ShieldCheck size={28} className="drop-shadow-[0_0_10px_rgba(0,242,255,0.5)]" />
                     </div>
-                    <div className="flex-1 relative z-10 space-y-3 text-center md:text-left">
+                    <div className="flex-1 relative z-10 space-y-2 text-center md:text-left">
                       <div>
-                        <h4 className="text-lg font-black uppercase italic tracking-tighter text-white mb-0.5">Verify Account</h4>
+                        <h4 className="text-md font-black uppercase italic tracking-tighter text-white mb-0.5">Verify Account</h4>
                         <p className="text-[10px] text-gray-400 font-medium leading-relaxed">
                           Finish your one-time <span className="text-[#00f2ff] font-bold">$10 fee</span> to unlock all features.
                         </p>
                       </div>
-                      <div className="pt-1 flex flex-wrap justify-center md:justify-start gap-3">
-                        <button onClick={handleVerifyClick} className={`px-8 py-3 rounded-xl text-[9px] font-black uppercase italic tracking-widest transition-all shadow-glow active:scale-95 ${isUnderReview ? "bg-amber-500 text-black animate-pulse cursor-wait" : "bg-[#00f2ff] text-black hover:scale-105"}`}>{isUnderReview ? "Under Review" : "Start Now"}</button>
+                      <div className="pt-0.5 flex flex-wrap justify-center md:justify-start gap-3">
+                        <button onClick={handleVerifyClick} className={`px-6 py-2.5 rounded-xl text-[9px] font-black uppercase italic tracking-widest transition-all shadow-glow active:scale-95 ${isUnderReview ? "bg-amber-500 text-black animate-pulse cursor-wait" : "bg-[#00f2ff] text-black hover:scale-105"}`}>{isUnderReview ? "Under Review" : "Start Now"}</button>
                       </div>
                     </div>
                   </div>
                 )}
 
-                <div className="p-6 bg-white/3 border border-white/5 rounded-[30px] shadow-2xl">
-                  <div className="flex justify-between items-center mb-4 px-1">
-                    <h4 className="text-[9px] font-black uppercase tracking-widest text-gray-400">Account Progress</h4>
-                    <span className="text-[9px] font-black text-[#00f2ff]">Phase 1 Sync</span>
+                <div className="p-5 bg-white/3 border border-white/5 rounded-[25px] shadow-2xl">
+                  <div className="flex justify-between items-center mb-3 px-1">
+                    <h4 className="text-[8px] font-black uppercase tracking-widest text-gray-400">Account Progress</h4>
+                    <span className="text-[8px] font-black text-[#00f2ff]">Phase 1 Sync</span>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
-                      { l: "Jobs", v: "0", i: <Target size={12} className="text-[#00f2ff]"/> },
-                      { l: "Uptime", v: "99.9%", i: <Activity size={12} className="text-emerald-500"/> },
-                      { l: "Status", v: "Tier 1", i: <Cpu size={12} className="text-amber-500"/> },
-                      { l: "Score", v: "0.0", i: <Star size={12} className="text-purple-500"/> }
+                      { l: "Jobs", v: "0", i: <Target size={11} className="text-[#00f2ff]"/> },
+                      { l: "Uptime", v: "99.9%", i: <Activity size={11} className="text-emerald-500"/> },
+                      { l: "Status", v: "Tier 1", i: <Cpu size={11} className="text-amber-500"/> },
+                      { l: "Score", v: "0.0", i: <Star size={11} className="text-purple-500"/> }
                     ].map((st, i) => (
-                      <div key={i} className="bg-black/20 p-3 rounded-xl border border-white/5 text-center">
+                      <div key={i} className="bg-black/20 p-2.5 rounded-xl border border-white/5 text-center">
                          <div className="mb-0.5 flex justify-center">{st.i}</div>
-                         <p className="text-[10px] font-black">{st.v}</p>
-                         <p className="text-[6px] font-bold text-gray-600 uppercase leading-none">{st.l}</p>
+                         <p className="text-[9px] font-black">{st.v}</p>
+                         <p className="text-[5px] font-bold text-gray-600 uppercase leading-none">{st.l}</p>
                       </div>
                     ))}
                   </div>
@@ -247,7 +247,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
               <div className="flex justify-between items-center px-2"><h3 className="text-lg font-bold uppercase tracking-tighter">Gig <span className="text-[#00f2ff]">Feed</span></h3><div className="flex items-center gap-2 bg-emerald-500/10 px-2 py-0.5 rounded-full"><div className="w-1 h-1 bg-emerald-500 rounded-full animate-ping" /><span className="text-[7px] font-black text-emerald-500 uppercase tracking-widest">Live</span></div></div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {marketplaceGigs.map((g) => (
-                  <div key={g.id} className={`p-4 rounded-[20px] bg-white/5 border border-white/10 transition-all ${g.status === 'Expired' ? 'opacity-40 grayscale' : 'hover:border-[#00f2ff]/30 shadow-xl'}`}>
+                  <div key={g.id} className={`p-4 rounded-[15px] bg-white/5 border border-white/10 transition-all ${g.status === 'Expired' ? 'opacity-40 grayscale' : 'hover:border-[#00f2ff]/30 shadow-xl'}`}>
                     <div className="flex justify-between items-start mb-2"><img src={g.img} className="w-8 h-8 rounded-lg object-cover border border-white/10" alt="cl" /><span className={`text-[7px] font-bold px-1.5 py-0.5 rounded uppercase ${g.status === 'Active' ? 'bg-[#00f2ff]/10 text-[#00f2ff]' : 'bg-white/5 text-gray-500'}`}>{g.dur}</span></div>
                     <h4 className="text-[10px] font-black uppercase mb-1 line-clamp-2 h-7 leading-tight">{g.title}</h4>
                     <div className="flex justify-between items-center pt-2 border-t border-white/5">
@@ -392,135 +392,138 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
         {showVerifyModal && (
           <div className="fixed inset-0 z-200 flex items-center justify-center p-6 backdrop-blur-md bg-black/60">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0" onClick={() => !isPaying && setShowVerifyModal(false)} />
-            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} className="relative w-full max-w-90 bg-[#0a0f1e] border-2 border-white/10 rounded-[45px] p-10 text-center shadow-2xl overflow-hidden">
+            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} className="relative w-full max-w-90 bg-[#0a0f1e] border-2 border-white/10 rounded-[35px] p-8 text-center shadow-2xl overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-[#00f2ff] to-transparent shadow-glow" />
               
               {paymentStep === "terms" ? (
-                <div className="space-y-6">
-                  <ShieldCheck size={40} className="text-[#00f2ff] mx-auto shadow-glow" />
-                  <h3 className="text-xl font-black italic uppercase tracking-tight text-white leading-none">Verification</h3>
-                  <div className="bg-white/5 p-5 rounded-3xl text-left border border-white/5 space-y-4 shadow-inner">
-                    <div className="space-y-3">
-                      <div className="flex gap-3">
-                        <div className="w-5 h-5 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0"><span className="text-[10px] font-black text-[#00f2ff]">1</span></div>
-                        <p className="text-[10px] text-gray-300 font-medium leading-relaxed"><strong>Vetting Fee:</strong> A one-time <span className="text-white">$10 (KES 1,300)</span> commitment fee to filter out bots and maintain high job quality.</p>
+                <div className="space-y-4">
+                  <ShieldCheck size={36} className="text-[#00f2ff] mx-auto shadow-glow" />
+                  <h3 className="text-lg font-black italic uppercase tracking-tight text-white leading-none">Verification</h3>
+                  
+                  <div className="bg-white/5 p-4 rounded-2xl text-left border border-white/5 space-y-3 shadow-inner">
+                    <div className="space-y-2">
+                      <div className="flex gap-2.5">
+                        <div className="w-4 h-4 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0"><span className="text-[9px] font-black text-[#00f2ff]">1</span></div>
+                        <p className="text-[9px] text-gray-300 font-medium leading-relaxed"><strong>Vetting Fee:</strong> A one-time <span className="text-white">$10 (KES 1,300)</span> commitment fee to filter out bots and maintain high job quality.</p>
                       </div>
-                      <div className="flex gap-3">
-                        <div className="w-5 h-5 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0"><span className="text-[10px] font-black text-[#00f2ff]">2</span></div>
-                        <p className="text-[10px] text-gray-300 font-medium leading-relaxed"><strong>Review Process:</strong> Our team will check your profile. We will email you a specialized survey and schedule a quick intro call.</p>
+                      <div className="flex gap-2.5">
+                        <div className="w-4 h-4 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0"><span className="text-[9px] font-black text-[#00f2ff]">2</span></div>
+                        <p className="text-[9px] text-gray-300 font-medium leading-relaxed"><strong>Review Process:</strong> Our team will check your profile. We will email you a specialized survey and schedule a quick intro call.</p>
                       </div>
-                      <div className="flex gap-3">
-                        <div className="w-5 h-5 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0"><span className="text-[10px] font-black text-[#00f2ff]">3</span></div>
-                        <p className="text-[10px] text-gray-300 font-medium leading-relaxed"><strong>Full Access:</strong> Once approved, you gain unlimited bidding rights and instant access to all global vault withdrawals.</p>
+                      <div className="flex gap-2.5">
+                        <div className="w-4 h-4 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0"><span className="text-[9px] font-black text-[#00f2ff]">3</span></div>
+                        <p className="text-[9px] text-gray-300 font-medium leading-relaxed"><strong>Full Access:</strong> Once approved, you gain unlimited bidding rights and instant access to all global vault withdrawals.</p>
                       </div>
                     </div>
-                    <div className="pt-2 border-t border-white/5">
-                      <p className="text-[9px] text-emerald-400 font-bold italic flex items-center gap-2 leading-none"><CheckCircle2 size={10}/> 100% Refund Guarantee if you fail the screening process.</p>
+                    <div className="pt-1.5 border-t border-white/5">
+                      <p className="text-[8px] text-emerald-400 font-bold italic flex items-center gap-1.5 leading-none"><CheckCircle2 size={8}/> 100% Refund Guarantee if you fail the screening process.</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4 bg-white/5 p-4 rounded-3xl border border-white/5 cursor-pointer text-left transition-all hover:bg-white/10" onClick={() => setAgreedToTerms(!agreedToTerms)}>
-                    <div className={`w-6 h-6 rounded-xl border-2 flex items-center justify-center transition-all shrink-0 ${agreedToTerms ? 'bg-[#00f2ff] border-[#00f2ff]' : 'border-white/20'}`}>{agreedToTerms && <X size={12} className="text-black font-black"/>}</div>
-                    <span className="text-[9px] font-black italic text-gray-400 leading-tight uppercase">I agree to pay the $10 fee and follow the refund rules.</span>
+
+                  <div className="flex items-center gap-3 bg-white/5 p-3 rounded-2xl border border-white/5 cursor-pointer text-left transition-all hover:bg-white/10" onClick={() => setAgreedToTerms(!agreedToTerms)}>
+                    <div className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all shrink-0 ${agreedToTerms ? 'bg-[#00f2ff] border-[#00f2ff]' : 'border-white/20'}`}>{agreedToTerms && <X size={10} className="text-black font-black"/>}</div>
+                    <span className="text-[8px] font-black italic text-gray-400 leading-tight uppercase">I agree to pay the $10 fee and follow the refund rules.</span>
                   </div>
-                  <button disabled={!agreedToTerms} onClick={() => setPaymentStep("choice")} className={`w-full py-5 rounded-[25px] font-black uppercase italic text-[11px] transition-all tracking-[0.2em] ${agreedToTerms ? 'bg-[#00f2ff] text-black shadow-glow hover:scale-[1.02]' : 'bg-gray-800 text-gray-600 cursor-not-allowed'}`}>Pay & Sync</button>
+                  
+                  <button disabled={!agreedToTerms} onClick={() => setPaymentStep("choice")} className={`w-full py-4 rounded-2xl font-black uppercase italic text-[10px] transition-all tracking-[0.2em] ${agreedToTerms ? 'bg-[#00f2ff] text-black shadow-glow hover:scale-[1.02]' : 'bg-gray-800 text-gray-600 cursor-not-allowed'}`}>Pay & Sync</button>
                 </div>
               ) : paymentStep === "choice" ? (
-                <div className="space-y-6 text-sm">
-                  <h3 className="text-md font-black uppercase italic tracking-widest text-[#00f2ff]">SELECT PAYMENT METHOD</h3>
-                  <div className="space-y-3 text-left">
-                    <button onClick={() => handleSecurePayment("CARD")} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group hover:bg-white/10 transition-all">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20"><Landmark size={22} className="text-white" /></div>
+                <div className="space-y-4 text-sm">
+                  <h3 className="text-[11px] font-black uppercase italic tracking-widest text-[#00f2ff]">SELECT PAYMENT METHOD</h3>
+                  <div className="space-y-2.5 text-left">
+                    <button onClick={() => handleSecurePayment("CARD")} className="w-full p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group hover:bg-white/10 transition-all">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20"><Landmark size={18} className="text-white" /></div>
                         <div>
-                          <p className="font-black text-white text-[12px]">Credit / Debit Card <span className="ml-2 text-[8px] px-2 py-0.5 bg-amber-500/10 text-amber-500/60 rounded-full font-bold uppercase border border-amber-500/20">Bank</span></p>
-                          <p className="text-[10px] text-gray-500 font-bold uppercase">Visa, Mastercard, Amex</p>
+                          <p className="font-black text-white text-[10px]">Credit / Debit Card <span className="ml-1.5 text-[7px] px-1.5 py-0.5 bg-amber-500/10 text-amber-500/60 rounded-full font-bold uppercase border border-amber-500/20">Bank</span></p>
+                          <p className="text-[8px] text-gray-500 font-bold uppercase">Visa, Mastercard, Amex</p>
                         </div>
                       </div>
-                      <ChevronRight size={18} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
+                      <ChevronRight size={14} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
                     </button>
-                    <button onClick={() => setPaymentStep("mpesa")} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group hover:bg-white/10 transition-all">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center font-black text-white shadow-lg shadow-emerald-500/20">M</div>
+                    <button onClick={() => setPaymentStep("mpesa")} className="w-full p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group hover:bg-white/10 transition-all">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center font-black text-white shadow-lg shadow-emerald-500/20">M</div>
                         <div>
-                          <p className="font-black text-white text-[12px]">M-Pesa <span className="ml-2 text-[8px] px-2 py-0.5 bg-emerald-500/20 text-emerald-500 rounded-full font-bold uppercase">Instant</span></p>
-                          <p className="text-[10px] text-gray-500 font-bold uppercase">Pay via mobile money</p>
+                          <p className="font-black text-white text-[10px]">M-Pesa <span className="ml-1.5 text-[7px] px-1.5 py-0.5 bg-emerald-500/20 text-emerald-500 rounded-full font-bold uppercase">Instant</span></p>
+                          <p className="text-[8px] text-gray-500 font-bold uppercase">Pay via mobile money</p>
                         </div>
                       </div>
-                      <ChevronRight size={18} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
+                      <ChevronRight size={14} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
                     </button>
-                    <button onClick={() => setPaymentStep("binance")} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group hover:bg-white/10 transition-all">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20"><Zap size={20} className="fill-white text-white" /></div>
+                    <button onClick={() => setPaymentStep("binance")} className="w-full p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group hover:bg-white/10 transition-all">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center shadow-lg shadow-amber-500/20"><Zap size={16} className="fill-white text-white" /></div>
                         <div>
-                          <p className="font-black text-white text-[12px]">Binance (USDT) <span className="ml-2 text-[8px] px-2 py-0.5 bg-amber-500/20 text-amber-500 rounded-full font-bold uppercase">Crypto</span></p>
-                          <p className="text-[10px] text-gray-500 font-bold uppercase">Pay with USDT crypto</p>
+                          <p className="font-black text-white text-[10px]">Binance (USDT) <span className="ml-1.5 text-[7px] px-1.5 py-0.5 bg-amber-500/20 text-amber-500 rounded-full font-bold uppercase">Crypto</span></p>
+                          <p className="text-[8px] text-gray-500 font-bold uppercase">Pay with USDT crypto</p>
                         </div>
                       </div>
-                      <ChevronRight size={18} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
+                      <ChevronRight size={14} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
                     </button>
-                    <button disabled className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group opacity-50 cursor-not-allowed">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center font-black text-white">PP</div>
+                    <button disabled className="w-full p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group opacity-50 cursor-not-allowed">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-black text-white">PP</div>
                         <div>
-                          <p className="font-black text-white text-[12px]">PayPal <span className="ml-2 text-[8px] px-2 py-0.5 bg-amber-500/10 text-amber-500/60 rounded-full font-bold uppercase border border-amber-500/20">Limited regions</span></p>
-                          <p className="text-[10px] text-gray-500 font-bold uppercase">Pay with your PayPal account</p>
+                          <p className="font-black text-white text-[10px]">PayPal <span className="ml-1.5 text-[7px] px-1.5 py-0.5 bg-amber-500/10 text-amber-500/60 rounded-full font-bold uppercase border border-amber-500/20">Limited regions</span></p>
+                          <p className="text-[8px] text-gray-500 font-bold uppercase">Pay with your PayPal account</p>
                         </div>
                       </div>
-                      <Info size={18} className="text-gray-600" />
+                      <Info size={14} className="text-gray-600" />
                     </button>
                   </div>
-                  <div className="pt-6 border-t border-white/5 text-left">
-                    <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2"><Sparkles size={14} className="text-[#00f2ff]"/> Why Purchase?</p>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="p-3 bg-white/3 border border-white/5 rounded-xl"><div className="w-6 h-6 bg-purple-600/20 rounded-lg flex items-center justify-center mb-2"><Zap size={12} className="text-purple-500"/></div><p className="text-[8px] font-bold text-white uppercase leading-tight">Access unlimited tasks</p></div>
-                      <div className="p-3 bg-white/3 border border-white/5 rounded-xl"><div className="w-6 h-6 bg-emerald-600/20 rounded-lg flex items-center justify-center mb-2"><DollarSign size={12} className="text-emerald-500"/></div><p className="text-[8px] font-bold text-white uppercase leading-tight">Earn more with more bids</p></div>
+                  <div className="pt-4 border-t border-white/5 text-left">
+                    <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2"><Sparkles size={12} className="text-[#00f2ff]"/> Why Purchase?</p>
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <div className="p-2.5 bg-white/3 border border-white/5 rounded-xl"><div className="w-5 h-5 bg-purple-600/20 rounded-lg flex items-center justify-center mb-1.5"><Zap size={10} className="text-purple-500"/></div><p className="text-[7px] font-bold text-white uppercase leading-tight">Access unlimited tasks</p></div>
+                      <div className="p-2.5 bg-white/3 border border-white/5 rounded-xl"><div className="w-5 h-5 bg-emerald-600/20 rounded-lg flex items-center justify-center mb-1.5"><DollarSign size={10} className="text-emerald-500"/></div><p className="text-[7px] font-bold text-white uppercase leading-tight">Earn more with more bids</p></div>
                     </div>
                   </div>
-                  <button onClick={() => setPaymentStep("terms")} className="mt-6 text-[9px] text-gray-500 uppercase font-black italic tracking-[0.3em]">Go Back</button>
+                  <button onClick={() => setPaymentStep("terms")} className="mt-4 text-[8px] text-gray-500 uppercase font-black italic tracking-[0.3em]">Go Back</button>
                 </div>
               ) : paymentStep === "binance" ? (
-                <div className="space-y-6">
-                  <div className="bg-indigo-700/20 -mx-10 -mt-10 p-6 flex items-center justify-between border-b border-white/10 text-left">
-                    <div className="flex items-center gap-3">
-                       <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center"><Zap size={16} className="text-white fill-white"/></div>
-                       <div><p className="text-[8px] font-black text-indigo-300 uppercase leading-none">PAYMENT</p><p className="text-[12px] font-black text-white uppercase">Pay with Binance USDT</p></div>
+                <div className="space-y-4">
+                  <div className="bg-indigo-700/20 -mx-8 -mt-8 p-5 flex items-center justify-between border-b border-white/10 text-left">
+                    <div className="flex items-center gap-2.5">
+                       <div className="w-7 h-7 bg-amber-500 rounded-lg flex items-center justify-center"><Zap size={14} className="text-white fill-white"/></div>
+                       <div><p className="text-[7px] font-black text-indigo-300 uppercase leading-none">PAYMENT</p><p className="text-[10px] font-black text-white uppercase">Pay with Binance USDT</p></div>
                     </div>
-                    <button onClick={() => setPaymentStep("choice")} className="p-2 hover:bg-white/5 rounded-full transition-all"><X size={18} className="text-gray-400"/></button>
+                    <button onClick={() => setPaymentStep("choice")} className="p-1.5 hover:bg-white/5 rounded-full transition-all"><X size={16} className="text-gray-400"/></button>
                   </div>
-                  <div className="bg-white rounded-2xl p-4 shadow-2xl">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TPN2mcYKFBhQkqpuLi9tsnYs9Rx3urQz6L" alt="Binance QR" className="w-40 h-40 mx-auto" />
-                    <p className="mt-3 text-[9px] font-bold text-gray-400 uppercase">Scan to get wallet address</p>
+                  <div className="bg-white rounded-xl p-3.5 shadow-2xl">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=TFWxe4TFcjUNgPJVgf5iXrMsw1oe4gDv9X" alt="Binance QR" className="w-36 h-36 mx-auto" />
+                    <p className="mt-2.5 text-[8px] font-bold text-gray-400 uppercase">Scan to get wallet address</p>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 border-y border-white/5 py-4">
-                    <div className="text-left"><p className="text-[8px] font-black text-gray-500 uppercase mb-0.5">Amount to Send</p><p className="text-lg font-black text-white">$10.00 USDT</p></div>
-                    <div className="text-right"><p className="text-[8px] font-black text-gray-500 uppercase mb-0.5">You Receive</p><p className="text-lg font-black text-[#00f2ff]">Phase 1 Active</p></div>
+                  <div className="grid grid-cols-2 gap-3 border-y border-white/5 py-3.5">
+                    <div className="text-left"><p className="text-[7px] font-black text-gray-500 uppercase mb-0.5">Amount to Send</p><p className="text-md font-black text-white">$10.00 USDT</p></div>
+                    <div className="text-right"><p className="text-[7px] font-black text-gray-500 uppercase mb-0.5">You Receive</p><p className="text-md font-black text-[#00f2ff]">Phase 1 Active</p></div>
                   </div>
-                  <div className="space-y-3 text-left">
-                    <p className="text-[9px] font-black text-gray-500 uppercase">WALLET ADDRESS</p>
+                  <div className="space-y-2.5 text-left">
+                    <p className="text-[8px] font-black text-gray-500 uppercase">WALLET ADDRESS</p>
                     <div className="flex gap-2">
-                       <div className="flex-1 bg-white/5 border border-white/10 rounded-xl p-3 text-[9px] font-mono text-gray-300 break-all truncate">TPN2mcYKFBhQkqpuLi9tsnYs9Rx3urQz6L</div>
+                       <div className="flex-1 bg-white/5 border border-white/10 rounded-xl p-3 text-[8px] font-mono text-gray-300 break-all truncate">TFWxe4TFcjUNgPJVgf5iXrMsw1oe4gDv9X</div>
                        <button onClick={copyAddress} className="bg-white/5 border border-white/10 p-3 rounded-xl hover:bg-white/10 transition-all text-gray-400 hover:text-white">
-                          {copied ? <Check size={16} className="text-emerald-500" /> : <Copy size={16} />}
+                          {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
                        </button>
                     </div>
                   </div>
-                  <div className="p-3 bg-blue-500/5 border border-blue-500/20 rounded-xl flex items-start gap-3 text-left">
-                    <Info size={14} className="text-blue-500 shrink-0 mt-0.5" />
-                    <p className="text-[9px] font-bold text-blue-300/80 leading-relaxed uppercase">Only send USDT (TRC20) to this address. Other assets will be permanently lost.</p>
+                  <div className="p-2.5 bg-blue-500/5 border border-blue-500/20 rounded-xl flex items-start gap-2.5 text-left">
+                    <Info size={12} className="text-blue-500 shrink-0 mt-0.5" />
+                    <p className="text-[8px] font-bold text-blue-300/80 leading-relaxed uppercase">Only send USDT (TRC20) to this address. Other assets will be lost forever.</p>
                   </div>
-                  <button onClick={() => showAlert("Transmitted", "Node signal sent. Once the blockchain confirms your hash, your node will sync within 2 hours.", "success")} className="w-full py-4 bg-[#00f2ff] text-black font-black rounded-xl uppercase italic text-[10px] shadow-glow">Confirm Transmission</button>
+                  <button onClick={() => showAlert("Transmitted", "Node signal sent. Once the blockchain confirms your hash, your node will sync within 2 hours.", "success")} className="w-full py-3.5 bg-[#00f2ff] text-black font-black rounded-xl uppercase italic text-[9px] shadow-glow">Confirm Transmission</button>
                 </div>
               ) : (
-                <div className="space-y-8">
-                   <Smartphone size={32} className="text-emerald-500 mx-auto animate-bounce" />
-                   <div className="space-y-2">
-                      <h3 className="text-lg font-black uppercase italic text-white leading-none">M-Pesa Sync</h3>
-                      <p className="text-[10px] text-gray-500 font-bold uppercase leading-none">Enter phone to pay $10</p>
+                <div className="space-y-6">
+                   <Smartphone size={28} className="text-emerald-500 mx-auto animate-bounce" />
+                   <div className="space-y-1.5">
+                      <h3 className="text-md font-black uppercase italic text-white leading-none">M-Pesa Sync</h3>
+                      <p className="text-[9px] text-gray-500 font-bold uppercase leading-none">Enter phone to pay $10</p>
                    </div>
-                   <input value={mpesaNumber} onChange={e => setMpesaNumber(e.target.value)} placeholder="2547XXXXXXXX" className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-center text-2xl font-black text-white outline-none focus:border-emerald-500 shadow-inner" />
-                   <div className="space-y-4">
-                      <button disabled={isPaying} onClick={() => handleSecurePayment("M-PESA")} className={`w-full py-5 bg-emerald-600 text-white font-black rounded-2xl uppercase italic text-[11px] shadow-lg tracking-widest`}>{isPaying ? "Sending..." : "Pay $10 (1,300 KES)"}</button>
-                      <button onClick={() => setPaymentStep("choice")} className="text-[9px] text-gray-500 uppercase font-black italic tracking-widest">Back</button>
+                   <input value={mpesaNumber} onChange={e => setMpesaNumber(e.target.value)} placeholder="2547XXXXXXXX" className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-center text-xl font-black text-white outline-none focus:border-emerald-500 shadow-inner" />
+                   <div className="space-y-3">
+                      <button disabled={isPaying} onClick={() => handleSecurePayment("M-PESA")} className={`w-full py-4 bg-emerald-600 text-white font-black rounded-xl uppercase italic text-[10px] shadow-lg tracking-widest`}>{isPaying ? "Sending..." : "Pay $10 (1,300 KES)"}</button>
+                      <button onClick={() => setPaymentStep("choice")} className="text-[8px] text-gray-500 uppercase font-black italic tracking-widest">Back</button>
                    </div>
                 </div>
               )}
@@ -533,14 +536,14 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
       <AnimatePresence>
         {customAlert.show && (
           <div className="fixed inset-0 z-300 flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm">
-             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="w-full max-w-75 bg-[#0a0f1e] border-2 border-white/10 rounded-[40px] p-8 text-center shadow-3xl relative">
+             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="w-full max-w-75 bg-[#0a0f1e] border-2 border-white/10 rounded-[30px] p-6 text-center shadow-3xl relative">
                 <div className={`absolute top-0 left-0 w-full h-1.5 ${customAlert.type === 'error' ? 'bg-red-500' : 'bg-[#00f2ff] shadow-glow'}`} />
-                <div className="mb-6 flex justify-center">
-                  {customAlert.type === 'error' ? <AlertTriangle size={32} className="text-red-500" /> : customAlert.type === 'success' ? <CheckCircle size={32} className="text-emerald-500" /> : <Info size={32} className="text-[#00f2ff]" />}
+                <div className="mb-4 flex justify-center">
+                  {customAlert.type === 'error' ? <AlertTriangle size={28} className="text-red-500" /> : customAlert.type === 'success' ? <CheckCircle size={28} className="text-emerald-500" /> : <Info size={28} className="text-[#00f2ff]" />}
                 </div>
-                <h4 className="text-md font-black uppercase italic mb-3 text-white tracking-tighter leading-none">{customAlert.title}</h4>
-                <p className="text-[10px] text-gray-400 italic mb-8 leading-relaxed tracking-wide">{customAlert.msg}</p>
-                <button onClick={() => setCustomAlert({...customAlert, show: false})} className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase italic hover:bg-white hover:text-black transition-all">Dismiss</button>
+                <h4 className="text-sm font-black uppercase italic mb-2.5 text-white tracking-tighter leading-none">{customAlert.title}</h4>
+                <p className="text-[9px] text-gray-400 italic mb-6 leading-relaxed tracking-wide">{customAlert.msg}</p>
+                <button onClick={() => setCustomAlert({...customAlert, show: false})} className="w-full py-3 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase italic hover:bg-white hover:text-black transition-all">Dismiss</button>
              </motion.div>
           </div>
         )}
