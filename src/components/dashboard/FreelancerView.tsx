@@ -13,7 +13,7 @@ import {
   Activity, Landmark, Bitcoin, HelpCircle, LifeBuoy, X, CheckCircle, Box,
   ShieldQuestion, UserCircle, DollarSign, ArrowUpRight, History,
   Shield, QrCode, ScanFace, Award, Target, TrendingUp, Layers,
-  Send, MessageCircle, Share2, ThumbsUp, Copy, Check, Sparkles, ArrowDownLeft, CreditCard as CardIcon
+  Send, MessageCircle, Share2, ThumbsUp, Copy, Check, Sparkles, GraduationCap
 } from "lucide-react";
 
 export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetadata: any }) => {
@@ -139,20 +139,20 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
 
   const marketplaceGigs = useMemo(() => [
     { id: "1", title: "Enterprise: Cloud Infrastructure Security Audit", budget: 1450, client: "Aegis Data", rating: 5.0, dur: "10 Days", img: "https://i.pravatar.cc/150?u=aegis", type: "Security", status: "Active" },
-    { id: "2", title: "Web3: Smart Contract Vulnerability Scan (Solidity)", budget: 2200, client: "Nexus Protocol", rating: 4.9, dur: "5 Days", img: "https://i.pravatar.cc/150?u=crypto", type: "Web3", status: "Active" },
-    { id: "3", title: "Backend: Node.js Memory Leak Investigation", budget: 400, client: "StreamSync", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=node", type: "Startup", status: "Expired" },
-    { id: "4", title: "UI/UX: Fintech Dashboard Design System", budget: 3200, client: "Vertex Pay", rating: 4.8, dur: "14 Days", img: "https://i.pravatar.cc/150?u=pay", type: "Fintech", status: "Active" },
-    { id: "5", title: "DevOps: Kubernetes Cluster Optimization", budget: 950, client: "CloudScale", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=devops", type: "Agency", status: "Expired" },
-    { id: "6", title: "Database: PostgreSQL Query Performance Tuning", budget: 600, client: "DataLake Inc", rating: 4.7, dur: "48 Hours", img: "https://i.pravatar.cc/150?u=db", type: "Enterprise", status: "Active" },
-    { id: "7", title: "AI: Custom LLM Integration (OpenAI API)", budget: 1800, client: "MindGraph AI", rating: 5.0, dur: "7 Days", img: "https://i.pravatar.cc/150?u=ai", type: "Research", status: "Active" },
-    { id: "8", title: "Frontend: Next.js SSR & SEO Refactor", budget: 1100, client: "EcoShop", rating: 4.9, dur: "6 Days", img: "https://i.pravatar.cc/150?u=next", type: "E-commerce", status: "Active" },
-    { id: "9", title: "Mobile: Flutter Push Notification Debugging", budget: 250, client: "GoMove App", rating: 4.6, dur: "Expired", img: "https://i.pravatar.cc/150?u=mobile", type: "Startup", status: "Expired" },
-    { id: "10", title: "Security: Penetration Test (External API)", budget: 2500, client: "VaultCore", rating: 5.0, dur: "10 Days", img: "https://i.pravatar.cc/150?u=vault", type: "Banking", status: "Active" },
-    { id: "11", title: "Python: Automated Web Scraping & Data Pipeline", budget: 850, client: "MarketSense", rating: 4.8, dur: "4 Days", img: "https://i.pravatar.cc/150?u=py", type: "Analytics", status: "Active" },
-    { id: "12", title: "Architect: Microservices Migration Strategy", budget: 4500, client: "Global Logistics", rating: 5.0, dur: "21 Days", img: "https://i.pravatar.cc/150?u=arch", type: "Enterprise", status: "Active" },
-    { id: "13", title: "Shopify: Liquid Theme Customization (Premium)", budget: 550, client: "Luxe Label", rating: 4.9, dur: "Expired", img: "https://i.pravatar.cc/150?u=luxe", type: "Retail", status: "Expired" },
-    { id: "14", title: "Technical Writing: API Documentation (Swagger)", budget: 700, client: "DevDocs Hub", rating: 5.0, dur: "5 Days", img: "https://i.pravatar.cc/150?u=doc", type: "SaaS", status: "Active" },
-    { id: "15", title: "Testing: Cypress E2E Automation Suite", budget: 1200, client: "SafeBet Ltd", rating: 4.7, dur: "8 Days", img: "https://i.pravatar.cc/150?u=test", type: "QA", status: "Active" },
+    { id: "2", title: "Academic: Advanced Calculus & Physics Solutions", budget: 85, client: "Academic Hub", rating: 4.8, dur: "24 Hours", img: "https://i.pravatar.cc/150?u=school", type: "School Work", status: "Active" },
+    { id: "3", title: "Web3: Smart Contract Vulnerability Scan (Solidity)", budget: 2200, client: "Nexus Protocol", rating: 4.9, dur: "5 Days", img: "https://i.pravatar.cc/150?u=crypto", type: "Web3", status: "Active" },
+    { id: "4", title: "Backend: Node.js Memory Leak Investigation", budget: 400, client: "StreamSync", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=node", type: "Startup", status: "Expired" },
+    { id: "5", title: "School Work: University Thesis Formatting (Latex)", budget: 120, client: "Dr. Aris", rating: 4.9, dur: "3 Days", img: "https://i.pravatar.cc/150?u=thesis", type: "Academic", status: "Active" },
+    { id: "6", title: "UI/UX: Fintech Dashboard Design System", budget: 3200, client: "Vertex Pay", rating: 4.8, dur: "14 Days", img: "https://i.pravatar.cc/150?u=pay", type: "Fintech", status: "Active" },
+    { id: "7", title: "DevOps: Kubernetes Cluster Optimization", budget: 950, client: "CloudScale", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=devops", type: "Agency", status: "Expired" },
+    { id: "8", title: "Database: PostgreSQL Query Performance Tuning", budget: 600, client: "DataLake Inc", rating: 4.7, dur: "48 Hours", img: "https://i.pravatar.cc/150?u=db", type: "Enterprise", status: "Active" },
+    { id: "9", title: "School: Business Law Case Study Analysis", budget: 50, client: "Legal Studies", rating: 4.6, dur: "12 Hours", img: "https://i.pravatar.cc/150?u=law", type: "Academic", status: "Active" },
+    { id: "10", title: "AI: Custom LLM Integration (OpenAI API)", budget: 1800, client: "MindGraph AI", rating: 5.0, dur: "7 Days", img: "https://i.pravatar.cc/150?u=ai", type: "Research", status: "Active" },
+    { id: "11", title: "Mobile: Flutter Push Notification Debugging", budget: 250, client: "GoMove App", rating: 4.6, dur: "Expired", img: "https://i.pravatar.cc/150?u=mobile", type: "Startup", status: "Expired" },
+    { id: "12", title: "Security: Penetration Test (External API)", budget: 2500, client: "VaultCore", rating: 5.0, dur: "10 Days", img: "https://i.pravatar.cc/150?u=vault", type: "Banking", status: "Active" },
+    { id: "13", title: "Python: Automated Web Scraping & Data Pipeline", budget: 850, client: "MarketSense", rating: 4.8, dur: "4 Days", img: "https://i.pravatar.cc/150?u=py", type: "Analytics", status: "Active" },
+    { id: "14", title: "Shopify: Liquid Theme Customization (Premium)", budget: 550, client: "Luxe Label", rating: 4.9, dur: "Expired", img: "https://i.pravatar.cc/150?u=luxe", type: "Retail", status: "Expired" },
+    { id: "15", title: "Technical Writing: API Documentation (Swagger)", budget: 700, client: "DevDocs Hub", rating: 5.0, dur: "5 Days", img: "https://i.pravatar.cc/150?u=doc", type: "SaaS", status: "Active" },
   ], []);
 
   const navItems = [
@@ -249,7 +249,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             </motion.div>
           )}
 
-          {/* --- 💰 VAULT (UPGRADED WALLET) --- */}
+          {/* --- 💰 VAULT --- */}
           {activeTab === "earnings" && (
             <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="space-y-4 pt-2">
                <div className="bg-linear-to-br from-[#00f2ff]/20 via-transparent to-transparent p-6 rounded-[30px] border border-white/10 shadow-3xl relative overflow-hidden">
@@ -258,26 +258,26 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                      <div className="p-3 bg-white/5 rounded-xl border border-white/10"><Landmark size={20} className="text-[#00f2ff]"/></div>
                      <div className="bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 flex items-center gap-2">
                         <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
-                        <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Secured Vault</span>
+                        <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Secured Wallet</span>
                      </div>
                   </div>
                   <div className="space-y-1 mb-8">
-                     <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Available Assets</p>
+                     <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Available Balance</p>
                      <h4 className="text-5xl font-black italic tracking-tighter text-white leading-none">$0.00</h4>
                      <p className="text-[9px] font-bold text-gray-500 uppercase tracking-tighter">Approx: KES 0.00</p>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                     <button onClick={() => showAlert("No money", "You do not have any money in your vault to withdraw.", "error")} className="py-4 bg-white text-black rounded-2xl text-[10px] font-black uppercase italic shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2">Withdraw <ArrowUpRight size={14}/></button>
+                     <button onClick={() => showAlert("Insufficient Funds", "You do not have any money in your wallet to withdraw.", "error")} className="py-4 bg-white text-black rounded-2xl text-[10px] font-black uppercase italic shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2">Withdraw <ArrowUpRight size={14}/></button>
                      <button className="py-4 bg-white/5 border border-white/10 text-white rounded-2xl text-[10px] font-black uppercase italic active:scale-95 transition-all flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">Transfer <Send size={12}/></button>
                   </div>
                </div>
 
                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-4 bg-white/3 border border-white/5 rounded-2xl">
+                  <div className="p-4 bg-white/3 border border-white/5 rounded-2xl text-left">
                      <div className="flex items-center gap-2 mb-2 text-gray-500"><History size={12}/><span className="text-[8px] font-black uppercase">Recent Activity</span></div>
                      <p className="text-[10px] text-gray-500 font-bold italic">No node transmissions yet.</p>
                   </div>
-                  <div className="p-4 bg-white/3 border border-white/5 rounded-2xl">
+                  <div className="p-4 bg-white/3 border border-white/5 rounded-2xl text-left">
                      <div className="flex items-center gap-2 mb-2 text-gray-500"><TrendingUp size={12}/><span className="text-[8px] font-black uppercase">Node Growth</span></div>
                      <p className="text-[10px] text-gray-500 font-bold italic">Bidding active required.</p>
                   </div>
@@ -296,10 +296,15 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                     <h4 className="text-[10px] font-black uppercase mb-1 line-clamp-2 h-7 leading-tight">{g.title}</h4>
                     <div className="flex justify-between items-center pt-2 border-t border-white/5">
                         <p className="text-sm font-bold text-[#00f2ff] tracking-tighter">${g.budget}</p>
-                        <button onClick={handleVerifyClick} className={`px-3 py-1 rounded-md text-[7px] font-black uppercase transition-all bg-white text-black hover:bg-[#00f2ff] ${isVerified ? 'opacity-100' : 'opacity-30 cursor-not-allowed'}`}>{isVerified ? "Bid" : "Apply"}</button>
+                        <button onClick={handleVerifyClick} className={`px-3 py-1 rounded-md text-[7px] font-black uppercase transition-all bg-white text-black hover:bg-[#00f2ff] ${isVerified ? 'opacity-100' : 'opacity-30'}`}>{isVerified ? "Bid" : "Apply"}</button>
                     </div>
                   </div>
                 ))}
+              </div>
+              <div className="pt-4 px-2">
+                  <button onClick={handleVerifyClick} className="w-full py-4 bg-white/5 border border-dashed border-white/20 rounded-2xl flex items-center justify-center gap-3 text-[10px] font-black uppercase italic text-gray-500 hover:border-[#00f2ff]/50 hover:text-white transition-all group">
+                      <Lock size={14} className="group-hover:text-[#00f2ff] transition-colors"/> See More Gigs
+                  </button>
               </div>
             </motion.div>
           )}
@@ -358,21 +363,33 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
           )}
 
           {activeTab === "account" && (
-            <div className="max-w-xl mx-auto space-y-6 text-center">
-               <div className="p-12 bg-linear-to-br from-white/10 to-white/5 border border-white/20 rounded-[60px] shadow-3xl relative overflow-hidden">
+            <div className="max-w-xl mx-auto space-y-6 text-center pt-2">
+               <div className="p-10 bg-linear-to-br from-white/10 to-white/5 border border-white/20 rounded-[50px] shadow-3xl relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-[#00f2ff] to-transparent shadow-glow" />
-                  <div className="relative w-28 h-28 mx-auto mb-8 bg-white/10 rounded-[40px] border border-white/10 flex items-center justify-center">
-                    <UserCircle size={55} className="text-gray-500"/>
-                    <div className="absolute -bottom-2 -right-2 bg-black border-2 border-[#00f2ff] p-2 rounded-2xl text-[#00f2ff] shadow-glow"><Fingerprint size={16}/></div>
+                  <div className="relative w-24 h-24 mx-auto mb-6 bg-white/10 rounded-[35px] border border-white/10 flex items-center justify-center">
+                    <UserCircle size={48} className="text-gray-500"/>
+                    <div className="absolute -bottom-2 -right-2 bg-black border-2 border-[#00f2ff] p-1.5 rounded-xl text-[#00f2ff] shadow-glow"><Fingerprint size={14}/></div>
                   </div>
-                  <h3 className="text-4xl font-black italic uppercase tracking-tighter mb-2 leading-none text-white">{user?.fullName}</h3>
-                  <div className="inline-block px-5 py-1.5 bg-black/40 rounded-full border border-white/5 text-[9px] font-bold text-[#00f2ff] uppercase tracking-[0.4em] mb-10 shadow-inner italic">Identity: Tier 1</div>
-                  <div className="grid grid-cols-2 gap-4 px-4">
-                     <button onClick={() => setActiveTab('earnings')} className="py-4 bg-white text-black rounded-2xl font-black uppercase text-[10px] shadow-xl active:scale-95 transition-all">Wallet</button>
-                     <button onClick={() => setActiveTab('support')} className="py-4 bg-white/5 border border-white/10 rounded-2xl font-black uppercase text-[10px]">Support</button>
+                  <h3 className="text-3xl font-black italic uppercase tracking-tighter mb-1 leading-none text-white">{user?.fullName}</h3>
+                  <div className="inline-block px-4 py-1 bg-black/40 rounded-full border border-white/5 text-[8px] font-bold text-[#00f2ff] uppercase tracking-[0.3em] mb-8 shadow-inner italic">Account Pulse: Active</div>
+                  
+                  <div className="grid grid-cols-2 gap-3 px-2 mb-8">
+                     <div className="bg-white/5 p-3 rounded-2xl border border-white/5 text-left">
+                        <p className="text-[7px] font-black text-gray-500 uppercase mb-1">Node Security</p>
+                        <div className="flex items-center gap-2 text-emerald-400 font-black text-[9px] uppercase italic"><Shield size={12}/> Encrypted</div>
+                     </div>
+                     <div className="bg-white/5 p-3 rounded-2xl border border-white/5 text-left">
+                        <p className="text-[7px] font-black text-gray-500 uppercase mb-1">Settlement Relay</p>
+                        <div className="flex items-center gap-2 text-[#00f2ff] font-black text-[9px] uppercase italic"><QrCode size={12}/> Localized</div>
+                     </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 px-2">
+                     <button onClick={() => setActiveTab('earnings')} className="py-3.5 bg-white text-black rounded-2xl font-black uppercase text-[9px] shadow-xl active:scale-95 transition-all">Vault Hub</button>
+                     <button onClick={() => setActiveTab('support')} className="py-3.5 bg-white/5 border border-white/10 rounded-2xl font-black uppercase text-[9px] text-white">Support</button>
                   </div>
                </div>
-               <SignOutButton><button className="px-12 py-5 bg-red-500/10 border-2 border-red-500/20 text-red-500 font-black italic rounded-full uppercase text-[9px] active:scale-95 transition-all">Sign Out</button></SignOutButton>
+               <SignOutButton><button className="px-10 py-4 bg-red-500/10 border-2 border-red-500/20 text-red-500 font-black italic rounded-full uppercase text-[8px] active:scale-95 transition-all">Terminate Session</button></SignOutButton>
             </div>
           )}
 
@@ -380,11 +397,11 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
              <div className="space-y-6">
                 <h3 className="text-xl font-bold uppercase px-2 tracking-widest text-[#00f2ff]">Help <span className="text-white">Center</span></h3>
                 <div className="grid md:grid-cols-2 gap-5">
-                   <div className="p-8 bg-white/5 border border-white/10 rounded-[40px] space-y-6 shadow-2xl backdrop-blur-xl">
+                   <div className="p-8 bg-white/5 border border-white/10 rounded-[40px] space-y-6 shadow-2xl backdrop-blur-xl text-left">
                       <div className="space-y-1"><p className="text-[9px] font-black text-gray-500 uppercase leading-none mb-1">Support Email</p><p className="text-xs font-black italic text-white underline cursor-pointer" onClick={() => window.location.href="mailto:support@nexusgigs.me"}>support@nexusgigs.me</p></div>
-                      <div className="space-y-1"><p className="text-[9px] font-black text-gray-500 uppercase leading-none mb-1">WhatsApp Direct</p><p className="text-xs italic text-[#00f2ff] font-bold">+254 113 637325</p></div>
+                      <div className="space-y-1"><p className="text-[9px] font-black text-gray-500 uppercase leading-none mb-1">WhatsApp Direct</p><p className="text-xs italic text-[#00f2ff] font-bold">+1 (500) 555-0006</p></div>
                       <div className="pt-6 border-t border-white/5">
-                        <p className="text-[10px] font-bold text-gray-500 uppercase mb-4 tracking-widest">Type your problem here:</p>
+                        <p className="text-[10px] font-bold text-gray-500 uppercase mb-4 tracking-widest text-left">Type your problem here:</p>
                         <textarea value={supportMsg} onChange={e => setSupportMsg(e.target.value)} placeholder="How can we help?" className="w-full bg-black/40 border border-white/10 rounded-2xl p-5 text-xs font-bold outline-none focus:border-[#00f2ff] h-32 mb-4 shadow-inner text-white resize-none" />
                         <button onClick={handleSupportEmail} className="w-full py-5 bg-[#00f2ff] text-black font-black rounded-2xl text-[10px] uppercase shadow-glow transition-all tracking-widest">Send Message</button>
                       </div>
@@ -463,7 +480,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 <div className="space-y-4 text-sm">
                   <h3 className="text-[11px] font-black uppercase italic tracking-widest text-[#00f2ff]">SELECT PAYMENT METHOD</h3>
                   <div className="space-y-2.5 text-left">
-                    {/* CARD / BANK */}
                     <button onClick={() => handleSecurePayment("CARD")} className="w-full p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group hover:bg-white/10 transition-all">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20"><Landmark size={18} className="text-white" /></div>
@@ -474,8 +490,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                       </div>
                       <ChevronRight size={14} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
                     </button>
-
-                    {/* M-PESA */}
                     <button onClick={() => setPaymentStep("mpesa")} className="w-full p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group hover:bg-white/10 transition-all">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center font-black text-white shadow-lg shadow-emerald-500/20">M</div>
@@ -486,8 +500,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                       </div>
                       <ChevronRight size={14} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
                     </button>
-
-                    {/* BINANCE USDT */}
                     <button onClick={() => setPaymentStep("binance")} className="w-full p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group hover:bg-white/10 transition-all">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center shadow-lg shadow-amber-500/20"><Zap size={16} className="fill-white text-white" /></div>
@@ -498,14 +510,12 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                       </div>
                       <ChevronRight size={14} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
                     </button>
-
-                    {/* PAYPAL */}
                     <button disabled className="w-full p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group opacity-50 cursor-not-allowed">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-black text-white">PP</div>
                         <div>
                           <p className="font-black text-white text-[10px]">PayPal <span className="ml-1.5 text-[7px] px-1.5 py-0.5 bg-amber-500/10 text-amber-500/60 rounded-full font-bold uppercase border border-amber-500/20">Limited regions</span></p>
-                          <p className="text-[8px] text-gray-500 font-bold uppercase">Pay with your PayPal account</p>
+                          <p className="text-[10px] text-gray-500 font-bold uppercase">Pay with your PayPal account</p>
                         </div>
                       </div>
                       <Info size={14} className="text-gray-600" />
