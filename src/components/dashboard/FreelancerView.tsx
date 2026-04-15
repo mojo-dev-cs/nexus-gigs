@@ -203,13 +203,13 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
 
                 {!isVerified && (
                   <div className="md:col-span-2 p-5 bg-white/5 border border-white/10 rounded-[25px] flex flex-col items-center gap-4 backdrop-blur-xl relative overflow-hidden shadow-2xl border-l-4 border-l-[#00f2ff] group transition-all hover:bg-white/[0.07]">
-                    <div className="flex flex-row items-center gap-4 w-full">
+                    <div className="flex flex-row items-center gap-4 w-full text-left">
                         <div className="w-12 h-12 bg-[#00f2ff]/10 rounded-xl flex items-center justify-center text-[#00f2ff] shadow-inner shrink-0 border border-[#00f2ff]/20 relative z-10">
                           <ShieldCheck size={24} className="drop-shadow-[0_0_10px_rgba(0,242,255,0.5)]" />
                         </div>
-                        <div className="flex-1 relative z-10 space-y-1 text-left">
+                        <div className="flex-1 relative z-10 space-y-1">
                             <h4 className="text-sm font-black uppercase italic tracking-tighter text-white">Verify Account</h4>
-                            <p className="text-[9px] text-gray-400 font-medium leading-relaxed text-left">Unlock the elite technical missions network.</p>
+                            <p className="text-[9px] text-gray-400 font-medium leading-relaxed">Unlock the elite technical missions network.</p>
                         </div>
                         <button onClick={handleVerifyClick} className={`px-5 py-2 rounded-lg text-[9px] font-black uppercase italic tracking-widest transition-all shadow-glow active:scale-95 ${isUnderReview ? "bg-amber-500 text-black animate-pulse" : "bg-[#00f2ff] text-black hover:scale-105"}`}>{isUnderReview ? "Review" : "Start"}</button>
                     </div>
@@ -281,38 +281,48 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             </motion.div>
           )}
 
-          {/* --- 📜 WORK (Tab Locked UI) --- */}
+          {/* --- 📜 WORK (RESTORED SECURE UI) --- */}
           {activeTab === "contracts" && (
             <div className="pt-10 px-4 text-center space-y-6">
                <div className="p-16 bg-white/5 border border-red-500/20 rounded-[50px] shadow-3xl">
                   <ShieldAlert size={50} className="mx-auto text-red-500 mb-6" />
                   <h3 className="text-xl font-black uppercase italic text-white leading-none mb-2">Tab Locked</h3>
-                  <p className="text-gray-400 text-[11px] mb-8 max-w-xs mx-auto italic">Complete your identity check to see your work and money history.</p>
-                  {!isVerified && <button onClick={handleVerifyClick} className="w-full py-5 bg-red-600 text-white font-black rounded-2xl text-[10px] uppercase shadow-lg">Unlock Tab</button>}
+                  <p className="text-gray-400 text-[11px] mb-8 max-w-xs mx-auto italic leading-relaxed">Complete your identity check to see your work and money history.</p>
+                  {!isVerified && <button onClick={handleVerifyClick} className="w-full py-5 bg-red-600 text-white font-black rounded-2xl text-[10px] uppercase shadow-lg transition-all active:scale-95">Unlock Tab</button>}
                </div>
             </div>
           )}
 
           {/* --- 💰 VAULT --- */}
           {activeTab === "earnings" && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 pt-2">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 pt-2 text-left">
                <div className="bg-linear-to-br from-[#00f2ff]/20 via-transparent to-transparent p-6 rounded-[30px] border border-white/10 shadow-3xl relative overflow-hidden">
                   <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#00f2ff]/5 blur-[60px] rounded-full" />
                   <div className="flex justify-between items-start mb-10">
                      <div className="p-3 bg-white/5 rounded-xl border border-white/10"><Landmark size={20} className="text-[#00f2ff]"/></div>
                      <div className="bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 flex items-center gap-2">
                         <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
-                        <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Secured Vault</span>
+                        <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Secured Wallet</span>
                      </div>
                   </div>
-                  <div className="space-y-1 mb-8 text-left">
-                     <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Available Assets</p>
+                  <div className="space-y-1 mb-8">
+                     <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Available Balance</p>
                      <h4 className="text-5xl font-black italic tracking-tighter text-white leading-none">$0.00</h4>
                      <p className="text-[9px] font-bold text-gray-500 uppercase tracking-tighter">Approx: KES 0.00</p>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                     <button onClick={() => showAlert("No money", "You do not have any money in your vault to withdraw.", "error")} className="py-4 bg-white text-black rounded-2xl text-[10px] font-black uppercase italic shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2">Withdraw <ArrowUpRight size={14}/></button>
+                     <button onClick={() => showAlert("Insufficient Funds", "You do not have any money in your wallet to withdraw.", "error")} className="py-4 bg-white text-black rounded-2xl text-[10px] font-black uppercase italic shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2">Withdraw <ArrowUpRight size={14}/></button>
                      <button className="py-4 bg-white/5 border border-white/10 text-white rounded-2xl text-[10px] font-black uppercase italic active:scale-95 transition-all flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">Transfer <Send size={12}/></button>
+                  </div>
+               </div>
+               <div className="grid grid-cols-2 gap-3">
+                  <div className="p-4 bg-white/3 border border-white/5 rounded-2xl">
+                     <div className="flex items-center gap-2 mb-2 text-gray-500"><History size={12}/><span className="text-[8px] font-black uppercase">Recent Activity</span></div>
+                     <p className="text-[10px] text-gray-500 font-bold italic">No node transmissions yet.</p>
+                  </div>
+                  <div className="p-4 bg-white/3 border border-white/5 rounded-2xl">
+                     <div className="flex items-center gap-2 mb-2 text-gray-500"><TrendingUp size={12}/><span className="text-[8px] font-black uppercase">Node Growth</span></div>
+                     <p className="text-[10px] text-gray-500 font-bold italic">Bidding active required.</p>
                   </div>
                </div>
             </motion.div>
@@ -328,29 +338,29 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                     <div className="absolute -bottom-2 -right-2 bg-black border-2 border-[#00f2ff] p-1.5 rounded-xl text-[#00f2ff] shadow-glow"><Fingerprint size={14}/></div>
                   </div>
                   <h3 className="text-3xl font-black italic uppercase tracking-tighter mb-1 leading-none text-white">{user?.fullName}</h3>
-                  <div className="inline-block px-4 py-1 bg-black/40 rounded-full border border-white/5 text-[8px] font-bold text-[#00f2ff] uppercase tracking-[0.3em] mb-8 shadow-inner italic">Account Pulse: Active</div>
+                  <div className="inline-block px-4 py-1 bg-black/40 rounded-full border border-white/5 text-[8px] font-bold text-[#00f2ff] uppercase tracking-[0.3em] mb-8 shadow-inner italic leading-none">Account Pulse: Active</div>
                   
                   <div className="grid grid-cols-2 gap-3 px-2 mb-8">
                      <div className="bg-white/5 p-3 rounded-2xl border border-white/5 text-left">
                         <p className="text-[7px] font-black text-gray-500 uppercase mb-1">Node Security</p>
-                        <div className="flex items-center gap-2 text-emerald-400 font-black text-[9px] uppercase italic"><Shield size={12}/> Encrypted</div>
+                        <div className="flex items-center gap-2 text-emerald-400 font-black text-[9px] uppercase italic leading-none"><Shield size={12}/> Encrypted</div>
                      </div>
                      <div className="bg-white/5 p-3 rounded-2xl border border-white/5 text-left">
                         <p className="text-[7px] font-black text-gray-500 uppercase mb-1">Settlement Relay</p>
-                        <div className="flex items-center gap-2 text-[#00f2ff] font-black text-[9px] uppercase italic"><QrCode size={12}/> Localized</div>
+                        <div className="flex items-center gap-2 text-[#00f2ff] font-black text-[9px] uppercase italic leading-none"><QrCode size={12}/> Localized</div>
                      </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 px-2">
                      <button onClick={() => setActiveTab('earnings')} className="py-3.5 bg-white text-black rounded-2xl font-black uppercase text-[9px] shadow-xl active:scale-95 transition-all">Vault Hub</button>
-                     <button onClick={() => setActiveTab('support')} className="py-3.5 bg-white/5 border border-white/10 rounded-2xl font-black uppercase text-[9px] text-white">Support</button>
+                     <button onClick={() => setActiveTab('support')} className="py-3.5 bg-white/5 border border-white/10 rounded-2xl font-black uppercase text-[9px] text-white transition-all">Support</button>
                   </div>
                </div>
                <SignOutButton><button className="px-10 py-4 bg-red-500/10 border-2 border-red-500/20 text-red-500 font-black italic rounded-full uppercase text-[8px] active:scale-95 transition-all">Terminate Session</button></SignOutButton>
             </div>
           )}
 
-          {/* Remaining tabs logic (Analytics, Support, Messages) */}
+          {/* Remaining tabs fallback logic */}
           {activeTab === "analytics" && (
             <div className="space-y-8 text-left">
                <h3 className="text-xl font-bold uppercase px-2 text-left">Work <span className="text-[#00f2ff]">Pulse</span></h3>
@@ -370,16 +380,18 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                </div>
             </div>
           )}
+
           {activeTab === "support" && (
              <div className="space-y-6 text-left">
                 <h3 className="text-xl font-bold uppercase px-2 tracking-widest text-[#00f2ff] text-left">Help <span className="text-white">Center</span></h3>
-                <div className="grid md:grid-cols-2 gap-5">
-                   <div className="p-8 bg-white/5 border border-white/10 rounded-[40px] space-y-6 shadow-2xl backdrop-blur-xl text-left">
-                      <div className="space-y-1"><p className="text-[9px] font-black text-gray-500 uppercase leading-none mb-1 text-left">Support Email</p><p className="text-xs font-black italic text-white underline cursor-pointer text-left" onClick={() => window.location.href="mailto:support@nexusgigs.me"}>support@nexusgigs.me</p></div>
-                      <div className="space-y-1"><p className="text-[9px] font-black text-gray-500 uppercase leading-none mb-1 text-left">WhatsApp Direct</p><p className="text-xs italic text-[#00f2ff] font-bold text-left">+1 (500) 555-0006</p></div>
+                <div className="grid md:grid-cols-2 gap-5 text-left">
+                   <div className="p-8 bg-white/5 border border-white/10 rounded-[40px] space-y-6 shadow-2xl backdrop-blur-xl">
+                      <div className="space-y-1"><p className="text-[9px] font-black text-gray-500 uppercase mb-1">Support Email</p><p className="text-xs font-black italic text-white underline cursor-pointer" onClick={() => window.location.href="mailto:support@nexusgigs.me"}>support@nexusgigs.me</p></div>
+                      <div className="space-y-1"><p className="text-[9px] font-black text-gray-500 uppercase mb-1">WhatsApp Direct</p><p className="text-xs italic text-[#00f2ff] font-bold">+1 (500) 555-0006</p></div>
                       <div className="pt-6 border-t border-white/5">
+                        <p className="text-[10px] font-bold text-gray-500 uppercase mb-4 tracking-widest">Problem Relay:</p>
                         <textarea value={supportMsg} onChange={e => setSupportMsg(e.target.value)} placeholder="How can we help?" className="w-full bg-black/40 border border-white/10 rounded-2xl p-5 text-xs font-bold outline-none focus:border-[#00f2ff] h-32 mb-4 shadow-inner text-white resize-none" />
-                        <button onClick={handleSupportEmail} className="w-full py-5 bg-[#00f2ff] text-black font-black rounded-2xl text-[10px] uppercase shadow-glow transition-all tracking-widest">Send Message</button>
+                        <button onClick={handleSupportEmail} className="w-full py-5 bg-[#00f2ff] text-black font-black rounded-2xl text-[10px] uppercase shadow-glow transition-all tracking-widest">Send Transmission</button>
                       </div>
                    </div>
                    <div className="p-8 bg-white/5 border border-white/10 rounded-[40px] grid grid-cols-2 gap-3 shadow-2xl">
@@ -391,13 +403,15 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                       ].map(soc => (
                         <button key={soc.n} onClick={() => window.open(soc.l, '_blank')} className="p-5 bg-black/40 border border-white/5 rounded-3xl flex flex-col items-center gap-3 hover:border-[#00f2ff] group transition-all shadow-xl active:scale-95"><div className="text-gray-400 group-hover:text-white transition-all group-hover:scale-110">{soc.i}</div><span className="text-[8px] font-black uppercase text-gray-500">{soc.n}</span></button>
                       ))}
+                      <button onClick={() => window.open('https://whatsapp.com/channel/0029VbCmx1AAu3aMiY7XVf1J', '_blank')} className="col-span-2 p-5 bg-emerald-500/10 border border-emerald-500/20 rounded-[30px] flex items-center justify-between group hover:bg-emerald-500 transition-all shadow-lg px-8 active:scale-95 font-black uppercase italic group-hover:text-black"><span>WhatsApp Channel</span><MessageCircle size={20}/></button>
                    </div>
                 </div>
              </div>
           )}
+
           {activeTab === "messages" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 text-left">
-               <h3 className="text-xl font-bold uppercase px-2 text-left">System <span className="text-[#00f2ff]">Log</span></h3>
+               <h3 className="text-xl font-bold uppercase px-2">System <span className="text-[#00f2ff]">Log</span></h3>
                {[
                  { t: "Nexus HQ", m: "Welcome Node. Please finish your verification to talk to others." },
                  { t: "Security Bot", m: "External account connection is encrypted. Identity sync is required." }
@@ -437,10 +451,10 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
           <div className="fixed inset-0 z-300 flex items-center justify-center p-6 backdrop-blur-md bg-black/60 text-left">
              <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="w-full max-w-80 bg-[#0a0f1e] border-2 border-white/10 rounded-[40px] p-8 text-center shadow-3xl relative">
                 <ShieldAlert size={48} className="text-[#00f2ff] mx-auto mb-6" />
-                <h4 className="text-lg font-black uppercase italic text-white mb-3 tracking-tight">Access Restricted</h4>
+                <h4 className="text-lg font-black uppercase italic text-white mb-3 tracking-tight leading-none">Access Restricted</h4>
                 <p className="text-[11px] text-gray-400 font-medium italic mb-8 leading-relaxed">To be able to see and apply for more gigs, you need to verify account.</p>
                 <div className="space-y-3">
-                    <button onClick={() => { setShowGigsRestriction(false); handleVerifyClick(); }} className="w-full py-4 bg-[#00f2ff] text-black font-black rounded-2xl text-[10px] uppercase shadow-glow transition-all">Continue</button>
+                    <button onClick={() => { setShowGigsRestriction(false); handleVerifyClick(); }} className="w-full py-4 bg-[#00f2ff] text-black font-black rounded-2xl text-[10px] uppercase shadow-glow transition-all active:scale-95">Continue</button>
                     <button onClick={() => setShowGigsRestriction(false)} className="w-full py-4 bg-white/5 text-gray-400 font-black rounded-2xl text-[10px] uppercase transition-all">Cancel</button>
                 </div>
              </motion.div>
@@ -457,54 +471,54 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
               <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-[#00f2ff] to-transparent shadow-glow" />
               
               {paymentStep === "terms" ? (
-                <div className="space-y-4 text-center">
+                <div className="space-y-4">
                   <ShieldCheck size={36} className="text-[#00f2ff] mx-auto shadow-glow" />
                   <h3 className="text-lg font-black italic uppercase tracking-tight text-white leading-none">Verification</h3>
                   <div className="bg-white/5 p-4 rounded-2xl text-left border border-white/5 space-y-3 shadow-inner">
-                    <div className="space-y-2 text-[9px] text-gray-300 font-medium">
-                      <div className="flex gap-2.5"><div className="w-4 h-4 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0"><span className="text-white">1</span></div><p><strong>Vetting Fee:</strong> commitment of <span className="text-white">$10 (KES 1,300)</span>.</p></div>
-                      <div className="flex gap-2.5"><div className="w-4 h-4 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0"><span className="text-white">2</span></div><p><strong>Review:</strong> Manual account audit and survey completion.</p></div>
-                      <div className="flex gap-2.5"><div className="w-4 h-4 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0"><span className="text-white">3</span></div><p><strong>Full Access:</strong> Gain bidding rights and vault withdrawals.</p></div>
+                    <div className="space-y-2 text-[9px] text-gray-300 font-medium leading-relaxed">
+                      <div className="flex gap-2.5"><div className="w-4 h-4 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0 text-white font-black">1</div><p><strong>Vetting Fee:</strong> One-time commitment of <span className="text-white">$10 (KES 1,300)</span> to filter bots.</p></div>
+                      <div className="flex gap-2.5"><div className="w-4 h-4 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0 text-white font-black">2</div><p><strong>Review:</strong> Manual account audit and survey completion requirements.</p></div>
+                      <div className="flex gap-2.5"><div className="w-4 h-4 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0 text-white font-black">3</div><p><strong>Full Access:</strong> Unlock unlimited bidding rights and instant withdrawals.</p></div>
                     </div>
-                    <div className="pt-1.5 border-t border-white/5">
-                      <p className="text-[8px] text-emerald-400 font-bold italic flex items-center gap-1.5 leading-none"><CheckCircle2 size={8}/> 100% Refund if you fail vetting.</p>
+                    <div className="pt-1.5 border-t border-white/5 text-center">
+                      <p className="text-[8px] text-emerald-400 font-bold italic flex items-center justify-center gap-1.5 leading-none"><CheckCircle2 size={8}/> 100% Refund guarantee if vetting fails.</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 bg-white/5 p-3 rounded-2xl border border-white/5 cursor-pointer text-left transition-all hover:bg-white/10" onClick={() => setAgreedToTerms(!agreedToTerms)}>
                     <div className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all shrink-0 ${agreedToTerms ? 'bg-[#00f2ff] border-[#00f2ff]' : 'border-white/20'}`}>{agreedToTerms && <X size={10} className="text-black font-black"/>}</div>
-                    <span className="text-[8px] font-black italic text-gray-400 uppercase leading-tight">I agree to pay the $10 fee and follow the rules.</span>
+                    <span className="text-[8px] font-black italic text-gray-400 uppercase leading-tight">I agree to pay the $10 fee and follow the refund rules.</span>
                   </div>
                   <button disabled={!agreedToTerms} onClick={() => setPaymentStep("choice")} className={`w-full py-4 rounded-2xl font-black uppercase italic text-[10px] transition-all tracking-[0.2em] ${agreedToTerms ? 'bg-[#00f2ff] text-black shadow-glow hover:scale-[1.02]' : 'bg-gray-800 text-gray-600'}`}>Pay & Sync</button>
                 </div>
               ) : paymentStep === "choice" ? (
                 <div className="space-y-4">
                   <h3 className="text-[11px] font-black uppercase italic tracking-widest text-[#00f2ff] text-center">SELECT PAYMENT METHOD</h3>
-                  <div className="space-y-2.5 text-left">
+                  <div className="space-y-2.5">
                     <button onClick={() => handleSecurePayment("CARD")} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group transition-all hover:bg-white/10">
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-4 text-left">
                           <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center shadow-lg"><Landmark size={20} className="text-white" /></div>
                           <div><p className="font-black text-white text-[12px]">Bank / Card</p><p className="text-[9px] text-gray-500 font-bold uppercase">Visa, Mastercard, Amex</p></div>
                         </div>
                         <ChevronRight size={14} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
                     </button>
-                    <button onClick={() => setPaymentStep("mpesa")} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group transition-all hover:bg-white/10">
-                        <div className="flex items-center gap-4">
+                    <button onClick={() => setPaymentStep("mpesa")} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group transition-all hover:bg-white/10 text-left">
+                        <div className="flex items-center gap-4 text-left">
                           <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg text-white font-black">M</div>
                           <div><p className="font-black text-white text-[12px]">M-Pesa <span className="ml-2 text-[8px] px-2 py-0.5 bg-emerald-500/20 text-emerald-500 rounded-full font-bold uppercase">Instant</span></p><p className="text-[9px] text-gray-500 font-bold uppercase">Pay via mobile money</p></div>
                         </div>
                         <ChevronRight size={14} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
                     </button>
-                    <button onClick={() => setPaymentStep("binance")} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group transition-all hover:bg-white/10">
-                        <div className="flex items-center gap-4">
+                    <button onClick={() => setPaymentStep("binance")} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group transition-all hover:bg-white/10 text-left">
+                        <div className="flex items-center gap-4 text-left">
                           <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center shadow-lg"><Zap size={20} className="fill-white text-white" /></div>
-                          <div><p className="font-black text-white text-[12px]">Binance (USDT) <span className="ml-2 text-[8px] px-2 py-0.5 bg-amber-500/20 text-amber-500 rounded-full font-bold uppercase">Crypto</span></p><p className="text-[9px] text-gray-500 font-bold uppercase">Pay with USDT crypto</p></div>
+                          <div><p className="font-black text-white text-[12px]">Binance (USDT) <span className="ml-2 text-[8px] px-2 py-0.5 bg-amber-500/20 text-amber-500 rounded-full font-bold uppercase tracking-widest">Crypto</span></p><p className="text-[9px] text-gray-500 font-bold uppercase leading-none">Pay with USDT crypto</p></div>
                         </div>
                         <ChevronRight size={14} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
                     </button>
                     <button disabled className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group opacity-50 cursor-not-allowed">
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-4 text-left">
                           <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center font-black text-white">PP</div>
-                          <div><p className="font-black text-white text-[12px]">PayPal <span className="ml-2 text-[8px] px-2 py-0.5 bg-amber-500/10 text-amber-500/60 rounded-full font-bold uppercase border border-amber-500/20">Restricted</span></p><p className="text-[9px] text-gray-500 font-bold uppercase">Limited regions only</p></div>
+                          <div><p className="font-black text-white text-[12px]">PayPal <span className="ml-2 text-[8px] px-2 py-0.5 bg-amber-500/10 text-amber-500/60 rounded-full font-bold uppercase border border-amber-500/20">Limited</span></p><p className="text-[9px] text-gray-500 font-bold uppercase leading-none">Restricted regions only</p></div>
                         </div>
                         <Info size={14} className="text-gray-600" />
                     </button>
@@ -512,18 +526,18 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                   <div className="pt-4 border-t border-white/5 text-center">
                     <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3 flex items-center justify-center gap-2"><Sparkles size={12} className="text-[#00f2ff]"/> Why Verify Account?</p>
                     <div className="grid grid-cols-2 gap-2.5">
-                      <div className="p-2.5 bg-white/3 border border-white/5 rounded-xl"><div className="w-5 h-5 bg-purple-600/20 rounded-lg flex items-center justify-center mb-1.5 mx-auto"><Zap size={10} className="text-purple-500"/></div><p className="text-[7px] font-bold text-white uppercase leading-tight">Unlimited Missions</p></div>
-                      <div className="p-2.5 bg-white/3 border border-white/5 rounded-xl"><div className="w-5 h-5 bg-emerald-600/20 rounded-lg flex items-center justify-center mb-1.5 mx-auto"><DollarSign size={10} className="text-emerald-500"/></div><p className="text-[7px] font-bold text-white uppercase leading-tight">Higher Bidding</p></div>
+                      <div className="p-2.5 bg-white/3 border border-white/5 rounded-xl"><div className="w-5 h-5 bg-purple-600/20 rounded-lg flex items-center justify-center mb-1.5 mx-auto"><Zap size={10} className="text-purple-500"/></div><p className="text-[7px] font-bold text-white uppercase leading-tight">Unlimited Tasks</p></div>
+                      <div className="p-2.5 bg-white/3 border border-white/5 rounded-xl"><div className="w-5 h-5 bg-emerald-600/20 rounded-lg flex items-center justify-center mb-1.5 mx-auto"><DollarSign size={10} className="text-emerald-500"/></div><p className="text-[7px] font-bold text-white uppercase leading-tight">Instant Bidding</p></div>
                     </div>
                   </div>
-                  <button onClick={() => setPaymentStep("terms")} className="mt-4 text-[8px] text-gray-500 uppercase font-black italic tracking-[0.3em] transition-all hover:text-white mx-auto block">Back</button>
+                  <button onClick={() => setPaymentStep("terms")} className="mt-4 text-[8px] text-gray-500 uppercase font-black italic tracking-[0.3em] transition-all hover:text-white mx-auto block leading-none">Go Back</button>
                 </div>
               ) : paymentStep === "binance" ? (
                 <div className="space-y-4">
                   <div className="bg-indigo-700/20 -mx-8 -mt-8 p-5 flex items-center justify-between border-b border-white/10 text-left">
                     <div className="flex items-center gap-2.5">
                        <div className="w-7 h-7 bg-amber-500 rounded-lg flex items-center justify-center"><Zap size={14} className="text-white fill-white"/></div>
-                       <div><p className="text-[7px] font-black text-indigo-300 uppercase leading-none">PAYMENT</p><p className="text-[10px] font-black text-white uppercase">USDT (TRC20)</p></div>
+                       <div><p className="text-[7px] font-black text-indigo-300 uppercase leading-none">PAYMENT</p><p className="text-[10px] font-black text-white uppercase leading-none">USDT (TRC20)</p></div>
                     </div>
                     <button onClick={() => setPaymentStep("choice")} className="p-1.5 hover:bg-white/5 rounded-full"><X size={16} className="text-gray-400"/></button>
                   </div>
@@ -531,17 +545,17 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=TFWxe4TFcjUNgPJVgf5iXrMsw1oe4gDv9X" alt="Binance QR" className="w-36 h-36 mx-auto" />
                   </div>
                   <div className="grid grid-cols-2 gap-3 border-y border-white/5 py-3.5 text-left">
-                    <div><p className="text-[7px] font-black text-gray-500 uppercase">Amount</p><p className="text-md font-black text-white">$10.00 USDT</p></div>
-                    <div className="text-right"><p className="text-[7px] font-black text-gray-500 uppercase">Status</p><p className="text-md font-black text-[#00f2ff]">Phase 1 Active</p></div>
+                    <div><p className="text-[7px] font-black text-gray-500 uppercase text-left leading-none mb-0.5">Amount</p><p className="text-md font-black text-white leading-none">$10.00 USDT</p></div>
+                    <div className="text-right"><p className="text-[7px] font-black text-gray-500 uppercase text-right leading-none mb-0.5">Status</p><p className="text-md font-black text-[#00f2ff] leading-none">Phase 1 Active</p></div>
                   </div>
                   <div className="space-y-2.5 text-left">
-                    <p className="text-[8px] font-black text-gray-500 uppercase text-left">WALLET ADDRESS</p>
+                    <p className="text-[8px] font-black text-gray-500 uppercase text-left leading-none">WALLET ADDRESS</p>
                     <div className="flex gap-2">
-                       <div className="flex-1 bg-white/5 border border-white/10 rounded-xl p-3 text-[8px] font-mono text-gray-300 truncate">TFWxe4TFcjUNgPJVgf5iXrMsw1oe4gDv9X</div>
-                       <button onClick={copyAddress} className="bg-white/5 border border-white/10 p-3 rounded-xl hover:bg-white/10 transition-all text-gray-400 hover:text-white">{copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}</button>
+                       <div className="flex-1 bg-white/5 border border-white/10 rounded-xl p-3 text-[8px] font-mono text-gray-300 truncate text-left">TFWxe4TFcjUNgPJVgf5iXrMsw1oe4gDv9X</div>
+                       <button onClick={copyAddress} className="bg-white/5 border border-white/10 p-3 rounded-xl hover:bg-white/10 transition-all text-gray-400 hover:text-white leading-none flex items-center justify-center">{copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}</button>
                     </div>
                   </div>
-                  <button onClick={() => showAlert("Transmitted", "Hash signal sent. Deployment in 2 hours.", "success")} className="w-full py-3.5 bg-[#00f2ff] text-black font-black rounded-xl uppercase italic text-[9px] shadow-glow transition-all active:scale-95">Confirm</button>
+                  <button onClick={() => showAlert("Transmitted", "Node signal sent. Your verification terminal will sync within 2 hours.", "success")} className="w-full py-3.5 bg-[#00f2ff] text-black font-black rounded-xl uppercase italic text-[9px] shadow-glow transition-all active:scale-95 leading-none">Confirm Transmission</button>
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -552,8 +566,8 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                    </div>
                    <input value={mpesaNumber} onChange={e => setMpesaNumber(e.target.value)} placeholder="2547XXXXXXXX" className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-center text-xl font-black text-white outline-none focus:border-emerald-500 shadow-inner" />
                    <div className="space-y-3">
-                      <button disabled={isPaying} onClick={() => handleSecurePayment("M-PESA")} className={`w-full py-4 bg-emerald-600 text-white font-black rounded-xl uppercase italic text-[10px] shadow-lg tracking-widest transition-all active:scale-95`}>{isPaying ? "Sending..." : "Pay $10 (1,300 KES)"}</button>
-                      <button onClick={() => setPaymentStep("choice")} className="text-[8px] text-gray-500 uppercase font-black italic tracking-widest transition-all hover:text-white mx-auto block">Back</button>
+                      <button disabled={isPaying} onClick={() => handleSecurePayment("M-PESA")} className={`w-full py-4 bg-emerald-600 text-white font-black rounded-xl uppercase italic text-[10px] shadow-lg tracking-widest transition-all active:scale-95 leading-none`}>{isPaying ? "Sending..." : "Pay $10 (1,300 KES)"}</button>
+                      <button onClick={() => setPaymentStep("choice")} className="text-[8px] text-gray-500 uppercase font-black italic tracking-widest transition-all hover:text-white mx-auto block leading-none">Go Back</button>
                    </div>
                 </div>
               )}
@@ -568,12 +582,12 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
           <div className="fixed inset-0 z-400 flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm text-left">
              <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="w-full max-w-75 bg-[#0a0f1e] border-2 border-white/10 rounded-[30px] p-6 text-center shadow-3xl relative">
                 <div className={`absolute top-0 left-0 w-full h-1.5 ${customAlert.type === 'error' ? 'bg-red-500' : 'bg-[#00f2ff] shadow-glow'}`} />
-                <div className="mb-4 flex justify-center">
+                <div className="mb-4 flex justify-center text-center">
                   {customAlert.type === 'error' ? <AlertTriangle size={28} className="text-red-500" /> : customAlert.type === 'success' ? <CheckCircle size={28} className="text-emerald-500" /> : <Info size={28} className="text-[#00f2ff]" />}
                 </div>
-                <h4 className="text-sm font-black uppercase italic mb-2.5 text-white tracking-tighter leading-none">{customAlert.title}</h4>
-                <p className="text-[9px] text-gray-400 italic mb-6 leading-relaxed tracking-wide">{customAlert.msg}</p>
-                <button onClick={() => setCustomAlert({...customAlert, show: false})} className="w-full py-3 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase italic hover:bg-white hover:text-black transition-all">Dismiss</button>
+                <h4 className="text-sm font-black uppercase italic mb-2.5 text-white tracking-tighter leading-none text-center">{customAlert.title}</h4>
+                <p className="text-[9px] text-gray-400 italic mb-6 leading-relaxed tracking-wide text-center">{customAlert.msg}</p>
+                <button onClick={() => setCustomAlert({...customAlert, show: false})} className="w-full py-3 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase italic hover:bg-white hover:text-black transition-all leading-none">Dismiss</button>
              </motion.div>
           </div>
         )}
