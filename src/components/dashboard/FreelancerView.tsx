@@ -519,7 +519,7 @@ const marketplaceGigs = useMemo(() => [
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center font-black text-white shadow-lg shadow-indigo-500/20">S</div>
                         <div>
-                          <p className="font-black text-white text-[12px]">Credit / Debit Card <span className="ml-2 text-[8px] px-2 py-0.5 bg-amber-500/10 text-amber-500/60 rounded-full font-bold uppercase border border-amber-500/20">Limited regions</span></p>
+                          <p className="font-black text-white text-[12px]">Credit / Debit Card <span className="ml-2 text-[8px] px-2 py-0.5 bg-amber-500/10 text-amber-500/60 rounded-full font-bold uppercase border border-amber-500/20">Bank payment</span></p>
                           <p className="text-[10px] text-gray-500 font-bold uppercase">Visa, Mastercard, Amex</p>
                         </div>
                       </div>
