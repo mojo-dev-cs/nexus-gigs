@@ -13,7 +13,7 @@ import {
   Activity, Landmark, Bitcoin, HelpCircle, LifeBuoy, X, CheckCircle, Box,
   ShieldQuestion, UserCircle, DollarSign, ArrowUpRight, History,
   Shield, QrCode, ScanFace, Award, Target, TrendingUp, Layers,
-  Send, MessageCircle, Share2, ThumbsUp, Copy, Check, Sparkles
+  Send, MessageCircle, Share2, ThumbsUp, Copy, Check, Sparkles, ArrowDownLeft, CreditCard as CardIcon
 } from "lucide-react";
 
 export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetadata: any }) => {
@@ -168,7 +168,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
 
   return (
     <div className="min-h-screen bg-[#020617] text-white font-sans selection:bg-[#00f2ff]/30 pb-24 overflow-x-hidden text-sm">
-      
       <div className="fixed inset-0 pointer-events-none">
         <motion.div animate={{ opacity: [0.1, 0.15, 0.1] }} transition={{ repeat: Infinity, duration: 5 }} className="absolute top-0 right-0 w-80 h-80 bg-blue-600/10 blur-[100px] rounded-full" />
       </div>
@@ -198,21 +197,30 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 </div>
 
                 {!isVerified && (
-                  <div className="md:col-span-2 p-5 bg-white/5 border border-white/10 rounded-[25px] flex flex-col md:flex-row items-center gap-5 backdrop-blur-xl relative overflow-hidden shadow-2xl border-l-4 border-l-[#00f2ff] group transition-all hover:bg-white/[0.07]">
-                    <div className="absolute -top-24 -left-24 w-48 h-48 bg-[#00f2ff]/10 blur-[80px] rounded-full pointer-events-none group-hover:bg-[#00f2ff]/20 transition-all" />
-                    <div className="w-14 h-14 bg-[#00f2ff]/10 rounded-[20px] flex items-center justify-center text-[#00f2ff] shadow-inner shrink-0 border border-[#00f2ff]/20 relative z-10">
-                      <ShieldCheck size={28} className="drop-shadow-[0_0_10px_rgba(0,242,255,0.5)]" />
+                  <div className="md:col-span-2 p-5 bg-white/5 border border-white/10 rounded-[25px] flex flex-col items-center gap-4 backdrop-blur-xl relative overflow-hidden shadow-2xl border-l-4 border-l-[#00f2ff] group transition-all hover:bg-white/[0.07]">
+                    <div className="flex flex-row items-center gap-4 w-full">
+                        <div className="w-12 h-12 bg-[#00f2ff]/10 rounded-xl flex items-center justify-center text-[#00f2ff] shadow-inner shrink-0 border border-[#00f2ff]/20 relative z-10">
+                          <ShieldCheck size={24} className="drop-shadow-[0_0_10px_rgba(0,242,255,0.5)]" />
+                        </div>
+                        <div className="flex-1 relative z-10 space-y-1 text-left">
+                            <h4 className="text-sm font-black uppercase italic tracking-tighter text-white">Verify Account</h4>
+                            <p className="text-[9px] text-gray-400 font-medium leading-relaxed">Unlock the elite technical missions network.</p>
+                        </div>
+                        <button onClick={handleVerifyClick} className={`px-5 py-2 rounded-lg text-[9px] font-black uppercase italic tracking-widest transition-all shadow-glow active:scale-95 ${isUnderReview ? "bg-amber-500 text-black animate-pulse" : "bg-[#00f2ff] text-black hover:scale-105"}`}>{isUnderReview ? "Review" : "Start"}</button>
                     </div>
-                    <div className="flex-1 relative z-10 space-y-2 text-center md:text-left">
-                      <div>
-                        <h4 className="text-md font-black uppercase italic tracking-tighter text-white mb-0.5">Verify Account</h4>
-                        <p className="text-[10px] text-gray-400 font-medium leading-relaxed">
-                          Finish your one-time <span className="text-[#00f2ff] font-bold">$10 fee</span> to unlock all features.
-                        </p>
-                      </div>
-                      <div className="pt-0.5 flex flex-wrap justify-center md:justify-start gap-3">
-                        <button onClick={handleVerifyClick} className={`px-6 py-2.5 rounded-xl text-[9px] font-black uppercase italic tracking-widest transition-all shadow-glow active:scale-95 ${isUnderReview ? "bg-amber-500 text-black animate-pulse cursor-wait" : "bg-[#00f2ff] text-black hover:scale-105"}`}>{isUnderReview ? "Under Review" : "Start Now"}</button>
-                      </div>
+
+                    <div className="w-full grid grid-cols-2 gap-2 mt-2 border-t border-white/5 pt-3">
+                         {[
+                             {t: "Unlimited Gigs", i: <Layers size={10}/>},
+                             {t: "Instant Vault Payouts", i: <Zap size={10}/>},
+                             {t: "Higher Trust Score", i: <ThumbsUp size={10}/>},
+                             {t: "Global Client Connect", i: <Globe size={10}/>}
+                         ].map((benefit, b) => (
+                             <div key={b} className="flex items-center gap-2">
+                                 <div className="text-[#00f2ff]">{benefit.i}</div>
+                                 <span className="text-[8px] font-bold text-gray-400 uppercase tracking-tighter">{benefit.t}</span>
+                             </div>
+                         ))}
                     </div>
                   </div>
                 )}
@@ -241,6 +249,42 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             </motion.div>
           )}
 
+          {/* --- 💰 VAULT (UPGRADED WALLET) --- */}
+          {activeTab === "earnings" && (
+            <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="space-y-4 pt-2">
+               <div className="bg-linear-to-br from-[#00f2ff]/20 via-transparent to-transparent p-6 rounded-[30px] border border-white/10 shadow-3xl relative overflow-hidden">
+                  <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#00f2ff]/5 blur-[60px] rounded-full" />
+                  <div className="flex justify-between items-start mb-10">
+                     <div className="p-3 bg-white/5 rounded-xl border border-white/10"><Landmark size={20} className="text-[#00f2ff]"/></div>
+                     <div className="bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 flex items-center gap-2">
+                        <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
+                        <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Secured Vault</span>
+                     </div>
+                  </div>
+                  <div className="space-y-1 mb-8">
+                     <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Available Assets</p>
+                     <h4 className="text-5xl font-black italic tracking-tighter text-white leading-none">$0.00</h4>
+                     <p className="text-[9px] font-bold text-gray-500 uppercase tracking-tighter">Approx: KES 0.00</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                     <button onClick={() => showAlert("No money", "You do not have any money in your vault to withdraw.", "error")} className="py-4 bg-white text-black rounded-2xl text-[10px] font-black uppercase italic shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2">Withdraw <ArrowUpRight size={14}/></button>
+                     <button className="py-4 bg-white/5 border border-white/10 text-white rounded-2xl text-[10px] font-black uppercase italic active:scale-95 transition-all flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">Transfer <Send size={12}/></button>
+                  </div>
+               </div>
+
+               <div className="grid grid-cols-2 gap-3">
+                  <div className="p-4 bg-white/3 border border-white/5 rounded-2xl">
+                     <div className="flex items-center gap-2 mb-2 text-gray-500"><History size={12}/><span className="text-[8px] font-black uppercase">Recent Activity</span></div>
+                     <p className="text-[10px] text-gray-500 font-bold italic">No node transmissions yet.</p>
+                  </div>
+                  <div className="p-4 bg-white/3 border border-white/5 rounded-2xl">
+                     <div className="flex items-center gap-2 mb-2 text-gray-500"><TrendingUp size={12}/><span className="text-[8px] font-black uppercase">Node Growth</span></div>
+                     <p className="text-[10px] text-gray-500 font-bold italic">Bidding active required.</p>
+                  </div>
+               </div>
+            </motion.div>
+          )}
+
           {/* --- 💼 GIGS --- */}
           {activeTab === "tasks" && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
@@ -260,7 +304,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             </motion.div>
           )}
 
-          {/* --- 📜 WORK, 💬 CHATS, 💰 VAULT, 📊 STATS, 👤 ME, 🛠️ HELP remain the same... */}
+          {/* Remaining tabs (Work, Chats, Stats, Me, Help) */}
           {activeTab === "contracts" && (
             <div className="pt-10 px-4 text-center space-y-6">
                <div className="p-16 bg-white/5 border border-red-500/20 rounded-[50px] shadow-3xl">
@@ -290,18 +334,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                     </div>
                  </div>
                ))}
-            </motion.div>
-          )}
-
-          {activeTab === "earnings" && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 text-center">
-               <h3 className="text-xl font-bold uppercase px-2 text-left">My <span className="text-[#00f2ff]">Wallet</span></h3>
-               <div className="p-12 bg-linear-to-br from-white/10 to-white/5 border border-white/20 rounded-[50px] shadow-2xl relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-8 opacity-5"><Wallet size={120}/></div>
-                  <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-2 font-bold">Total Balance</p>
-                  <h4 className="text-6xl font-black italic tracking-tighter mb-10 text-white">{currency === "USD" ? "$0.00" : "KES 0"}</h4>
-                  <button onClick={() => showAlert("No money", "You do not have any money in your vault to withdraw.", "error")} className="flex items-center gap-3 px-12 py-5 bg-white text-black rounded-2xl text-[11px] font-black uppercase italic mx-auto shadow-xl active:scale-95 transition-all">Withdraw <ArrowUpRight size={16}/></button>
-               </div>
             </motion.div>
           )}
 
@@ -431,6 +463,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 <div className="space-y-4 text-sm">
                   <h3 className="text-[11px] font-black uppercase italic tracking-widest text-[#00f2ff]">SELECT PAYMENT METHOD</h3>
                   <div className="space-y-2.5 text-left">
+                    {/* CARD / BANK */}
                     <button onClick={() => handleSecurePayment("CARD")} className="w-full p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group hover:bg-white/10 transition-all">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20"><Landmark size={18} className="text-white" /></div>
@@ -441,6 +474,8 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                       </div>
                       <ChevronRight size={14} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
                     </button>
+
+                    {/* M-PESA */}
                     <button onClick={() => setPaymentStep("mpesa")} className="w-full p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group hover:bg-white/10 transition-all">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center font-black text-white shadow-lg shadow-emerald-500/20">M</div>
@@ -451,6 +486,8 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                       </div>
                       <ChevronRight size={14} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
                     </button>
+
+                    {/* BINANCE USDT */}
                     <button onClick={() => setPaymentStep("binance")} className="w-full p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group hover:bg-white/10 transition-all">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center shadow-lg shadow-amber-500/20"><Zap size={16} className="fill-white text-white" /></div>
@@ -461,6 +498,8 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                       </div>
                       <ChevronRight size={14} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
                     </button>
+
+                    {/* PAYPAL */}
                     <button disabled className="w-full p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group opacity-50 cursor-not-allowed">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-black text-white">PP</div>
