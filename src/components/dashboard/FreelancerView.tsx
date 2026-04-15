@@ -281,7 +281,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             </motion.div>
           )}
 
-          {/* --- 📜 WORK --- */}
+          {/* --- 📜 WORK (Tab Locked UI) --- */}
           {activeTab === "contracts" && (
             <div className="pt-10 px-4 text-center space-y-6">
                <div className="p-16 bg-white/5 border border-red-500/20 rounded-[50px] shadow-3xl">
@@ -315,16 +315,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                      <button className="py-4 bg-white/5 border border-white/10 text-white rounded-2xl text-[10px] font-black uppercase italic active:scale-95 transition-all flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">Transfer <Send size={12}/></button>
                   </div>
                </div>
-               <div className="grid grid-cols-2 gap-3">
-                  <div className="p-4 bg-white/3 border border-white/5 rounded-2xl text-left">
-                     <div className="flex items-center gap-2 mb-2 text-gray-500"><History size={12}/><span className="text-[8px] font-black uppercase">Activity</span></div>
-                     <p className="text-[10px] text-gray-500 font-bold italic">No node transmissions.</p>
-                  </div>
-                  <div className="p-4 bg-white/3 border border-white/5 rounded-2xl text-left">
-                     <div className="flex items-center gap-2 mb-2 text-gray-500"><TrendingUp size={12}/><span className="text-[8px] font-black uppercase">Node Growth</span></div>
-                     <p className="text-[10px] text-gray-500 font-bold italic">Verify required.</p>
-                  </div>
-               </div>
             </motion.div>
           )}
 
@@ -352,7 +342,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 px-2">
-                     <button onClick={() => setActiveTab('earnings')} className="py-3.5 bg-white text-black rounded-2xl font-black uppercase text-[9px] shadow-xl active:scale-95 transition-all">Wallet Hub</button>
+                     <button onClick={() => setActiveTab('earnings')} className="py-3.5 bg-white text-black rounded-2xl font-black uppercase text-[9px] shadow-xl active:scale-95 transition-all">Vault Hub</button>
                      <button onClick={() => setActiveTab('support')} className="py-3.5 bg-white/5 border border-white/10 rounded-2xl font-black uppercase text-[9px] text-white">Support</button>
                   </div>
                </div>
@@ -360,28 +350,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             </div>
           )}
 
-          {/* Remaining fallback logic for other tabs (Messages, Stats, etc.) */}
-          {activeTab === "messages" && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 text-left">
-               <h3 className="text-xl font-bold uppercase px-2 text-left">System <span className="text-[#00f2ff]">Log</span></h3>
-               {[
-                 { t: "Nexus HQ", m: "Welcome Node. Please finish your verification to talk to others." },
-                 { t: "Security Bot", m: "External account connection is encrypted. Identity sync is required." }
-               ].map((msg, i) => (
-                 <div key={i} onClick={() => setExpandedMsg(expandedMsg === i ? null : i)} className="p-6 rounded-[30px] bg-white/3 border border-white/5 cursor-pointer hover:bg-white/5 transition-all group text-left">
-                    <div className="flex gap-4 items-center">
-                       <div className="p-3 bg-black/40 rounded-xl border border-white/5 text-[#00f2ff]"><MessageSquare size={16}/></div>
-                       <div className="flex-1 text-[10px]">
-                          <h4 className="font-black uppercase italic text-white leading-none mb-1">{msg.t}</h4>
-                          <p className={`text-gray-400 ${expandedMsg === i ? "" : "line-clamp-1"}`}>{msg.m}</p>
-                       </div>
-                       <ChevronDown size={14} className={`text-gray-600 transition-transform ${expandedMsg === i ? "rotate-180" : ""}`}/>
-                    </div>
-                 </div>
-               ))}
-            </motion.div>
-          )}
-
+          {/* Remaining tabs logic (Analytics, Support, Messages) */}
           {activeTab === "analytics" && (
             <div className="space-y-8 text-left">
                <h3 className="text-xl font-bold uppercase px-2 text-left">Work <span className="text-[#00f2ff]">Pulse</span></h3>
@@ -401,7 +370,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                </div>
             </div>
           )}
-
           {activeTab === "support" && (
              <div className="space-y-6 text-left">
                 <h3 className="text-xl font-bold uppercase px-2 tracking-widest text-[#00f2ff] text-left">Help <span className="text-white">Center</span></h3>
@@ -410,7 +378,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                       <div className="space-y-1"><p className="text-[9px] font-black text-gray-500 uppercase leading-none mb-1 text-left">Support Email</p><p className="text-xs font-black italic text-white underline cursor-pointer text-left" onClick={() => window.location.href="mailto:support@nexusgigs.me"}>support@nexusgigs.me</p></div>
                       <div className="space-y-1"><p className="text-[9px] font-black text-gray-500 uppercase leading-none mb-1 text-left">WhatsApp Direct</p><p className="text-xs italic text-[#00f2ff] font-bold text-left">+1 (500) 555-0006</p></div>
                       <div className="pt-6 border-t border-white/5">
-                        <p className="text-[10px] font-bold text-gray-500 uppercase mb-4 tracking-widest text-left">Type your problem here:</p>
                         <textarea value={supportMsg} onChange={e => setSupportMsg(e.target.value)} placeholder="How can we help?" className="w-full bg-black/40 border border-white/10 rounded-2xl p-5 text-xs font-bold outline-none focus:border-[#00f2ff] h-32 mb-4 shadow-inner text-white resize-none" />
                         <button onClick={handleSupportEmail} className="w-full py-5 bg-[#00f2ff] text-black font-black rounded-2xl text-[10px] uppercase shadow-glow transition-all tracking-widest">Send Message</button>
                       </div>
@@ -424,10 +391,29 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                       ].map(soc => (
                         <button key={soc.n} onClick={() => window.open(soc.l, '_blank')} className="p-5 bg-black/40 border border-white/5 rounded-3xl flex flex-col items-center gap-3 hover:border-[#00f2ff] group transition-all shadow-xl active:scale-95"><div className="text-gray-400 group-hover:text-white transition-all group-hover:scale-110">{soc.i}</div><span className="text-[8px] font-black uppercase text-gray-500">{soc.n}</span></button>
                       ))}
-                      <button onClick={() => window.open('https://whatsapp.com/channel/0029VbCmx1AAu3aMiY7XVf1J', '_blank')} className="col-span-2 p-5 bg-emerald-500/10 border border-emerald-500/20 rounded-[30px] flex items-center justify-between group hover:bg-emerald-500 transition-all shadow-lg px-8 active:scale-95 font-black uppercase italic group-hover:text-black"><span>WhatsApp Channel</span><MessageCircle size={20} /></button>
                    </div>
                 </div>
              </div>
+          )}
+          {activeTab === "messages" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 text-left">
+               <h3 className="text-xl font-bold uppercase px-2 text-left">System <span className="text-[#00f2ff]">Log</span></h3>
+               {[
+                 { t: "Nexus HQ", m: "Welcome Node. Please finish your verification to talk to others." },
+                 { t: "Security Bot", m: "External account connection is encrypted. Identity sync is required." }
+               ].map((msg, i) => (
+                 <div key={i} onClick={() => setExpandedMsg(expandedMsg === i ? null : i)} className="p-6 rounded-[30px] bg-white/3 border border-white/5 cursor-pointer hover:bg-white/5 transition-all group text-left">
+                    <div className="flex gap-4 items-center">
+                       <div className="p-3 bg-black/40 rounded-xl border border-white/5 text-[#00f2ff]"><MessageSquare size={16}/></div>
+                       <div className="flex-1 text-[10px]">
+                          <h4 className="font-black uppercase italic text-white leading-none mb-1">{msg.t}</h4>
+                          <p className={`text-gray-400 ${expandedMsg === i ? "" : "line-clamp-1"}`}>{msg.m}</p>
+                       </div>
+                       <ChevronDown size={14} className={`text-gray-600 transition-transform ${expandedMsg === i ? "rotate-180" : ""}`}/>
+                    </div>
+                 </div>
+               ))}
+            </motion.div>
           )}
 
         </AnimatePresence>
@@ -471,14 +457,17 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
               <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-[#00f2ff] to-transparent shadow-glow" />
               
               {paymentStep === "terms" ? (
-                <div className="space-y-4">
+                <div className="space-y-4 text-center">
                   <ShieldCheck size={36} className="text-[#00f2ff] mx-auto shadow-glow" />
                   <h3 className="text-lg font-black italic uppercase tracking-tight text-white leading-none">Verification</h3>
                   <div className="bg-white/5 p-4 rounded-2xl text-left border border-white/5 space-y-3 shadow-inner">
                     <div className="space-y-2 text-[9px] text-gray-300 font-medium">
-                      <div className="flex gap-2.5"><div className="w-4 h-4 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0"><span className="text-white">1</span></div><p><strong>Vetting Fee:</strong> One-time commitment of <span className="text-white">$10 (KES 1,300)</span>.</p></div>
+                      <div className="flex gap-2.5"><div className="w-4 h-4 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0"><span className="text-white">1</span></div><p><strong>Vetting Fee:</strong> commitment of <span className="text-white">$10 (KES 1,300)</span>.</p></div>
                       <div className="flex gap-2.5"><div className="w-4 h-4 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0"><span className="text-white">2</span></div><p><strong>Review:</strong> Manual account audit and survey completion.</p></div>
                       <div className="flex gap-2.5"><div className="w-4 h-4 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0"><span className="text-white">3</span></div><p><strong>Full Access:</strong> Gain bidding rights and vault withdrawals.</p></div>
+                    </div>
+                    <div className="pt-1.5 border-t border-white/5">
+                      <p className="text-[8px] text-emerald-400 font-bold italic flex items-center gap-1.5 leading-none"><CheckCircle2 size={8}/> 100% Refund if you fail vetting.</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 bg-white/5 p-3 rounded-2xl border border-white/5 cursor-pointer text-left transition-all hover:bg-white/10" onClick={() => setAgreedToTerms(!agreedToTerms)}>
@@ -489,22 +478,45 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                 </div>
               ) : paymentStep === "choice" ? (
                 <div className="space-y-4">
-                  <h3 className="text-[11px] font-black uppercase italic tracking-widest text-[#00f2ff]">PAYMENT METHOD</h3>
+                  <h3 className="text-[11px] font-black uppercase italic tracking-widest text-[#00f2ff] text-center">SELECT PAYMENT METHOD</h3>
                   <div className="space-y-2.5 text-left">
-                    <button onClick={() => handleSecurePayment("CARD")} className="w-full p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group transition-all hover:bg-white/10">
-                        <div className="flex items-center gap-3"><div className="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center shadow-lg"><Landmark size={18} className="text-white" /></div><p className="font-black text-white text-[10px]">Bank / Card</p></div>
+                    <button onClick={() => handleSecurePayment("CARD")} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group transition-all hover:bg-white/10">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center shadow-lg"><Landmark size={20} className="text-white" /></div>
+                          <div><p className="font-black text-white text-[12px]">Bank / Card</p><p className="text-[9px] text-gray-500 font-bold uppercase">Visa, Mastercard, Amex</p></div>
+                        </div>
                         <ChevronRight size={14} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
                     </button>
-                    <button onClick={() => setPaymentStep("mpesa")} className="w-full p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group transition-all hover:bg-white/10">
-                        <div className="flex items-center gap-3"><div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center shadow-lg text-white font-black">M</div><p className="font-black text-white text-[10px]">M-Pesa</p></div>
+                    <button onClick={() => setPaymentStep("mpesa")} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group transition-all hover:bg-white/10">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg text-white font-black">M</div>
+                          <div><p className="font-black text-white text-[12px]">M-Pesa <span className="ml-2 text-[8px] px-2 py-0.5 bg-emerald-500/20 text-emerald-500 rounded-full font-bold uppercase">Instant</span></p><p className="text-[9px] text-gray-500 font-bold uppercase">Pay via mobile money</p></div>
+                        </div>
                         <ChevronRight size={14} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
                     </button>
-                    <button onClick={() => setPaymentStep("binance")} className="w-full p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group transition-all hover:bg-white/10">
-                        <div className="flex items-center gap-3"><div className="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center shadow-lg"><Zap size={16} className="fill-white text-white" /></div><p className="font-black text-white text-[10px]">Binance (USDT)</p></div>
+                    <button onClick={() => setPaymentStep("binance")} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group transition-all hover:bg-white/10">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center shadow-lg"><Zap size={20} className="fill-white text-white" /></div>
+                          <div><p className="font-black text-white text-[12px]">Binance (USDT) <span className="ml-2 text-[8px] px-2 py-0.5 bg-amber-500/20 text-amber-500 rounded-full font-bold uppercase">Crypto</span></p><p className="text-[9px] text-gray-500 font-bold uppercase">Pay with USDT crypto</p></div>
+                        </div>
                         <ChevronRight size={14} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                    <button disabled className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group opacity-50 cursor-not-allowed">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center font-black text-white">PP</div>
+                          <div><p className="font-black text-white text-[12px]">PayPal <span className="ml-2 text-[8px] px-2 py-0.5 bg-amber-500/10 text-amber-500/60 rounded-full font-bold uppercase border border-amber-500/20">Restricted</span></p><p className="text-[9px] text-gray-500 font-bold uppercase">Limited regions only</p></div>
+                        </div>
+                        <Info size={14} className="text-gray-600" />
                     </button>
                   </div>
-                  <button onClick={() => setPaymentStep("terms")} className="mt-4 text-[8px] text-gray-500 uppercase font-black italic tracking-[0.3em] transition-all hover:text-white">Back</button>
+                  <div className="pt-4 border-t border-white/5 text-center">
+                    <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3 flex items-center justify-center gap-2"><Sparkles size={12} className="text-[#00f2ff]"/> Why Verify Account?</p>
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <div className="p-2.5 bg-white/3 border border-white/5 rounded-xl"><div className="w-5 h-5 bg-purple-600/20 rounded-lg flex items-center justify-center mb-1.5 mx-auto"><Zap size={10} className="text-purple-500"/></div><p className="text-[7px] font-bold text-white uppercase leading-tight">Unlimited Missions</p></div>
+                      <div className="p-2.5 bg-white/3 border border-white/5 rounded-xl"><div className="w-5 h-5 bg-emerald-600/20 rounded-lg flex items-center justify-center mb-1.5 mx-auto"><DollarSign size={10} className="text-emerald-500"/></div><p className="text-[7px] font-bold text-white uppercase leading-tight">Higher Bidding</p></div>
+                    </div>
+                  </div>
+                  <button onClick={() => setPaymentStep("terms")} className="mt-4 text-[8px] text-gray-500 uppercase font-black italic tracking-[0.3em] transition-all hover:text-white mx-auto block">Back</button>
                 </div>
               ) : paymentStep === "binance" ? (
                 <div className="space-y-4">
@@ -519,8 +531,8 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=TFWxe4TFcjUNgPJVgf5iXrMsw1oe4gDv9X" alt="Binance QR" className="w-36 h-36 mx-auto" />
                   </div>
                   <div className="grid grid-cols-2 gap-3 border-y border-white/5 py-3.5 text-left">
-                    <div><p className="text-[7px] font-black text-gray-500 uppercase text-left">Amount</p><p className="text-md font-black text-white">$10.00 USDT</p></div>
-                    <div className="text-right"><p className="text-[7px] font-black text-gray-500 uppercase text-right">Status</p><p className="text-md font-black text-[#00f2ff]">Phase 1 Active</p></div>
+                    <div><p className="text-[7px] font-black text-gray-500 uppercase">Amount</p><p className="text-md font-black text-white">$10.00 USDT</p></div>
+                    <div className="text-right"><p className="text-[7px] font-black text-gray-500 uppercase">Status</p><p className="text-md font-black text-[#00f2ff]">Phase 1 Active</p></div>
                   </div>
                   <div className="space-y-2.5 text-left">
                     <p className="text-[8px] font-black text-gray-500 uppercase text-left">WALLET ADDRESS</p>
@@ -541,7 +553,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                    <input value={mpesaNumber} onChange={e => setMpesaNumber(e.target.value)} placeholder="2547XXXXXXXX" className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-center text-xl font-black text-white outline-none focus:border-emerald-500 shadow-inner" />
                    <div className="space-y-3">
                       <button disabled={isPaying} onClick={() => handleSecurePayment("M-PESA")} className={`w-full py-4 bg-emerald-600 text-white font-black rounded-xl uppercase italic text-[10px] shadow-lg tracking-widest transition-all active:scale-95`}>{isPaying ? "Sending..." : "Pay $10 (1,300 KES)"}</button>
-                      <button onClick={() => setPaymentStep("choice")} className="text-[8px] text-gray-500 uppercase font-black italic tracking-widest transition-all hover:text-white">Back</button>
+                      <button onClick={() => setPaymentStep("choice")} className="text-[8px] text-gray-500 uppercase font-black italic tracking-widest transition-all hover:text-white mx-auto block">Back</button>
                    </div>
                 </div>
               )}
