@@ -81,6 +81,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
   const handleVerifyClick = () => {
     if (isVerified) return showAlert("Verified", "Your account is already verified.", "success");
     if (isUnderReview) return showAlert("Review in Progress", "We are checking your payment. We will email you the survey soon. If you fail, you get your money back.", "info");
+    setPaymentStep("terms");
     setShowVerifyModal(true);
   };
 
@@ -253,6 +254,42 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             </motion.div>
           )}
 
+          {/* --- 💰 VAULT --- */}
+          {activeTab === "earnings" && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 pt-2">
+               <div className="bg-linear-to-br from-[#00f2ff]/20 via-transparent to-transparent p-6 rounded-[30px] border border-white/10 shadow-3xl relative overflow-hidden">
+                  <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#00f2ff]/5 blur-[60px] rounded-full" />
+                  <div className="flex justify-between items-start mb-10">
+                     <div className="p-3 bg-white/5 rounded-xl border border-white/10"><Landmark size={20} className="text-[#00f2ff]"/></div>
+                     <div className="bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 flex items-center gap-2">
+                        <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
+                        <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Secured Vault</span>
+                     </div>
+                  </div>
+                  <div className="space-y-1 mb-8 text-left">
+                     <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Available Assets</p>
+                     <h4 className="text-5xl font-black italic tracking-tighter text-white leading-none">$0.00</h4>
+                     <p className="text-[9px] font-bold text-gray-500 uppercase tracking-tighter">Approx: KES 0.00</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                     <button onClick={() => showAlert("No money", "You do not have any money in your vault to withdraw.", "error")} className="py-4 bg-white text-black rounded-2xl text-[10px] font-black uppercase italic shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2">Withdraw <ArrowUpRight size={14}/></button>
+                     <button className="py-4 bg-white/5 border border-white/10 text-white rounded-2xl text-[10px] font-black uppercase italic active:scale-95 transition-all flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">Transfer <Send size={12}/></button>
+                  </div>
+               </div>
+
+               <div className="grid grid-cols-2 gap-3">
+                  <div className="p-4 bg-white/3 border border-white/5 rounded-2xl text-left">
+                     <div className="flex items-center gap-2 mb-2 text-gray-500"><History size={12}/><span className="text-[8px] font-black uppercase">Recent Activity</span></div>
+                     <p className="text-[10px] text-gray-500 font-bold italic">No transmissions.</p>
+                  </div>
+                  <div className="p-4 bg-white/3 border border-white/5 rounded-2xl text-left">
+                     <div className="flex items-center gap-2 mb-2 text-gray-500"><TrendingUp size={12}/><span className="text-[8px] font-black uppercase">Node Growth</span></div>
+                     <p className="text-[10px] text-gray-500 font-bold italic">Verification required.</p>
+                  </div>
+               </div>
+            </motion.div>
+          )}
+
           {/* --- 💼 GIGS --- */}
           {activeTab === "tasks" && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
@@ -264,7 +301,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                         <img src={g.img} className="w-8 h-8 rounded-lg object-cover border border-white/10" alt="cl" />
                         <span className={`text-[7px] font-bold px-1.5 py-0.5 rounded uppercase ${g.status === 'Active' ? 'bg-[#00f2ff]/10 text-[#00f2ff]' : 'bg-white/5 text-gray-500'}`}>{g.dur}</span>
                     </div>
-                    <h4 className="text-[10px] font-black uppercase mb-1 line-clamp-2 h-7 leading-tight">{g.title}</h4>
+                    <h4 className="text-[10px] font-black uppercase mb-1 line-clamp-2 h-7 leading-tight text-left">{g.title}</h4>
                     <div className="flex justify-between items-center pt-2 border-t border-white/5">
                         <p className="text-sm font-bold text-[#00f2ff] tracking-tighter">${g.budget}</p>
                         <button onClick={handleApplyAction} className="px-4 py-1 rounded-lg text-[8px] font-black uppercase transition-all bg-[#00f2ff] text-black hover:bg-white shadow-glow">Apply</button>
@@ -274,7 +311,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
               </div>
               <div className="pt-4 px-2">
                   <button onClick={handleApplyAction} className="w-full py-4 bg-[#00f2ff] text-black rounded-2xl flex items-center justify-center gap-3 text-[10px] font-black uppercase italic shadow-glow hover:scale-[1.02] transition-all group">
-                      <Lock size={14} className="transition-colors"/> See More Missions
+                      <Lock size={14}/> See More Missions
                   </button>
               </div>
             </motion.div>
@@ -312,18 +349,39 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
             </div>
           )}
 
-          {/* Fallback Tabs Logic (Vault, Stats, Help, Messages) stay the same as provided code */}
-          {activeTab === "earnings" && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 text-center">
-               <h3 className="text-xl font-bold uppercase px-2 text-left">My <span className="text-[#00f2ff]">Wallet</span></h3>
-               <div className="p-12 bg-linear-to-br from-white/10 to-white/5 border border-white/20 rounded-[50px] shadow-2xl relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-8 opacity-5"><Wallet size={120}/></div>
-                  <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-2 font-bold">Total Balance</p>
-                  <h4 className="text-6xl font-black italic tracking-tighter mb-10 text-white">{currency === "USD" ? "$0.00" : "KES 0"}</h4>
-                  <button onClick={() => showAlert("No money", "You do not have any money in your vault to withdraw.", "error")} className="flex items-center gap-3 px-12 py-5 bg-white text-black rounded-2xl text-[11px] font-black uppercase italic mx-auto shadow-xl active:scale-95 transition-all">Withdraw <ArrowUpRight size={16}/></button>
+          {/* Other Tabs (Stats, Support, etc.) stay the same logic-wise */}
+          {activeTab === "contracts" && (
+            <div className="pt-10 px-4 text-center space-y-6">
+               <div className="p-16 bg-white/5 border border-red-500/20 rounded-[50px] shadow-3xl">
+                  <ShieldAlert size={50} className="mx-auto text-red-500 mb-6" />
+                  <h3 className="text-xl font-black uppercase italic text-white leading-none mb-2">Tab Locked</h3>
+                  <p className="text-gray-400 text-[11px] mb-8 max-w-xs mx-auto italic">Complete your identity check to see your work and money history.</p>
+                  {!isVerified && <button onClick={handleVerifyClick} className="w-full py-5 bg-red-600 text-white font-black rounded-2xl text-[10px] uppercase shadow-lg">Unlock Tab</button>}
                </div>
+            </div>
+          )}
+
+          {activeTab === "messages" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+               <h3 className="text-xl font-bold uppercase px-2 text-left">System <span className="text-[#00f2ff]">Log</span></h3>
+               {[
+                 { t: "Nexus HQ", m: "Welcome Node. Please finish your verification to talk to others." },
+                 { t: "Security Bot", m: "External account connection is encrypted. Identity sync is required." }
+               ].map((msg, i) => (
+                 <div key={i} onClick={() => setExpandedMsg(expandedMsg === i ? null : i)} className="p-6 rounded-[30px] bg-white/3 border border-white/5 cursor-pointer hover:bg-white/5 transition-all group text-left">
+                    <div className="flex gap-4 items-center">
+                       <div className="p-3 bg-black/40 rounded-xl border border-white/5 text-[#00f2ff]"><MessageSquare size={16}/></div>
+                       <div className="flex-1 text-[10px]">
+                          <h4 className="font-black uppercase italic text-white leading-none mb-1">{msg.t}</h4>
+                          <p className={`text-gray-400 ${expandedMsg === i ? "" : "line-clamp-1"}`}>{msg.m}</p>
+                       </div>
+                       <ChevronDown size={14} className={`text-gray-600 transition-transform ${expandedMsg === i ? "rotate-180" : ""}`}/>
+                    </div>
+                 </div>
+               ))}
             </motion.div>
           )}
+
           {activeTab === "analytics" && (
             <div className="space-y-8">
                <h3 className="text-xl font-bold uppercase px-2 text-left">Work <span className="text-[#00f2ff]">Pulse</span></h3>
@@ -343,9 +401,10 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                </div>
             </div>
           )}
+
           {activeTab === "support" && (
              <div className="space-y-6">
-                <h3 className="text-xl font-bold uppercase px-2 tracking-widest text-[#00f2ff]">Help <span className="text-white">Center</span></h3>
+                <h3 className="text-xl font-bold uppercase px-2 tracking-widest text-[#00f2ff] text-left">Help <span className="text-white">Center</span></h3>
                 <div className="grid md:grid-cols-2 gap-5">
                    <div className="p-8 bg-white/5 border border-white/10 rounded-[40px] space-y-6 shadow-2xl backdrop-blur-xl text-left">
                       <div className="space-y-1"><p className="text-[9px] font-black text-gray-500 uppercase leading-none mb-1">Support Email</p><p className="text-xs font-black italic text-white underline cursor-pointer" onClick={() => window.location.href="mailto:support@nexusgigs.me"}>support@nexusgigs.me</p></div>
@@ -365,30 +424,10 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                       ].map(soc => (
                         <button key={soc.n} onClick={() => window.open(soc.l, '_blank')} className="p-5 bg-black/40 border border-white/5 rounded-3xl flex flex-col items-center gap-3 hover:border-[#00f2ff] group transition-all shadow-xl active:scale-95"><div className="text-gray-400 group-hover:text-white transition-all group-hover:scale-110">{soc.i}</div><span className="text-[8px] font-black uppercase text-gray-500">{soc.n}</span></button>
                       ))}
-                      <button onClick={() => window.open('https://whatsapp.com/channel/0029VbCmx1AAu3aMiY7XVf1J', '_blank')} className="col-span-2 p-5 bg-emerald-500/10 border border-emerald-500/20 rounded-[30px] flex items-center justify-between group hover:bg-emerald-500 transition-all shadow-lg px-8 active:scale-95"><span className="text-[10px] font-black uppercase italic group-hover:text-black">WhatsApp Channel</span><MessageCircle size={20} className="text-emerald-500 group-hover:text-black"/></button>
+                      <button onClick={() => window.open('https://whatsapp.com/channel/0029VbCmx1AAu3aMiY7XVf1J', '_blank')} className="col-span-2 p-5 bg-emerald-500/10 border border-emerald-500/20 rounded-[30px] flex items-center justify-between group hover:bg-emerald-500 transition-all shadow-lg px-8 active:scale-95 font-black uppercase italic group-hover:text-black"><span>WhatsApp Channel</span><MessageCircle size={20} /></button>
                    </div>
                 </div>
              </div>
-          )}
-          {activeTab === "messages" && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-               <h3 className="text-xl font-bold uppercase px-2">System <span className="text-[#00f2ff]">Log</span></h3>
-               {[
-                 { t: "Nexus HQ", m: "Welcome Node. Please finish your verification to talk to others." },
-                 { t: "Security Bot", m: "External account connection is encrypted. Identity sync is required." }
-               ].map((msg, i) => (
-                 <div key={i} onClick={() => setExpandedMsg(expandedMsg === i ? null : i)} className="p-6 rounded-[30px] bg-white/3 border border-white/5 cursor-pointer hover:bg-white/5 transition-all group">
-                    <div className="flex gap-4 items-center">
-                       <div className="p-3 bg-black/40 rounded-xl border border-white/5 text-[#00f2ff]"><MessageSquare size={16}/></div>
-                       <div className="flex-1 text-[10px]">
-                          <h4 className="font-black uppercase italic text-white leading-none mb-1">{msg.t}</h4>
-                          <p className={`text-gray-400 ${expandedMsg === i ? "" : "line-clamp-1"}`}>{msg.m}</p>
-                       </div>
-                       <ChevronDown size={14} className={`text-gray-600 transition-transform ${expandedMsg === i ? "rotate-180" : ""}`}/>
-                    </div>
-                 </div>
-               ))}
-            </motion.div>
           )}
 
         </AnimatePresence>
@@ -406,29 +445,29 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
         </div>
       </div>
 
-      {/* --- APPLY RESTRICTION POPUP --- */}
+      {/* --- ACCOUNT RESTRICTION POPUP --- */}
       <AnimatePresence>
         {showGigsRestriction && (
-          <div className="fixed inset-0 z-300 flex items-center justify-center p-6 backdrop-blur-md bg-black/60">
+          <div className="fixed inset-0 z-300 flex items-center justify-center p-6 backdrop-blur-md bg-black/60 text-left">
              <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="w-full max-w-80 bg-[#0a0f1e] border-2 border-white/10 rounded-[40px] p-8 text-center shadow-3xl relative">
                 <ShieldAlert size={48} className="text-[#00f2ff] mx-auto mb-6" />
-                <h4 className="text-lg font-black uppercase italic text-white mb-3">Account Locked</h4>
+                <h4 className="text-lg font-black uppercase italic text-white mb-3 tracking-tight">Access Restricted</h4>
                 <p className="text-[11px] text-gray-400 font-medium italic mb-8 leading-relaxed">To be able to see and apply for more gigs, you need to verify account.</p>
                 <div className="space-y-3">
                     <button onClick={() => { setShowGigsRestriction(false); handleVerifyClick(); }} className="w-full py-4 bg-[#00f2ff] text-black font-black rounded-2xl text-[10px] uppercase shadow-glow">Continue</button>
-                    <button onClick={() => setShowGigsRestriction(false)} className="w-full py-4 bg-white/5 text-gray-500 font-black rounded-2xl text-[10px] uppercase">Cancel</button>
+                    <button onClick={() => setShowGigsRestriction(false)} className="w-full py-4 bg-white/5 text-gray-400 font-black rounded-2xl text-[10px] uppercase">Cancel</button>
                 </div>
              </motion.div>
           </div>
         )}
       </AnimatePresence>
 
-      {/* --- VERIFICATION MODAL (Normal Procedure) --- */}
+      {/* --- VERIFICATION MODAL --- */}
       <AnimatePresence>
         {showVerifyModal && (
-          <div className="fixed inset-0 z-200 flex items-center justify-center p-6 backdrop-blur-md bg-black/60">
+          <div className="fixed inset-0 z-200 flex items-center justify-center p-6 backdrop-blur-md bg-black/60 text-left">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0" onClick={() => !isPaying && setShowVerifyModal(false)} />
-            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} className="relative w-full max-w-90 bg-[#0a0f1e] border-2 border-white/10 rounded-[45px] p-8 text-center shadow-2xl overflow-hidden">
+            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} className="relative w-full max-w-90 bg-[#0a0f1e] border-2 border-white/10 rounded-[35px] p-8 text-center shadow-2xl overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-[#00f2ff] to-transparent shadow-glow" />
               
               {paymentStep === "terms" ? (
@@ -499,7 +538,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
                     <div className="text-right"><p className="text-[7px] font-black text-gray-500 uppercase">Status</p><p className="text-md font-black text-[#00f2ff]">Phase 1 Active</p></div>
                   </div>
                   <div className="space-y-2.5 text-left">
-                    <p className="text-[8px] font-black text-gray-500 uppercase">WALLET ADDRESS</p>
+                    <p className="text-[8px] font-black text-gray-500 uppercase text-left">WALLET ADDRESS</p>
                     <div className="flex gap-2">
                        <div className="flex-1 bg-white/5 border border-white/10 rounded-xl p-3 text-[8px] font-mono text-gray-300 truncate">TFWxe4TFcjUNgPJVgf5iXrMsw1oe4gDv9X</div>
                        <button onClick={copyAddress} className="bg-white/5 border border-white/10 p-3 rounded-xl">{copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}</button>
@@ -529,7 +568,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
       {/* --- CUSTOM ALERT --- */}
       <AnimatePresence>
         {customAlert.show && (
-          <div className="fixed inset-0 z-400 flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-400 flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm text-left">
              <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="w-full max-w-75 bg-[#0a0f1e] border-2 border-white/10 rounded-[30px] p-6 text-center shadow-3xl relative">
                 <div className={`absolute top-0 left-0 w-full h-1.5 ${customAlert.type === 'error' ? 'bg-red-500' : 'bg-[#00f2ff] shadow-glow'}`} />
                 <div className="mb-4 flex justify-center">
