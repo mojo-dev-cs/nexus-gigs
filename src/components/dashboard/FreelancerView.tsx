@@ -137,7 +137,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[], userMetada
     window.location.href = `mailto:support@nexusgigs.me?subject=Help&body=Msg: ${supportMsg}%0D%0AID: ${user?.id}`;
   };
 
-const marketplaceGigs = useMemo(() => [
+  const marketplaceGigs = useMemo(() => [
     { id: "1", title: "Enterprise: Cloud Infrastructure Security Audit", budget: 1450, client: "Aegis Data", rating: 5.0, dur: "10 Days", img: "https://i.pravatar.cc/150?u=aegis", type: "Security", status: "Active" },
     { id: "2", title: "Web3: Smart Contract Vulnerability Scan (Solidity)", budget: 2200, client: "Nexus Protocol", rating: 4.9, dur: "5 Days", img: "https://i.pravatar.cc/150?u=crypto", type: "Web3", status: "Active" },
     { id: "3", title: "Backend: Node.js Memory Leak Investigation", budget: 400, client: "StreamSync", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=node", type: "Startup", status: "Expired" },
@@ -173,90 +173,66 @@ const marketplaceGigs = useMemo(() => [
         <motion.div animate={{ opacity: [0.1, 0.15, 0.1] }} transition={{ repeat: Infinity, duration: 5 }} className="absolute top-0 right-0 w-80 h-80 bg-blue-600/10 blur-[100px] rounded-full" />
       </div>
 
-      <div className="max-w-5xl mx-auto pt-6 px-4 relative z-10">
+      <div className="max-w-5xl mx-auto pt-4 px-4 relative z-10">
         <AnimatePresence mode="wait">
           
           {/* --- 🏠 HOME --- */}
           {activeTab === "home" && (
-            <motion.div key="home" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
-              <header className="flex justify-between items-center bg-white/5 backdrop-blur-xl p-5 rounded-[25px] border border-white/10 shadow-2xl relative">
+            <motion.div key="home" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-4">
+              <header className="flex justify-between items-center bg-white/5 backdrop-blur-xl p-4 rounded-[20px] border border-white/10 shadow-2xl relative">
                 <div className="absolute top-0 left-0 w-1 h-full bg-[#00f2ff]" />
-                <div className="space-y-1">
-                  <p className="text-[10px] font-black uppercase text-gray-500">Welcome</p>
-                  <h2 className="text-2xl font-black italic uppercase tracking-tighter">{user?.firstName || "User"}</h2>
+                <div className="space-y-0.5">
+                  <p className="text-[9px] font-black uppercase text-gray-500">Welcome</p>
+                  <h2 className="text-xl font-black italic uppercase tracking-tighter">{user?.firstName || "User"}</h2>
                 </div>
-                <div className="flex items-center gap-3 bg-black/40 px-3 py-1.5 rounded-xl border border-white/5 shadow-inner">
-                   <div className={`w-2 h-2 rounded-full ${isVerified ? 'bg-[#00f2ff] shadow-[0_0_10px_#00f2ff]' : isUnderReview ? 'bg-amber-500 animate-pulse' : 'bg-red-500'}`} />
-                   <span className="text-[8px] font-bold uppercase tracking-widest">{isVerified ? "VERIFIED" : isUnderReview ? "REVIEWING" : "UNVERIFIED"}</span>
+                <div className="flex items-center gap-2 bg-black/40 px-2 py-1 rounded-lg border border-white/5 shadow-inner">
+                   <div className={`w-1.5 h-1.5 rounded-full ${isVerified ? 'bg-[#00f2ff] shadow-[0_0_10px_#00f2ff]' : isUnderReview ? 'bg-amber-500 animate-pulse' : 'bg-red-500'}`} />
+                   <span className="text-[7px] font-bold uppercase tracking-widest">{isVerified ? "VERIFIED" : isUnderReview ? "REVIEWING" : "UNVERIFIED"}</span>
                 </div>
               </header>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div className="p-8 bg-linear-to-br from-[#00f2ff]/10 to-transparent border border-[#00f2ff]/20 rounded-[30px] shadow-2xl flex flex-col justify-between">
-                  <div><p className="text-[8px] font-bold uppercase text-[#00f2ff] mb-1">My Balance</p><h3 className="text-4xl font-black mb-4 tracking-tighter">$0.00</h3></div>
-                  <button onClick={() => setActiveTab("earnings")} className="w-full py-3 bg-white text-black font-black rounded-xl text-[10px] uppercase hover:bg-[#00f2ff] transition-all">Wallet</button>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-6 bg-linear-to-br from-[#00f2ff]/10 to-transparent border border-[#00f2ff]/20 rounded-[25px] shadow-2xl flex flex-col justify-between h-40">
+                  <div><p className="text-[7px] font-bold uppercase text-[#00f2ff] mb-0.5">My Balance</p><h3 className="text-3xl font-black tracking-tighter">$0.00</h3></div>
+                  <button onClick={() => setActiveTab("earnings")} className="w-full py-2 bg-white text-black font-black rounded-lg text-[9px] uppercase hover:bg-[#00f2ff] transition-all">Wallet</button>
                 </div>
 
                 {!isVerified && (
-                  <div className="md:col-span-2 p-8 bg-white/5 border border-white/10 rounded-[40px] flex flex-col md:flex-row items-center gap-8 backdrop-blur-xl relative overflow-hidden shadow-2xl border-l-4 border-l-[#00f2ff] group transition-all hover:bg-white/[0.07]">
+                  <div className="md:col-span-2 p-6 bg-white/5 border border-white/10 rounded-[30px] flex flex-col md:flex-row items-center gap-6 backdrop-blur-xl relative overflow-hidden shadow-2xl border-l-4 border-l-[#00f2ff] group transition-all hover:bg-white/[0.07]">
                     <div className="absolute -top-24 -left-24 w-48 h-48 bg-[#00f2ff]/10 blur-[80px] rounded-full pointer-events-none group-hover:bg-[#00f2ff]/20 transition-all" />
-                    <div className="w-20 h-20 bg-[#00f2ff]/10 rounded-[30px] flex items-center justify-center text-[#00f2ff] shadow-inner shrink-0 border border-[#00f2ff]/20 relative z-10">
-                      <ShieldCheck size={40} className="drop-shadow-[0_0_10px_rgba(0,242,255,0.5)]" />
+                    <div className="w-16 h-16 bg-[#00f2ff]/10 rounded-[25px] flex items-center justify-center text-[#00f2ff] shadow-inner shrink-0 border border-[#00f2ff]/20 relative z-10">
+                      <ShieldCheck size={32} className="drop-shadow-[0_0_10px_rgba(0,242,255,0.5)]" />
                     </div>
-                    <div className="flex-1 relative z-10 space-y-4">
+                    <div className="flex-1 relative z-10 space-y-3 text-center md:text-left">
                       <div>
-                        <h4 className="text-xl font-black uppercase italic tracking-tighter text-white mb-1">Verify Account</h4>
-                        <p className="text-[11px] text-gray-400 font-medium leading-relaxed">
+                        <h4 className="text-lg font-black uppercase italic tracking-tighter text-white mb-0.5">Verify Account</h4>
+                        <p className="text-[10px] text-gray-400 font-medium leading-relaxed">
                           Finish your one-time <span className="text-[#00f2ff] font-bold">$10 fee</span> to unlock all features.
                         </p>
                       </div>
-                      <div className="grid grid-cols-1 gap-3 border-y border-white/5 py-5">
-                        {[
-                          { text: "Stop fake accounts and scammers", color: "text-emerald-400" },
-                          { text: "Connect with serious clients only", color: "text-blue-400" },
-                          { text: "Safety for all your payments", color: "text-[#00f2ff]" }
-                        ].map((item, idx) => (
-                          <div key={idx} className="flex items-center gap-3">
-                            <div className={`w-1.5 h-1.5 rounded-full bg-current ${item.color} shadow-[0_0_8px_currentColor]`} />
-                            <p className="text-[10px] font-bold uppercase tracking-wide text-gray-300">{item.text}</p>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="pt-2 flex items-center gap-4">
-                        <button 
-                          onClick={handleVerifyClick} 
-                          className={`px-10 py-4 rounded-2xl text-[10px] font-black uppercase italic tracking-widest transition-all shadow-glow active:scale-95 ${
-                            isUnderReview 
-                            ? "bg-amber-500 text-black animate-pulse cursor-wait" 
-                            : "bg-[#00f2ff] text-black hover:scale-105"
-                          }`}
-                        >
-                          {isUnderReview ? "Account Under Review" : "Start Verification"}
-                        </button>
-                        {isUnderReview && (
-                          <span className="text-[9px] font-black text-amber-500 uppercase animate-pulse">Reviewing...</span>
-                        )}
+                      <div className="pt-1 flex flex-wrap justify-center md:justify-start gap-3">
+                        <button onClick={handleVerifyClick} className={`px-8 py-3 rounded-xl text-[9px] font-black uppercase italic tracking-widest transition-all shadow-glow active:scale-95 ${isUnderReview ? "bg-amber-500 text-black animate-pulse cursor-wait" : "bg-[#00f2ff] text-black hover:scale-105"}`}>{isUnderReview ? "Under Review" : "Start Now"}</button>
                       </div>
                     </div>
                   </div>
                 )}
 
-                <div className="p-8 bg-white/3 border border-white/5 rounded-[40px] shadow-2xl">
-                  <div className="flex justify-between items-center mb-6 px-2">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Account Progress</h4>
-                    <span className="text-[10px] font-black text-[#00f2ff]">Phase 1 Sync</span>
+                <div className="p-6 bg-white/3 border border-white/5 rounded-[30px] shadow-2xl">
+                  <div className="flex justify-between items-center mb-4 px-1">
+                    <h4 className="text-[9px] font-black uppercase tracking-widest text-gray-400">Account Progress</h4>
+                    <span className="text-[9px] font-black text-[#00f2ff]">Phase 1 Sync</span>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
-                      { l: "Jobs", v: "0", i: <Target size={14} className="text-[#00f2ff]"/> },
-                      { l: "Uptime", v: "99.9%", i: <Activity size={14} className="text-emerald-500"/> },
-                      { l: "Status", v: "Tier 1", i: <Cpu size={14} className="text-amber-500"/> },
-                      { l: "Score", v: "0.0", i: <Star size={14} className="text-purple-500"/> }
+                      { l: "Jobs", v: "0", i: <Target size={12} className="text-[#00f2ff]"/> },
+                      { l: "Uptime", v: "99.9%", i: <Activity size={12} className="text-emerald-500"/> },
+                      { l: "Status", v: "Tier 1", i: <Cpu size={12} className="text-amber-500"/> },
+                      { l: "Score", v: "0.0", i: <Star size={12} className="text-purple-500"/> }
                     ].map((st, i) => (
-                      <div key={i} className="bg-black/20 p-4 rounded-2xl border border-white/5 text-center">
-                         <div className="mb-1 flex justify-center">{st.i}</div>
-                         <p className="text-xs font-black">{st.v}</p>
-                         <p className="text-[7px] font-bold text-gray-600 uppercase leading-none">{st.l}</p>
+                      <div key={i} className="bg-black/20 p-3 rounded-xl border border-white/5 text-center">
+                         <div className="mb-0.5 flex justify-center">{st.i}</div>
+                         <p className="text-[10px] font-black">{st.v}</p>
+                         <p className="text-[6px] font-bold text-gray-600 uppercase leading-none">{st.l}</p>
                       </div>
                     ))}
                   </div>
@@ -267,32 +243,24 @@ const marketplaceGigs = useMemo(() => [
 
           {/* --- 💼 GIGS --- */}
           {activeTab === "tasks" && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
-              <div className="flex justify-between items-center px-2"><h3 className="text-xl font-bold uppercase tracking-tighter">Gig <span className="text-[#00f2ff]">Feed</span></h3><div className="flex items-center gap-2 bg-emerald-500/10 px-3 py-1 rounded-full"><div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" /><span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Live</span></div></div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
+              <div className="flex justify-between items-center px-2"><h3 className="text-lg font-bold uppercase tracking-tighter">Gig <span className="text-[#00f2ff]">Feed</span></h3><div className="flex items-center gap-2 bg-emerald-500/10 px-2 py-0.5 rounded-full"><div className="w-1 h-1 bg-emerald-500 rounded-full animate-ping" /><span className="text-[7px] font-black text-emerald-500 uppercase tracking-widest">Live</span></div></div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {marketplaceGigs.map((g) => (
-                  <div key={g.id} className={`p-5 rounded-[25px] bg-white/5 border border-white/10 transition-all ${g.status === 'Expired' ? 'opacity-40 grayscale' : 'hover:border-[#00f2ff]/30 shadow-xl'}`}>
-                    <div className="flex justify-between items-start mb-3"><img src={g.img} className="w-10 h-10 rounded-xl object-cover border border-white/10" alt="cl" /><span className={`text-[8px] font-bold px-2 py-1 rounded-lg uppercase ${g.status === 'Active' ? 'bg-[#00f2ff]/10 text-[#00f2ff]' : 'bg-white/5 text-gray-500'}`}>{g.dur}</span></div>
-                    <h4 className="text-xs font-black uppercase mb-1 line-clamp-2 h-8 leading-tight">{g.title}</h4>
-                    <div className="flex justify-between items-center pt-3 border-t border-white/5">
-                        <p className="text-md font-bold text-[#00f2ff] tracking-tighter">${g.budget}</p>
-                        <button onClick={handleVerifyClick} className={`px-4 py-1.5 rounded-lg text-[8px] font-black uppercase transition-all bg-white text-black hover:bg-[#00f2ff] ${isVerified ? 'opacity-100' : 'opacity-30 cursor-not-allowed'}`}>
-                          {isVerified ? "Bid" : "apply"}
-                        </button>
+                  <div key={g.id} className={`p-4 rounded-[20px] bg-white/5 border border-white/10 transition-all ${g.status === 'Expired' ? 'opacity-40 grayscale' : 'hover:border-[#00f2ff]/30 shadow-xl'}`}>
+                    <div className="flex justify-between items-start mb-2"><img src={g.img} className="w-8 h-8 rounded-lg object-cover border border-white/10" alt="cl" /><span className={`text-[7px] font-bold px-1.5 py-0.5 rounded uppercase ${g.status === 'Active' ? 'bg-[#00f2ff]/10 text-[#00f2ff]' : 'bg-white/5 text-gray-500'}`}>{g.dur}</span></div>
+                    <h4 className="text-[10px] font-black uppercase mb-1 line-clamp-2 h-7 leading-tight">{g.title}</h4>
+                    <div className="flex justify-between items-center pt-2 border-t border-white/5">
+                        <p className="text-sm font-bold text-[#00f2ff] tracking-tighter">${g.budget}</p>
+                        <button onClick={handleVerifyClick} className={`px-3 py-1 rounded-md text-[7px] font-black uppercase transition-all bg-white text-black hover:bg-[#00f2ff] ${isVerified ? 'opacity-100' : 'opacity-30 cursor-not-allowed'}`}>{isVerified ? "Bid" : "Apply"}</button>
                     </div>
                   </div>
                 ))}
-                {!isVerified && (
-                  <button onClick={handleVerifyClick} className="p-5 rounded-[25px] border-2 border-dashed border-white/10 flex flex-col items-center justify-center gap-2 hover:bg-white/5 transition-all group min-h-40 text-center">
-                     <Lock size={20} className="text-gray-500 group-hover:text-[#00f2ff]" />
-                     <p className="text-[9px] font-black text-gray-500 uppercase">Verify to see more gigs</p>
-                  </button>
-                )}
               </div>
             </motion.div>
           )}
 
-          {/* --- 📜 WORK --- */}
+          {/* --- 📜 WORK, 💬 CHATS, 💰 VAULT, 📊 STATS, 👤 ME, 🛠️ HELP remain the same... */}
           {activeTab === "contracts" && (
             <div className="pt-10 px-4 text-center space-y-6">
                <div className="p-16 bg-white/5 border border-red-500/20 rounded-[50px] shadow-3xl">
@@ -304,7 +272,6 @@ const marketplaceGigs = useMemo(() => [
             </div>
           )}
 
-          {/* --- 💬 CHATS --- */}
           {activeTab === "messages" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
                <h3 className="text-xl font-bold uppercase px-2">System <span className="text-[#00f2ff]">Log</span></h3>
@@ -326,7 +293,6 @@ const marketplaceGigs = useMemo(() => [
             </motion.div>
           )}
 
-          {/* --- 💰 VAULT --- */}
           {activeTab === "earnings" && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 text-center">
                <h3 className="text-xl font-bold uppercase px-2 text-left">My <span className="text-[#00f2ff]">Wallet</span></h3>
@@ -336,14 +302,9 @@ const marketplaceGigs = useMemo(() => [
                   <h4 className="text-6xl font-black italic tracking-tighter mb-10 text-white">{currency === "USD" ? "$0.00" : "KES 0"}</h4>
                   <button onClick={() => showAlert("No money", "You do not have any money in your vault to withdraw.", "error")} className="flex items-center gap-3 px-12 py-5 bg-white text-black rounded-2xl text-[11px] font-black uppercase italic mx-auto shadow-xl active:scale-95 transition-all">Withdraw <ArrowUpRight size={16}/></button>
                </div>
-               <div className="grid grid-cols-2 gap-4 text-left">
-                  <div className="p-6 bg-white/5 border border-white/5 rounded-[30px]"><p className="text-[8px] font-black text-gray-500 uppercase mb-1">Total Earned</p><p className="text-lg font-black">$0.00</p></div>
-                  <div className="p-6 bg-white/5 border border-white/5 rounded-[30px]"><p className="text-[8px] font-black text-gray-500 uppercase mb-1">In Review</p><p className="text-lg font-black">$0.00</p></div>
-               </div>
             </motion.div>
           )}
 
-          {/* --- 📊 STATS --- */}
           {activeTab === "analytics" && (
             <div className="space-y-8">
                <h3 className="text-xl font-bold uppercase px-2 text-left">Work <span className="text-[#00f2ff]">Pulse</span></h3>
@@ -361,14 +322,9 @@ const marketplaceGigs = useMemo(() => [
                     </div>
                   ))}
                </div>
-               <div className="p-16 bg-white/2 border border-white/5 rounded-[40px] text-center opacity-40 shadow-inner">
-                  <Activity size={40} className="mx-auto text-[#00f2ff] mb-4"/>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-center">Verify account to see your<br/>work performance data.</p>
-               </div>
             </div>
           )}
 
-          {/* --- 👤 ME --- */}
           {activeTab === "account" && (
             <div className="max-w-xl mx-auto space-y-6 text-center">
                <div className="p-12 bg-linear-to-br from-white/10 to-white/5 border border-white/20 rounded-[60px] shadow-3xl relative overflow-hidden">
@@ -388,7 +344,6 @@ const marketplaceGigs = useMemo(() => [
             </div>
           )}
 
-          {/* --- 🛠️ HELP --- */}
           {activeTab === "support" && (
              <div className="space-y-6">
                 <h3 className="text-xl font-bold uppercase px-2 tracking-widest text-[#00f2ff]">Help <span className="text-white">Center</span></h3>
@@ -444,62 +399,38 @@ const marketplaceGigs = useMemo(() => [
                 <div className="space-y-6">
                   <ShieldCheck size={40} className="text-[#00f2ff] mx-auto shadow-glow" />
                   <h3 className="text-xl font-black italic uppercase tracking-tight text-white leading-none">Verification</h3>
-                  
                   <div className="bg-white/5 p-5 rounded-3xl text-left border border-white/5 space-y-4 shadow-inner">
                     <div className="space-y-3">
                       <div className="flex gap-3">
-                        <div className="w-5 h-5 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0">
-                          <span className="text-[10px] font-black text-[#00f2ff]">1</span>
-                        </div>
-                        <p className="text-[10px] text-gray-300 font-medium leading-relaxed">
-                          <strong>Vetting Fee:</strong> A one-time <span className="text-white">$10 (KES 1,300)</span> commitment fee to filter out bots and maintain high job quality.
-                        </p>
+                        <div className="w-5 h-5 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0"><span className="text-[10px] font-black text-[#00f2ff]">1</span></div>
+                        <p className="text-[10px] text-gray-300 font-medium leading-relaxed"><strong>Vetting Fee:</strong> A one-time <span className="text-white">$10 (KES 1,300)</span> commitment fee to filter out bots and maintain high job quality.</p>
                       </div>
                       <div className="flex gap-3">
-                        <div className="w-5 h-5 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0">
-                          <span className="text-[10px] font-black text-[#00f2ff]">2</span>
-                        </div>
-                        <p className="text-[10px] text-gray-300 font-medium leading-relaxed">
-                          <strong>Review Process:</strong> Our team will check your profile. We will email you a specialized survey and schedule a quick intro call.
-                        </p>
+                        <div className="w-5 h-5 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0"><span className="text-[10px] font-black text-[#00f2ff]">2</span></div>
+                        <p className="text-[10px] text-gray-300 font-medium leading-relaxed"><strong>Review Process:</strong> Our team will check your profile. We will email you a specialized survey and schedule a quick intro call.</p>
                       </div>
                       <div className="flex gap-3">
-                        <div className="w-5 h-5 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0">
-                          <span className="text-[10px] font-black text-[#00f2ff]">3</span>
-                        </div>
-                        <p className="text-[10px] text-gray-300 font-medium leading-relaxed">
-                          <strong>Full Access:</strong> Once approved, you gain unlimited bidding rights and instant access to all global vault withdrawals.
-                        </p>
+                        <div className="w-5 h-5 rounded-full bg-[#00f2ff]/20 flex items-center justify-center shrink-0"><span className="text-[10px] font-black text-[#00f2ff]">3</span></div>
+                        <p className="text-[10px] text-gray-300 font-medium leading-relaxed"><strong>Full Access:</strong> Once approved, you gain unlimited bidding rights and instant access to all global vault withdrawals.</p>
                       </div>
                     </div>
                     <div className="pt-2 border-t border-white/5">
-                      <p className="text-[9px] text-emerald-400 font-bold italic flex items-center gap-2 leading-none">
-                        <CheckCircle2 size={10}/> 100% Refund Guarantee if you fail the screening process.
-                      </p>
+                      <p className="text-[9px] text-emerald-400 font-bold italic flex items-center gap-2 leading-none"><CheckCircle2 size={10}/> 100% Refund Guarantee if you fail the screening process.</p>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-4 bg-white/5 p-4 rounded-3xl border border-white/5 cursor-pointer text-left transition-all hover:bg-white/10" onClick={() => setAgreedToTerms(!agreedToTerms)}>
-                    <div className={`w-6 h-6 rounded-xl border-2 flex items-center justify-center transition-all shrink-0 ${agreedToTerms ? 'bg-[#00f2ff] border-[#00f2ff]' : 'border-white/20'}`}>
-                      {agreedToTerms && <X size={12} className="text-black font-black"/>}
-                    </div>
+                    <div className={`w-6 h-6 rounded-xl border-2 flex items-center justify-center transition-all shrink-0 ${agreedToTerms ? 'bg-[#00f2ff] border-[#00f2ff]' : 'border-white/20'}`}>{agreedToTerms && <X size={12} className="text-black font-black"/>}</div>
                     <span className="text-[9px] font-black italic text-gray-400 leading-tight uppercase">I agree to pay the $10 fee and follow the refund rules.</span>
                   </div>
-                  
-                  <button disabled={!agreedToTerms} onClick={() => setPaymentStep("choice")} className={`w-full py-5 rounded-[25px] font-black uppercase italic text-[11px] transition-all tracking-[0.2em] ${agreedToTerms ? 'bg-[#00f2ff] text-black shadow-glow hover:scale-[1.02]' : 'bg-gray-800 text-gray-600 cursor-not-allowed'}`}>
-                    Pay & Sync
-                  </button>
+                  <button disabled={!agreedToTerms} onClick={() => setPaymentStep("choice")} className={`w-full py-5 rounded-[25px] font-black uppercase italic text-[11px] transition-all tracking-[0.2em] ${agreedToTerms ? 'bg-[#00f2ff] text-black shadow-glow hover:scale-[1.02]' : 'bg-gray-800 text-gray-600 cursor-not-allowed'}`}>Pay & Sync</button>
                 </div>
               ) : paymentStep === "choice" ? (
                 <div className="space-y-6 text-sm">
                   <h3 className="text-md font-black uppercase italic tracking-widest text-[#00f2ff]">SELECT PAYMENT METHOD</h3>
                   <div className="space-y-3 text-left">
-                    {/* CARD / BANK */}
                     <button onClick={() => handleSecurePayment("CARD")} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group hover:bg-white/10 transition-all">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                          <Landmark size={22} className="text-white" />
-                        </div>
+                        <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20"><Landmark size={22} className="text-white" /></div>
                         <div>
                           <p className="font-black text-white text-[12px]">Credit / Debit Card <span className="ml-2 text-[8px] px-2 py-0.5 bg-amber-500/10 text-amber-500/60 rounded-full font-bold uppercase border border-amber-500/20">Bank</span></p>
                           <p className="text-[10px] text-gray-500 font-bold uppercase">Visa, Mastercard, Amex</p>
@@ -507,8 +438,6 @@ const marketplaceGigs = useMemo(() => [
                       </div>
                       <ChevronRight size={18} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
                     </button>
-
-                    {/* M-PESA */}
                     <button onClick={() => setPaymentStep("mpesa")} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group hover:bg-white/10 transition-all">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center font-black text-white shadow-lg shadow-emerald-500/20">M</div>
@@ -519,13 +448,9 @@ const marketplaceGigs = useMemo(() => [
                       </div>
                       <ChevronRight size={18} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
                     </button>
-
-                    {/* BINANCE USDT */}
                     <button onClick={() => setPaymentStep("binance")} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group hover:bg-white/10 transition-all">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20">
-                          <Zap size={20} className="fill-white text-white" />
-                        </div>
+                        <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20"><Zap size={20} className="fill-white text-white" /></div>
                         <div>
                           <p className="font-black text-white text-[12px]">Binance (USDT) <span className="ml-2 text-[8px] px-2 py-0.5 bg-amber-500/20 text-amber-500 rounded-full font-bold uppercase">Crypto</span></p>
                           <p className="text-[10px] text-gray-500 font-bold uppercase">Pay with USDT crypto</p>
@@ -533,8 +458,6 @@ const marketplaceGigs = useMemo(() => [
                       </div>
                       <ChevronRight size={18} className="text-gray-600 group-hover:translate-x-1 transition-transform" />
                     </button>
-
-                    {/* PAYPAL */}
                     <button disabled className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group opacity-50 cursor-not-allowed">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center font-black text-white">PP</div>
@@ -564,28 +487,28 @@ const marketplaceGigs = useMemo(() => [
                     </div>
                     <button onClick={() => setPaymentStep("choice")} className="p-2 hover:bg-white/5 rounded-full transition-all"><X size={18} className="text-gray-400"/></button>
                   </div>
-                  <div className="bg-white rounded-3xl p-6 shadow-2xl">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=TPN2mcYKFBhQkqpuLi9tsnYs9Rx3urQz6L" alt="Binance QR" className="w-48 h-48 mx-auto" />
-                    <p className="mt-4 text-[10px] font-bold text-gray-400 uppercase">Scan to get wallet address</p>
+                  <div className="bg-white rounded-2xl p-4 shadow-2xl">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TPN2mcYKFBhQkqpuLi9tsnYs9Rx3urQz6L" alt="Binance QR" className="w-40 h-40 mx-auto" />
+                    <p className="mt-3 text-[9px] font-bold text-gray-400 uppercase">Scan to get wallet address</p>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 border-y border-white/5 py-6">
-                    <div className="text-left"><p className="text-[8px] font-black text-gray-500 uppercase mb-1">Amount to Send</p><p className="text-xl font-black text-white">$10.00 USDT</p></div>
-                    <div className="text-right"><p className="text-[8px] font-black text-gray-500 uppercase mb-1">You Receive</p><p className="text-xl font-black text-[#00f2ff]">Phase 1 Active</p></div>
+                  <div className="grid grid-cols-2 gap-4 border-y border-white/5 py-4">
+                    <div className="text-left"><p className="text-[8px] font-black text-gray-500 uppercase mb-0.5">Amount to Send</p><p className="text-lg font-black text-white">$10.00 USDT</p></div>
+                    <div className="text-right"><p className="text-[8px] font-black text-gray-500 uppercase mb-0.5">You Receive</p><p className="text-lg font-black text-[#00f2ff]">Phase 1 Active</p></div>
                   </div>
-                  <div className="space-y-4 text-left">
-                    <p className="text-[10px] font-black text-gray-500 uppercase">WALLET ADDRESS</p>
+                  <div className="space-y-3 text-left">
+                    <p className="text-[9px] font-black text-gray-500 uppercase">WALLET ADDRESS</p>
                     <div className="flex gap-2">
-                       <div className="flex-1 bg-white/5 border border-white/10 rounded-2xl p-4 text-[10px] font-mono text-gray-300 break-all truncate">TPN2mcYKFBhQkqpuLi9tsnYs9Rx3urQz6L</div>
-                       <button onClick={copyAddress} className="bg-white/5 border border-white/10 p-4 rounded-2xl hover:bg-white/10 transition-all text-gray-400 hover:text-white">
-                          {copied ? <Check size={18} className="text-emerald-500" /> : <Copy size={18} />}
+                       <div className="flex-1 bg-white/5 border border-white/10 rounded-xl p-3 text-[9px] font-mono text-gray-300 break-all truncate">TPN2mcYKFBhQkqpuLi9tsnYs9Rx3urQz6L</div>
+                       <button onClick={copyAddress} className="bg-white/5 border border-white/10 p-3 rounded-xl hover:bg-white/10 transition-all text-gray-400 hover:text-white">
+                          {copied ? <Check size={16} className="text-emerald-500" /> : <Copy size={16} />}
                        </button>
                     </div>
                   </div>
-                  <div className="p-4 bg-blue-500/5 border border-blue-500/20 rounded-2xl flex items-start gap-4 text-left">
-                    <Info size={16} className="text-blue-500 shrink-0 mt-0.5" />
-                    <p className="text-[10px] font-bold text-blue-300/80 leading-relaxed uppercase">Only send USDT (TRC20) to this address. Other assets will be permanently lost.</p>
+                  <div className="p-3 bg-blue-500/5 border border-blue-500/20 rounded-xl flex items-start gap-3 text-left">
+                    <Info size={14} className="text-blue-500 shrink-0 mt-0.5" />
+                    <p className="text-[9px] font-bold text-blue-300/80 leading-relaxed uppercase">Only send USDT (TRC20) to this address. Other assets will be permanently lost.</p>
                   </div>
-                  <button onClick={() => showAlert("Transmitted", "Node signal sent. Once the blockchain confirms your hash, your node will sync within 2 hours.", "success")} className="w-full py-5 bg-[#00f2ff] text-black font-black rounded-2xl uppercase italic text-[11px] shadow-glow">Confirm Transmission</button>
+                  <button onClick={() => showAlert("Transmitted", "Node signal sent. Once the blockchain confirms your hash, your node will sync within 2 hours.", "success")} className="w-full py-4 bg-[#00f2ff] text-black font-black rounded-xl uppercase italic text-[10px] shadow-glow">Confirm Transmission</button>
                 </div>
               ) : (
                 <div className="space-y-8">
@@ -596,9 +519,7 @@ const marketplaceGigs = useMemo(() => [
                    </div>
                    <input value={mpesaNumber} onChange={e => setMpesaNumber(e.target.value)} placeholder="2547XXXXXXXX" className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-center text-2xl font-black text-white outline-none focus:border-emerald-500 shadow-inner" />
                    <div className="space-y-4">
-                      <button disabled={isPaying} onClick={() => handleSecurePayment("M-PESA")} className={`w-full py-5 bg-emerald-600 text-white font-black rounded-2xl uppercase italic text-[11px] shadow-lg tracking-widest`}>
-                        {isPaying ? "Sending..." : "Pay $10 (1,300 KES)"}
-                      </button>
+                      <button disabled={isPaying} onClick={() => handleSecurePayment("M-PESA")} className={`w-full py-5 bg-emerald-600 text-white font-black rounded-2xl uppercase italic text-[11px] shadow-lg tracking-widest`}>{isPaying ? "Sending..." : "Pay $10 (1,300 KES)"}</button>
                       <button onClick={() => setPaymentStep("choice")} className="text-[9px] text-gray-500 uppercase font-black italic tracking-widest">Back</button>
                    </div>
                 </div>
@@ -619,9 +540,7 @@ const marketplaceGigs = useMemo(() => [
                 </div>
                 <h4 className="text-md font-black uppercase italic mb-3 text-white tracking-tighter leading-none">{customAlert.title}</h4>
                 <p className="text-[10px] text-gray-400 italic mb-8 leading-relaxed tracking-wide">{customAlert.msg}</p>
-                <button onClick={() => setCustomAlert({...customAlert, show: false})} className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase italic hover:bg-white hover:text-black transition-all">
-                  Dismiss
-                </button>
+                <button onClick={() => setCustomAlert({...customAlert, show: false})} className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase italic hover:bg-white hover:text-black transition-all">Dismiss</button>
              </motion.div>
           </div>
         )}
