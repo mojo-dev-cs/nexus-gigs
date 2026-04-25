@@ -306,19 +306,23 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
 
   const allGigTypes = ["All", "Security", "Academic", "Web3", "Startup", "Fintech", "Agency", "Enterprise", "Research", "School Work"];
 
-  const marketplaceGigs = useMemo(() => [
-    { id: "1", title: "Enterprise: Cloud Infrastructure Security Audit", budget: 1450, client: "Aegis Data", rating: 5.0, dur: "10 Days", img: "https://i.pravatar.cc/150?u=aegis", type: "Security", status: "Active", hot: true },
-    { id: "2", title: "School Work: University Thesis Data Analysis", budget: 130, client: "Dr. Aris", rating: 4.9, dur: "3 Days", img: "https://i.pravatar.cc/150?u=thesis", type: "Academic", status: "Active", hot: false },
+const marketplaceGigs = useMemo(() => [
+    { id: "1", title: "Cyber: Bank API Penetration Test", budget: 2100, client: "SafeVault", rating: 5.0, dur: "7 Days", img: "https://i.pravatar.cc/150?u=safe", type: "Security", status: "Active", hot: true },
+    { id: "2", title: "Academic: Python Scripts for Lab Research", budget: 110, client: "BioTech Lab", rating: 5.0, dur: "5 Days", img: "https://i.pravatar.cc/150?u=lab", type: "School Work", status: "Active", hot: false },
     { id: "3", title: "Web3: Smart Contract Vulnerability Scan (Solidity)", budget: 2200, client: "Nexus Protocol", rating: 4.9, dur: "5 Days", img: "https://i.pravatar.cc/150?u=crypto", type: "Web3", status: "Active", hot: true },
-    { id: "4", title: "Backend: Node.js Memory Leak Investigation", budget: 400, client: "StreamSync", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=node", type: "Startup", status: "Expired", hot: false },
-    { id: "5", title: "School Work: Advanced Calculus Problem Set", budget: 45, client: "Academic Hub", rating: 4.8, dur: "24 Hours", img: "https://i.pravatar.cc/150?u=school", type: "Academic", status: "Active", hot: false },
-    { id: "6", title: "UI/UX: Fintech Dashboard Design System", budget: 3200, client: "Vertex Pay", rating: 4.8, dur: "14 Days", img: "https://i.pravatar.cc/150?u=pay", type: "Fintech", status: "Active", hot: true },
-    { id: "7", title: "DevOps: Kubernetes Cluster Optimization", budget: 950, client: "CloudScale", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=devops", type: "Agency", status: "Expired", hot: false },
-    { id: "8", title: "Database: PostgreSQL Query Performance Tuning", budget: 600, client: "DataLake Inc", rating: 4.7, dur: "48 Hours", img: "https://i.pravatar.cc/150?u=db", type: "Enterprise", status: "Active", hot: false },
-    { id: "9", title: "Academic: Python Scripts for Lab Research", budget: 110, client: "BioTech Lab", rating: 5.0, dur: "5 Days", img: "https://i.pravatar.cc/150?u=lab", type: "School Work", status: "Active", hot: false },
-    { id: "10", title: "AI: Custom LLM Integration (OpenAI API)", budget: 1800, client: "MindGraph AI", rating: 5.0, dur: "7 Days", img: "https://i.pravatar.cc/150?u=ai", type: "Research", status: "Active", hot: true },
+    { id: "4", title: "School Work: Advanced Calculus Problem Set", budget: 45, client: "Academic Hub", rating: 4.8, dur: "Expired", img: "https://i.pravatar.cc/150?u=school", type: "Academic", status: "Expired", hot: false },
+    { id: "5", title: "Next.js: Speed & SEO Optimization", budget: 800, client: "E-Com Solutions", rating: 4.9, dur: "4 Days", img: "https://i.pravatar.cc/150?u=ecom", type: "Dev", status: "Active", hot: true },
+    { id: "6", title: "Fintech: Mobile App UI/UX Design System", budget: 1500, client: "Vertex Pay", rating: 4.8, dur: "14 Days", img: "https://i.pravatar.cc/150?u=pay", type: "Design", status: "Active", hot: false },
+    { id: "7", title: "DevOps: AWS Kubernetes Cluster Setup", budget: 1200, client: "CloudScale", rating: 5.0, dur: "Expired", img: "https://i.pravatar.cc/150?u=devops", type: "Agency", status: "Expired", hot: false },
+    { id: "8", title: "Database: SQL Query Performance Tuning", budget: 450, client: "DataLake Inc", rating: 4.7, dur: "48 Hours", img: "https://i.pravatar.cc/150?u=db", type: "Enterprise", status: "Active", hot: false },
+    { id: "9", title: "University Thesis: Data Science Analysis", budget: 130, client: "Dr. Aris", rating: 4.9, dur: "3 Days", img: "https://i.pravatar.cc/150?u=thesis", type: "Academic", status: "Active", hot: true },
+    { id: "10", title: "AI: Custom Chatbot for SaaS (OpenAI)", budget: 1800, client: "MindGraph AI", rating: 5.0, dur: "7 Days", img: "https://i.pravatar.cc/150?u=ai", type: "Research", status: "Active", hot: true },
+    { id: "11", title: "Academic: Legal Case Study Analysis", budget: 70, client: "Legal Hub", rating: 4.6, dur: "Expired", img: "https://i.pravatar.cc/150?u=law", type: "School Work", status: "Expired", hot: false },
+    { id: "12", title: "Shopify: Liquid Theme Customization", budget: 550, client: "Luxe Label", rating: 4.9, dur: "3 Days", img: "https://i.pravatar.cc/150?u=luxe", type: "Dev", status: "Active", hot: false },
+    { id: "13", title: "Cyber: Malware Reverse Engineering", budget: 3000, client: "DefendX", rating: 5.0, dur: "10 Days", img: "https://i.pravatar.cc/150?u=def", type: "Security", status: "Active", hot: true },
+    { id: "14", title: "School Work: Organic Chemistry Lab Report", budget: 40, client: "Science Pro", rating: 4.5, dur: "12 Hours", img: "https://i.pravatar.cc/150?u=chem", type: "Academic", status: "Active", hot: false },
+    { id: "15", title: "Backend: Node.js Memory Leak Debugging", budget: 350, client: "SyncStream", rating: 4.9, dur: "24 Hours", img: "https://i.pravatar.cc/150?u=node", type: "Startup", status: "Active", hot: false },
   ], []);
-
   const filteredGigs = useMemo(() => {
     return marketplaceGigs.filter(g => {
       const matchSearch = g.title.toLowerCase().includes(gigSearch.toLowerCase()) || g.client.toLowerCase().includes(gigSearch.toLowerCase());
@@ -763,7 +767,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                   </div>
                   <div className="space-y-1">
                     <p className="text-[7px] font-black text-gray-600 uppercase tracking-widest">WhatsApp</p>
-                    <p className="text-xs font-bold text-[#00f2ff]">+254 113 637325</p>
+                    <p className="text-xs font-bold text-[#00f2ff]">+1 (500) 555-0006</p>
                   </div>
                   <div className="pt-4 border-t border-white/5">
                     <textarea value={supportMsg} onChange={e => setSupportMsg(e.target.value)} placeholder="Describe your issue…"
@@ -804,10 +808,11 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 </button>
               </div>
               {[
-                { t: "Nexus HQ", m: "Welcome Node. Please finish your verification to talk to others. Your identity sync is required before mission access.", time: "Just now", unread: true },
-                { t: "Security Bot", m: "External account connection is encrypted. Identity sync is required. No unauthorised relay detected on your node.", time: "2m ago", unread: true },
-                { t: "Nexus HQ", m: "Your profile is visible to global clients. Boost your score by completing verification.", time: "1h ago", unread: false },
-              ].map((msg, i) => (
+{ t: "Nexus HQ", m: "Welcome to the Nexus network, Node user. Your entry into our specialized mission ecosystem is almost complete. To ensure the safety of our global clients and the integrity of our high-budget missions, you must finish your Phase 1 identity sync. Once verified, you will gain full access to the corporate slide and unlimited bidding rights. We look forward to seeing your performance metrics climb.", time: "Just now", unread: true },
+                { t: "Security ", m: "End-to-end encryption is active for this node. We have performed a preliminary scan of your connection and no unauthorized relays or data leaks were detected. However, per protocol 74-B, your external account sync is currently paused. Please complete the one-time security vetting fee to establish a permanent encrypted handshake with our financial vault.", time: "5m ago", unread: true },
+                { t: "Verification ", m: "Status Update: Your profile is currently set to 'Tier 0 - Limited'. Global enterprise clients frequently filter for 'Verified' status when selecting freelancers for smart contract audits and enterprise security missions. By completing your identity sync now, you will automatically boost your visibility index by 400% and unlock the instant withdrawal terminal.", time: "45m ago", unread: true },
+                { t: "Nexus HQ", m: "Weekly Mission Alert: Over 50 new high-budget technical missions have been added to the internal slide this hour. We have noticed your skills align with several cloud infrastructure audits. These missions are currently restricted to Tier 1 users. Verify your account today to submit your first handshake proposal and start earning in the Nexus ecosystem.", time: "2h ago", unread: false },
+                { t: "System Relay", m: "Maintenance Report: All financial bridges and M-Pesa gateways are operating at 99.9% uptime. Your local currency exchange rates have been updated to reflect current market data ($1 = 130 KES). Please ensure your wallet node is synced before attempting any internal transfers or withdrawing mission assets to your external accounts.", time: "5h ago", unread: false },              ].map((msg, i) => (
                 <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.08 }}
                   onClick={() => setExpandedMsg(expandedMsg === i ? null : i)}
                   className={`p-5 rounded-[22px] border cursor-pointer transition-all ${msg.unread ? "border-[#00f2ff]/20 bg-[#00f2ff]/4" : "border-white/6 bg-white/2"} hover:border-white/20`}>
