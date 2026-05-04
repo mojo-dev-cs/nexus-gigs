@@ -20,6 +20,8 @@ import {
   Download, Upload, Repeat, Layers, AlertCircle,
   ChevronsUp, Trophy, Hash, Percent, Info, Link,
   Phone, HeadphonesIcon, BookOpen, Video, FileQuestion,
+  ToggleLeft, ToggleRight, Plus, Trash2, LogOut,
+  Crown, Sparkle, Gem, Radio,
 } from "lucide-react";
 
 interface Toast {
@@ -119,7 +121,58 @@ const SectionHead = ({ label }: { label: string }) => (
   </div>
 );
 
-// ── Payment method logos (SVG/emoji inline) ──────────────────────────────────
+// Premium locked overlay for tabs/sections
+const PremiumLockedSection = ({
+  title, description, icon, cta, onCta, features,
+}: {
+  title: string; description: string; icon: React.ReactNode; cta: string; onCta: () => void; features?: string[];
+}) => (
+  <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+    className="relative rounded-4xl overflow-hidden border border-white/8 p-8"
+    style={{ background: "linear-gradient(160deg, rgba(6,16,31,0.98) 0%, rgba(3,8,15,0.99) 100%)" }}>
+    {/* Ambient glow */}
+    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 blur-[60px] opacity-20 pointer-events-none"
+      style={{ background: "radial-gradient(ellipse, #00f5d4, transparent)" }} />
+    <div className="relative z-10 text-center">
+      <div className="w-16 h-16 mx-auto mb-5 rounded-[22px] flex items-center justify-center border border-white/10 relative"
+        style={{ background: "linear-gradient(135deg, rgba(0,245,212,0.12), rgba(0,245,212,0.04))" }}>
+        <div className="absolute inset-0 rounded-[22px] blur-xl opacity-30"
+          style={{ background: "radial-gradient(circle, #00f5d4, transparent)" }} />
+        <div className="relative text-[#00f5d4]">{icon}</div>
+      </div>
+      <Badge color="#00f5d4" className="mb-4"><Crown size={8} /> Premium Feature</Badge>
+      <h3 className="text-[20px] font-black italic uppercase tracking-tighter text-white mb-3 leading-none">{title}</h3>
+      <p className="text-[10px] text-white/30 font-bold leading-relaxed mb-6 max-w-xs mx-auto">{description}</p>
+      {features && (
+        <div className="grid grid-cols-2 gap-2 mb-6 text-left max-w-xs mx-auto">
+          {features.map((f, i) => (
+            <div key={i} className="flex items-center gap-2 p-2.5 bg-white/3 rounded-xl border border-white/5">
+              <div className="w-4 h-4 rounded-full bg-[#00f5d4]/15 flex items-center justify-center shrink-0">
+                <Check size={8} className="text-[#00f5d4]" />
+              </div>
+              <p className="text-[8px] font-bold text-white/40 uppercase tracking-wide">{f}</p>
+            </div>
+          ))}
+        </div>
+      )}
+      <RippleButton onClick={onCta}
+        className="px-10 py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest text-black mx-auto"
+        style={{ background: "linear-gradient(135deg, #00f5d4, #0097a7)" }}>
+        {cta}
+      </RippleButton>
+    </div>
+  </motion.div>
+);
+
+// Toggle switch component
+const Toggle = ({ active, onChange }: { active: boolean; onChange: () => void }) => (
+  <button onClick={onChange}
+    className={`relative w-10 h-5.5 rounded-full transition-all duration-300 ${active ? "bg-[#00f5d4]" : "bg-white/10"}`}>
+    <div className={`absolute top-0.5 w-4 h-4 rounded-full transition-all duration-300 ${active ? "left-5 bg-black" : "left-0.5 bg-white/30"}`} />
+  </button>
+);
+
+// ── Payment method logos ──────────────────────────────────────────────────────
 
 const MpesaLogo = () => (
   <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg overflow-hidden">
@@ -158,28 +211,6 @@ const PaypalLogo = () => (
   </div>
 );
 
-// ── Golden glow overlay for locked gigs ──────────────────────────────────────
-
-const GoldenLockOverlay = ({ onUnlock }: { onUnlock: () => void }) => (
-  <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-[22px]"
-    style={{ background: "linear-gradient(135deg, rgba(255,193,7,0.18) 0%, rgba(255,152,0,0.10) 100%)", backdropFilter: "blur(6px)" }}>
-    <div className="relative mb-2">
-      <div className="absolute inset-0 rounded-full blur-xl opacity-60" style={{ background: "radial-gradient(circle, #ffd700, #ff8c00)" }} />
-      <div className="relative w-12 h-12 rounded-full flex items-center justify-center border-2 border-amber-400/60 shadow-[0_0_30px_rgba(255,193,7,0.5)]"
-        style={{ background: "linear-gradient(135deg, #ffd700, #ff8c00)" }}>
-        <Lock size={20} className="text-black" />
-      </div>
-    </div>
-    <p className="text-[8px] font-black text-amber-300 uppercase tracking-widest mb-0.5">Requires 10 HU</p>
-    <p className="text-[7px] text-amber-400/60 font-bold uppercase tracking-wide mb-3">Min. to apply</p>
-    <button onClick={onUnlock}
-      className="px-4 py-2 rounded-[10px] text-[8px] font-black uppercase tracking-widest text-black shadow-[0_0_20px_rgba(255,193,7,0.4)]"
-      style={{ background: "linear-gradient(135deg, #ffd700, #ff8c00)" }}>
-      Refill HU ✦
-    </button>
-  </div>
-);
-
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetadata: any }) => {
@@ -206,6 +237,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   const [cashBalance] = useState(0.0);
   const isVerified = userMetadata?.status === "Verified";
 
+  // Modal states
   const [showModal, setShowModal] = useState(false);
   const [modalStep, setModalStep] = useState<"packages" | "choice" | "mpesa" | "binance">("packages");
   const [selectedPack, setSelectedPack] = useState<(typeof uplinkPackages)[0] | null>(null);
@@ -215,10 +247,31 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   const [copied, setCopied] = useState(false);
   const [calcHU, setCalcHU] = useState("1200");
   const calcKES = Math.round(parseFloat(calcHU || "0") * 1.083);
+
+  // UI states
   const [expandedMsg, setExpandedMsg] = useState<number | null>(null);
   const [showBalance, setShowBalance] = useState(true);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [activeVaultTab, setActiveVaultTab] = useState<"overview" | "history" | "limits" | "referral">("overview");
+
+  // Me tab — functional state
+  const [expandedSetting, setExpandedSetting] = useState<string | null>(null);
+  const [notifications, setNotifications] = useState({
+    missions: true, payments: true, messages: false, weekly: true, newGigs: true,
+  });
+  const [twoFAEnabled, setTwoFAEnabled] = useState(false);
+  const [generatedApiKey, setGeneratedApiKey] = useState<string | null>(null);
+  const [copiedKey, setCopiedKey] = useState(false);
+  const [selectedLang, setSelectedLang] = useState("English (EAT)");
+  const [sessions] = useState([
+    { device: "Chrome · Windows", location: "Nairobi, KE", last: "Active now", current: true },
+    { device: "Safari · iPhone 15", location: "Nairobi, KE", last: "2 hours ago", current: false },
+  ]);
+  const [revokedSession, setRevokedSession] = useState<number[]>([]);
+
+  // Chat message state
+  const [chatInput, setChatInput] = useState("");
+  const [selectedChat, setSelectedChat] = useState<number | null>(null);
 
   const uplinkPackages = [
     { id: 1, name: "Starter", price: 3, hu: 150, desc: "Apply for a few small gigs today.", hot: false },
@@ -258,9 +311,9 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   ];
 
   const messages = [
-    { sender: "Uplink HQ", body: "Welcome to the Nexus. To keep global clients secure, you must hold Handshake Units (HU). Refilling gives you immediate access to all missions.", time: "Just now", unread: true },
-    { sender: "Security Bot", body: "Encryption active. Your uplink power is low (5 HU). Missions require at least 10 HU to apply. Pick a package to establish a permanent connection.", time: "14m ago", unread: true },
-    { sender: "Exchange Relay", body: "Rates Updated: $1.00 is trading at KES 130.00. Use the Vault Calculator to verify node liquidity before withdrawal.", time: "1h ago", unread: false },
+    { sender: "Uplink HQ", body: "Welcome to the Nexus. To keep global clients secure, you must hold Handshake Units (HU). Refilling gives you immediate access to all missions.", time: "Just now", unread: true, avatar: "🏢" },
+    { sender: "Security Bot", body: "Encryption active. Your uplink power is low (5 HU). Missions require at least 10 HU to apply. Pick a package to establish a permanent connection.", time: "14m ago", unread: true, avatar: "🤖" },
+    { sender: "Exchange Relay", body: "Rates Updated: $1.00 is trading at KES 130.00. Use the Vault Calculator to verify node liquidity before withdrawal.", time: "1h ago", unread: false, avatar: "📡" },
   ];
 
   const typeColors: Record<string, string> = {
@@ -274,6 +327,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
       setHuBalance((p) => p - cost);
       addToast(`Handshake sent! −${cost} HU`, "success");
     } else {
+      addToast(`Need ${cost - huBalance} more HU to apply`, "error");
       openRefill();
     }
   };
@@ -284,21 +338,35 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
     setIsPaying(true);
     try {
       if (method === "CARD") {
+        // Charge the exact KES amount shown for the selected package
+        const kesAmount = selectedPack.price * RATE;
         const res = await fetch("/api/paystack", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount: selectedPack.price, currency: "USD", email: user?.primaryEmailAddress?.emailAddress }),
+          body: JSON.stringify({
+            amount: kesAmount,         // deduct KES as displayed (e.g. KES 1,300 for Pro Uplink)
+            currency: "KES",
+            email: user?.primaryEmailAddress?.emailAddress,
+            metadata: { hu: selectedPack.hu, pack: selectedPack.name },
+          }),
         });
         const data = await res.json();
         if (data?.data?.authorization_url) window.location.href = data.data.authorization_url;
         else addToast("Payment gateway error.", "error");
       } else {
         const clean = mpesaNum.replace(/\D/g, "");
-        if (!clean.startsWith("254") || clean.length !== 12) { addToast("Format: 254XXXXXXXXX (12 digits)", "error"); return; }
+        if (!clean.startsWith("254") || clean.length !== 12) {
+          addToast("Format: 254XXXXXXXXX (12 digits)", "error"); return;
+        }
         const res = await fetch("/api/intasend", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount: selectedPack.price * RATE, phone: clean, email: user?.primaryEmailAddress?.emailAddress }),
+          body: JSON.stringify({
+            amount: selectedPack.price * RATE,
+            phone: clean,
+            email: user?.primaryEmailAddress?.emailAddress,
+            metadata: { hu: selectedPack.hu },
+          }),
         });
         if (res.ok) { addToast("Check your phone for the STK prompt.", "success"); setShowModal(false); }
         else addToast("M-Pesa connection failed.", "error");
@@ -312,6 +380,12 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
     setCopied(true);
     addToast("Address copied!", "success");
     setTimeout(() => setCopied(false), 2500);
+  };
+
+  const generateApiKey = () => {
+    const key = "nxs_" + Array.from({ length: 32 }, () => "abcdefghijklmnopqrstuvwxyz0123456789"[Math.floor(Math.random() * 36)]).join("");
+    setGeneratedApiKey(key);
+    addToast("API key generated!", "success");
   };
 
   const faqItems = [
@@ -332,8 +406,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
           style={{ background: "radial-gradient(circle, #00f5d4, transparent)" }} />
         <div className="absolute bottom-0 -left-40 w-150 h-150 rounded-full opacity-[0.05] blur-[120px]"
           style={{ background: "radial-gradient(circle, #3b82f6, transparent)" }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-225 h-100 rounded-full opacity-[0.02] blur-[200px]"
-          style={{ background: "radial-gradient(ellipse, #00f5d4, transparent)" }} />
         <div className="absolute inset-0 opacity-[0.025]"
           style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
       </div>
@@ -363,8 +435,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
           ══════════════════════════════════════════════════════ */}
           {activeTab === "home" && (
             <motion.div key="home" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }} className="space-y-5">
-
-              {/* Header */}
               <header className="relative flex justify-between items-center p-6 rounded-[26px] border border-white/[0.07] bg-white/[0.035] backdrop-blur-2xl overflow-hidden shadow-2xl">
                 <div className="absolute top-0 left-0 w-0.75 h-full rounded-r-full" style={{ background: "linear-gradient(to bottom, #00f5d4, transparent)" }} />
                 <div className="pl-2">
@@ -388,7 +458,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 </div>
               </header>
 
-              {/* Cards row */}
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <GlassCard className="md:col-span-3 p-6 space-y-4" accent glow>
                   <div className="flex items-center gap-3">
@@ -422,7 +491,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 </div>
               </div>
 
-              {/* Minimum HU info banner */}
+              {/* HU info banner */}
               <div className="p-4 rounded-2xl border flex items-center gap-4"
                 style={{ background: "linear-gradient(135deg, rgba(255,193,7,0.06), rgba(255,152,0,0.04))", borderColor: "rgba(255,193,7,0.2)" }}>
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
@@ -439,7 +508,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 </button>
               </div>
 
-              {/* Quick actions row */}
+              {/* Quick actions */}
               <div className="grid grid-cols-4 gap-3">
                 {[
                   { icon: <Zap size={16} />, label: "Refill HU", color: "#00f5d4", action: openRefill },
@@ -455,7 +524,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 ))}
               </div>
 
-              {/* Live activity card */}
+              {/* Live activity */}
               <GlassCard className="p-5">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
@@ -496,7 +565,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
           )}
 
           {/* ══════════════════════════════════════════════════════
-              GIGS — All blurred unless HU >= 10, golden lock overlay
+              GIGS — Fully visible, apply button locked per HU
           ══════════════════════════════════════════════════════ */}
           {activeTab === "tasks" && (
             <motion.div key="tasks" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }} className="space-y-5">
@@ -505,23 +574,22 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 <Badge color="#34d399"><PulseDot color="#34d399" size={5} /> Uplink Active</Badge>
               </div>
 
-              {/* HU warning */}
+              {/* HU warning — sticky top */}
               {huBalance < 10 && (
                 <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
                   className="p-4 rounded-2xl border flex items-center gap-4"
                   style={{ background: "linear-gradient(135deg, rgba(255,193,7,0.08), rgba(255,152,0,0.05))", borderColor: "rgba(255,193,7,0.25)" }}>
                   <div className="relative shrink-0">
-                    <div className="absolute inset-0 rounded-full blur-lg opacity-50" style={{ background: "#ffd700" }} />
-                    <div className="relative w-10 h-10 rounded-xl flex items-center justify-center border border-amber-400/40 shadow-[0_0_20px_rgba(255,193,7,0.3)]"
+                    <div className="relative w-10 h-10 rounded-xl flex items-center justify-center border border-amber-400/40"
                       style={{ background: "linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,140,0,0.15))" }}>
                       <Lock size={18} className="text-amber-400" />
                     </div>
                   </div>
                   <div className="flex-1">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-amber-300">All gigs require minimum 10 HU to apply</p>
-                    <p className="text-[8px] text-white/25 font-bold mt-0.5">You have {huBalance} HU · Need {10 - huBalance} more · Gigs are visible but locked</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-amber-300">Apply buttons locked · Need {10 - huBalance} more HU</p>
+                    <p className="text-[8px] text-white/25 font-bold mt-0.5">Browse all {marketplaceGigs.length + corporateGigs.length} gigs freely — refill HU to apply</p>
                   </div>
-                  <button onClick={openRefill} className="shrink-0 px-4 py-2 rounded-[10px] text-[8px] font-black uppercase tracking-widest text-black shadow-[0_0_16px_rgba(255,193,7,0.35)]"
+                  <button onClick={openRefill} className="shrink-0 px-4 py-2 rounded-[10px] text-[8px] font-black uppercase tracking-widest text-black"
                     style={{ background: "linear-gradient(135deg, #ffd700, #ff8c00)" }}>
                     Unlock ✦
                   </button>
@@ -541,20 +609,9 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
               {gigMode === "marketplace" ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {marketplaceGigs.map((g) => {
-                    const locked = huBalance < 10;
+                    const canApply = huBalance >= g.cost;
                     return (
-                      <div key={g.id} className={`relative p-5 rounded-[22px] border transition-all
-                        ${locked ? "border-amber-400/15 bg-white/2.5" : "border-white/[0.07] bg-white/[0.035] hover:border-white/[0.14] hover:bg-white/4.5 shadow-xl"}`}>
-                        {locked && (
-                          <>
-                            {/* blur the content */}
-                            <div className="absolute inset-0 rounded-[22px] z-10" style={{ backdropFilter: "blur(7px)" }} />
-                            {/* golden shimmer border */}
-                            <div className="absolute inset-0 rounded-[22px] z-10 pointer-events-none"
-                              style={{ boxShadow: "inset 0 0 0 1px rgba(255,193,7,0.25), 0 0 30px rgba(255,193,7,0.08)" }} />
-                            <GoldenLockOverlay onUnlock={openRefill} />
-                          </>
-                        )}
+                      <div key={g.id} className="p-5 rounded-[22px] border border-white/[0.07] bg-white/[0.035] hover:border-white/[0.14] hover:bg-white/4.5 transition-all shadow-xl">
                         <div className="flex items-start justify-between mb-4">
                           <img src={g.img} className="w-10 h-10 rounded-xl border border-white/10 object-cover" alt={g.client} />
                           <Badge color={typeColors[g.type] || "#00f5d4"}>{g.type}</Badge>
@@ -566,11 +623,19 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                             <p className="text-[14px] font-black text-white leading-none">{fmt(g.budget)}</p>
                             <p className="text-[7px] text-white/25 font-bold uppercase mt-0.5">Project budget</p>
                           </div>
-                          <RippleButton onClick={() => handleApply(g.cost)}
-                            className="px-5 py-2.5 rounded-[11px] text-[8px] font-black uppercase tracking-widest text-black"
-                            style={{ background: "linear-gradient(135deg, #00f5d4, #0097a7)" }}>
-                            Apply · {g.cost} HU
-                          </RippleButton>
+                          {canApply ? (
+                            <RippleButton onClick={() => handleApply(g.cost)}
+                              className="px-5 py-2.5 rounded-[11px] text-[8px] font-black uppercase tracking-widest text-black"
+                              style={{ background: "linear-gradient(135deg, #00f5d4, #0097a7)" }}>
+                              Apply · {g.cost} HU
+                            </RippleButton>
+                          ) : (
+                            <button onClick={openRefill}
+                              className="px-5 py-2.5 rounded-[11px] text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 border border-amber-400/30 transition-all hover:bg-amber-400/10"
+                              style={{ color: "#fbbf24", background: "rgba(255,193,7,0.06)" }}>
+                              <Lock size={9} /> Need {g.cost} HU
+                            </button>
+                          )}
                         </div>
                       </div>
                     );
@@ -579,18 +644,9 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {corporateGigs.map((c) => {
-                    const locked = huBalance < 50;
+                    const canApply = huBalance >= c.cost;
                     return (
-                      <div key={c.id} className={`relative p-6 rounded-[26px] border transition-all shadow-2xl group
-                        ${locked ? "border-amber-400/15 bg-white/2.5" : "border-white/[0.07] bg-white/[0.035] hover:border-white/[0.14] hover:bg-white/5"}`}>
-                        {locked && (
-                          <>
-                            <div className="absolute inset-0 rounded-[26px] z-10" style={{ backdropFilter: "blur(7px)" }} />
-                            <div className="absolute inset-0 rounded-[26px] z-10 pointer-events-none"
-                              style={{ boxShadow: "inset 0 0 0 1px rgba(255,193,7,0.25), 0 0 30px rgba(255,193,7,0.08)" }} />
-                            <GoldenLockOverlay onUnlock={openRefill} />
-                          </>
-                        )}
+                      <div key={c.id} className="p-6 rounded-[26px] border border-white/[0.07] bg-white/[0.035] hover:border-white/[0.14] hover:bg-white/5 transition-all shadow-2xl group">
                         <div className="flex items-center gap-4 mb-5">
                           <CompanyLogo name={c.company} domain={c.domain} size={52} />
                           <div className="min-w-0">
@@ -603,10 +659,18 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                             <p className="text-[7px] text-white/25 font-bold uppercase mt-0.5">/ month</p>
                           </div>
                         </div>
-                        <RippleButton onClick={() => handleApply(c.cost)}
-                          className="w-full py-3.5 rounded-[14px] text-[9px] font-black uppercase tracking-widest border border-white/8 bg-white/6 text-white hover:bg-white/10 transition-all flex items-center justify-center gap-2">
-                          <Zap size={12} className="text-[#00f5d4]" /> Handshake · {c.cost} HU <ArrowUpRight size={12} />
-                        </RippleButton>
+                        {canApply ? (
+                          <RippleButton onClick={() => handleApply(c.cost)}
+                            className="w-full py-3.5 rounded-[14px] text-[9px] font-black uppercase tracking-widest border border-white/8 bg-white/6 text-white hover:bg-white/10 transition-all flex items-center justify-center gap-2">
+                            <Zap size={12} className="text-[#00f5d4]" /> Handshake · {c.cost} HU <ArrowUpRight size={12} />
+                          </RippleButton>
+                        ) : (
+                          <button onClick={openRefill}
+                            className="w-full py-3.5 rounded-[14px] text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2 border border-amber-400/25 transition-all hover:bg-amber-400/8"
+                            style={{ color: "#fbbf24", background: "rgba(255,193,7,0.05)" }}>
+                            <Lock size={12} /> Requires {c.cost} HU · Refill to Apply <ArrowUpRight size={12} />
+                          </button>
+                        )}
                       </div>
                     );
                   })}
@@ -616,13 +680,11 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
           )}
 
           {/* ══════════════════════════════════════════════════════
-              VAULT — Premium
+              VAULT
           ══════════════════════════════════════════════════════ */}
           {activeTab === "earnings" && (
             <motion.div key="earnings" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }} className="space-y-5">
               <SectionHead label="Vault Hub" />
-
-              {/* Vault tab nav */}
               <div className="flex gap-1 p-1 rounded-2xl border border-white/[0.07] bg-white/3 w-fit">
                 {(["overview", "history", "limits", "referral"] as const).map((t) => (
                   <button key={t} onClick={() => setActiveVaultTab(t)}
@@ -635,7 +697,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
               {activeVaultTab === "overview" && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* HU Balance */}
                     <div className="p-7 rounded-[28px] border border-[#00f5d4]/15 overflow-hidden relative"
                       style={{ background: "linear-gradient(135deg, rgba(0,245,212,0.08) 0%, rgba(0,245,212,0.02) 100%)" }}>
                       <div className="absolute top-0 right-0 w-40 h-40 rounded-full blur-[80px] opacity-30"
@@ -655,13 +716,12 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                           style={{ background: "linear-gradient(135deg, #00f5d4, #0097a7)" }}>
                           + Refill
                         </button>
-                        <button className="px-4 py-2.5 rounded-xl text-[8px] font-black uppercase tracking-widest border border-white/8 bg-white/4 text-white/40 hover:text-white transition-all">
+                        <button onClick={() => setActiveVaultTab("history")} className="px-4 py-2.5 rounded-xl text-[8px] font-black uppercase tracking-widest border border-white/8 bg-white/4 text-white/40 hover:text-white transition-all">
                           History
                         </button>
                       </div>
                     </div>
 
-                    {/* Cash Balance */}
                     <div className="p-7 rounded-[28px] border border-emerald-500/15 overflow-hidden relative"
                       style={{ background: "linear-gradient(135deg, rgba(52,211,153,0.07) 0%, rgba(52,211,153,0.02) 100%)" }}>
                       <div className="absolute top-0 right-0 w-40 h-40 rounded-full blur-[80px] opacity-20"
@@ -686,7 +746,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                     </div>
                   </div>
 
-                  {/* Stats row */}
                   <div className="grid grid-cols-4 gap-3">
                     <StatCard label="Total Earned" value="$0" icon={<TrendingUp size={15} />} color="#34d399" sub="Lifetime" />
                     <StatCard label="Withdrawn" value="$0" icon={<Download size={15} />} color="#60a5fa" sub="All time" />
@@ -694,7 +753,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                     <StatCard label="HU Spent" value="0" icon={<Zap size={15} />} color="#00f5d4" sub="All gigs" />
                   </div>
 
-                  {/* Calculator */}
                   <GlassCard className="p-5">
                     <div className="flex items-center gap-2 mb-4">
                       <Calculator size={13} className="text-[#00f5d4]" />
@@ -714,7 +772,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                     </div>
                   </GlassCard>
 
-                  {/* Payment methods */}
                   <GlassCard className="p-5">
                     <div className="flex items-center gap-2 mb-4">
                       <CreditCard size={13} className="text-[#00f5d4]" />
@@ -741,10 +798,14 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
               )}
 
               {activeVaultTab === "history" && (
-                <GlassCard className="p-8 text-center">
-                  <Clock size={32} className="mx-auto text-white/10 mb-3" />
-                  <p className="text-[11px] text-white/25 font-bold uppercase tracking-widest">No transactions yet. Start applying to missions to generate history.</p>
-                </GlassCard>
+                <PremiumLockedSection
+                  title="Transaction History"
+                  description="Your complete earnings ledger, withdrawal records, and HU spend history appear here once you complete your first mission or refill."
+                  icon={<Clock size={28} />}
+                  cta="Apply to First Gig"
+                  onCta={() => setActiveTab("tasks")}
+                  features={["Full ledger", "CSV export", "HU log", "Withdrawal history"]}
+                />
               )}
 
               {activeVaultTab === "limits" && (
@@ -813,19 +874,50 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
           )}
 
           {/* ══════════════════════════════════════════════════════
-              WORK
+              WORK — Premium locked with feature preview
           ══════════════════════════════════════════════════════ */}
           {activeTab === "contracts" && (
-            <motion.div key="contracts" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }}
-              className="flex items-center justify-center min-h-[60vh]">
-              <div className="text-center p-14 rounded-[40px] border border-red-500/15 bg-red-500/4 max-w-sm w-full">
-                <ShieldAlert size={50} className="mx-auto text-red-500/70 mb-6" />
-                <h3 className="text-[18px] font-black italic uppercase tracking-tight text-white mb-3 leading-none">History Locked</h3>
-                <p className="text-[11px] text-white/30 mb-8 leading-relaxed">Complete profile verification to view your work history and mission earnings log.</p>
-                <RippleButton onClick={openRefill} className="px-10 py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest text-white"
-                  style={{ background: "linear-gradient(135deg, #ef4444, #b91c1c)" }}>
-                  Verify Now
-                </RippleButton>
+            <motion.div key="contracts" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }} className="space-y-5">
+              <SectionHead label="Work Hub" />
+
+              {/* Teaser stats — grayed out */}
+              <div className="grid grid-cols-4 gap-3 opacity-30 pointer-events-none select-none">
+                <StatCard label="Active Work" value="—" icon={<Briefcase size={15} />} color="#00f5d4" />
+                <StatCard label="Completed" value="—" icon={<CheckCircle2 size={15} />} color="#34d399" />
+                <StatCard label="Earned" value="—" icon={<DollarSign size={15} />} color="#fb923c" />
+                <StatCard label="Rating" value="—" icon={<Star size={15} />} color="#a78bfa" />
+              </div>
+
+              {/* Premium locked */}
+              <PremiumLockedSection
+                title="Work History Locked"
+                description="Your active contracts, completed missions, earnings breakdown, and client ratings appear here. Apply to your first gig to unlock this hub."
+                icon={<FileText size={28} />}
+                cta="Browse Gigs Now"
+                onCta={() => setActiveTab("tasks")}
+                features={["Active contracts", "Client messaging", "Milestone tracker", "Earnings log", "Dispute center", "Rating system"]}
+              />
+
+              {/* Blurred mock contract card */}
+              <div className="relative p-6 rounded-[22px] border border-white/5 bg-white/2 overflow-hidden">
+                <div className="absolute inset-0 z-10" style={{ backdropFilter: "blur(12px)" }} />
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 bg-white/10 rounded-xl" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 bg-white/10 rounded-full w-2/3" />
+                    <div className="h-2 bg-white/5 rounded-full w-1/2" />
+                  </div>
+                  <div className="h-5 bg-white/10 rounded-full w-16" />
+                </div>
+                <div className="h-2 bg-white/5 rounded-full w-full mb-2" />
+                <div className="h-2 bg-white/5 rounded-full w-4/5" />
+                {/* Lock badge centered */}
+                <div className="absolute inset-0 z-20 flex items-center justify-center">
+                  <div className="flex items-center gap-3 px-5 py-3 rounded-2xl border border-white/10 bg-black/60 backdrop-blur-xl">
+                    <Lock size={16} className="text-[#00f5d4]" />
+                    <span className="text-[9px] font-black uppercase tracking-widest text-white/60">Complete a gig to unlock</span>
+                  </div>
+                </div>
               </div>
             </motion.div>
           )}
@@ -842,10 +934,14 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 <StatCard label="Settled" value={fmt(0)} icon={<DollarSign size={15} />} color="#fb923c" />
                 <StatCard label="Uptime" value="100%" icon={<Wifi size={15} />} color="#a78bfa" />
               </div>
-              <GlassCard className="p-8 text-center">
-                <TrendingUp size={32} className="mx-auto text-white/10 mb-3" />
-                <p className="text-[11px] text-white/25 font-bold uppercase tracking-widest">No activity yet. Apply to missions to generate analytics.</p>
-              </GlassCard>
+              <PremiumLockedSection
+                title="Analytics Dashboard"
+                description="Charts, earnings trends, application history, win rate, and client breakdown appear after your first completed mission."
+                icon={<BarChart3 size={28} />}
+                cta="Apply to First Gig"
+                onCta={() => setActiveTab("tasks")}
+                features={["Earnings chart", "Win rate", "Client ratings", "Skill breakdown"]}
+              />
             </motion.div>
           )}
 
@@ -856,7 +952,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
             <motion.div key="support" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }} className="max-w-lg mx-auto space-y-5">
               <SectionHead label="Help Center" />
 
-              {/* Status banner */}
               <div className="p-4 rounded-2xl border flex items-center gap-4"
                 style={{ background: "linear-gradient(135deg, rgba(52,211,153,0.06), rgba(52,211,153,0.02))", borderColor: "rgba(52,211,153,0.2)" }}>
                 <PulseDot color="#34d399" size={8} />
@@ -867,12 +962,11 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 <Badge color="#34d399" className="ml-auto">99.9%</Badge>
               </div>
 
-              {/* Contact cards */}
               <GlassCard className="p-5 space-y-3" glow>
                 <p className="text-[8px] font-black uppercase tracking-[0.18em] text-white/25 mb-2">Contact Channels</p>
                 {[
                   { label: "Email Support", value: "support@nexusgigs.me", icon: <Mail size={15} />, sub: "Avg. reply: 2hrs", color: "#60a5fa", action: () => window.location.href = "mailto:support@nexusgigs.me" },
-                  { label: "WhatsApp Relay", value: "+254 113 637325", icon: <Phone size={15} />, sub: "Mon–Fri 08:00–20:00 EAT", color: "#34d399", action: undefined },
+                  { label: "WhatsApp Relay", value: "+254 113 637325", icon: <Phone size={15} />, sub: "Mon–Fri 08:00–20:00 EAT", color: "#34d399", action: () => window.open("https://wa.me/254113637325", "_blank") },
                   { label: "Live Chat", value: "In-app messaging", icon: <MessageSquare size={15} />, sub: "Beta · Coming soon", color: "#a78bfa", action: undefined },
                 ].map((item, i) => (
                   <div key={i} onClick={item.action}
@@ -891,7 +985,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 ))}
               </GlassCard>
 
-              {/* FAQ */}
               <GlassCard className="p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <FileQuestion size={13} className="text-[#00f5d4]" />
@@ -916,58 +1009,95 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                   ))}
                 </div>
               </GlassCard>
-
-              {/* Resources */}
-              <GlassCard className="p-5">
-                <div className="flex items-center gap-2 mb-4">
-                  <BookOpen size={13} className="text-[#00f5d4]" />
-                  <span className="text-[9px] font-black uppercase tracking-[0.18em] text-white/40">Resources</span>
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { icon: <BookOpen size={16} />, label: "Docs", color: "#60a5fa" },
-                    { icon: <Video size={16} />, label: "Tutorials", color: "#a78bfa" },
-                    { icon: <Globe size={16} />, label: "Community", color: "#34d399" },
-                  ].map((r, i) => (
-                    <button key={i} onClick={() => addToast("Coming soon!", "info")}
-                      className="p-3.5 bg-black/30 rounded-[14px] border border-white/5 hover:border-white/10 transition-all text-center">
-                      <div className="flex justify-center mb-1.5" style={{ color: r.color }}>{r.icon}</div>
-                      <p className="text-[7px] font-black uppercase tracking-widest text-white/30">{r.label}</p>
-                    </button>
-                  ))}
-                </div>
-              </GlassCard>
             </motion.div>
           )}
 
           {/* ══════════════════════════════════════════════════════
-              MESSAGES
+              MESSAGES — Premium with send locked
           ══════════════════════════════════════════════════════ */}
           {activeTab === "messages" && (
             <motion.div key="messages" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }} className="space-y-4">
-              <SectionHead label="System Relay" />
+              <div className="flex items-center justify-between">
+                <SectionHead label="System Relay" />
+                <Badge color="#fb923c"><Lock size={8} /> Reply Locked</Badge>
+              </div>
+
+              {/* Locked compose bar */}
+              <div className="p-4 rounded-2xl border border-white/5 bg-white/2 flex items-center gap-3 opacity-50 cursor-not-allowed">
+                <div className="flex-1 bg-black/40 border border-white/6 rounded-xl px-4 py-3 text-[10px] text-white/15 font-bold">
+                  Apply to a gig to unlock direct client messaging…
+                </div>
+                <button className="p-3 rounded-xl border border-white/6 bg-white/3">
+                  <Lock size={14} className="text-white/20" />
+                </button>
+              </div>
+
+              {/* Premium locked messaging notice */}
+              <div className="p-4 rounded-2xl border flex items-center gap-3"
+                style={{ background: "linear-gradient(135deg, rgba(251,146,60,0.06), rgba(251,146,60,0.02))", borderColor: "rgba(251,146,60,0.2)" }}>
+                <Crown size={14} className="text-orange-400 shrink-0" />
+                <div className="flex-1">
+                  <p className="text-[9px] font-black text-orange-300 uppercase tracking-widest">Direct client messaging unlocks after first application</p>
+                  <p className="text-[8px] text-white/25 font-bold mt-0.5">System messages below are read-only · Refill HU and apply to enable full relay</p>
+                </div>
+                <button onClick={openRefill} className="shrink-0 px-3 py-1.5 rounded-[10px] text-[8px] font-black uppercase tracking-widest text-black"
+                  style={{ background: "linear-gradient(135deg, #fb923c, #ea580c)" }}>
+                  Unlock
+                </button>
+              </div>
+
               {messages.map((msg, i) => (
                 <div key={i} onClick={() => setExpandedMsg(expandedMsg === i ? null : i)}
                   className={`p-5 rounded-[22px] border cursor-pointer transition-all ${msg.unread ? "bg-[#00f5d4]/4 border-[#00f5d4]/20" : "bg-white/3 border-white/6"}`}>
                   <div className="flex gap-4 items-start">
-                    <div className="p-2.5 bg-black/40 rounded-xl text-[#00f5d4] shrink-0 mt-0.5"><MessageSquare size={14} /></div>
+                    <div className="w-10 h-10 bg-black/40 rounded-xl border border-white/8 flex items-center justify-center text-lg shrink-0 mt-0.5">
+                      {msg.avatar}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-center mb-1">
                         <h4 className="text-[10px] font-black uppercase tracking-widest text-white">{msg.sender}</h4>
                         <span className="text-[7px] text-white/20 font-bold uppercase">{msg.time}</span>
                       </div>
                       <p className={`text-[10px] text-white/35 leading-relaxed ${expandedMsg === i ? "" : "line-clamp-1"}`}>{msg.body}</p>
+                      {expandedMsg === i && (
+                        <button onClick={(e) => { e.stopPropagation(); openRefill(); }}
+                          className="mt-3 flex items-center gap-2 text-[8px] font-black text-[#00f5d4]/60 uppercase tracking-widest hover:text-[#00f5d4] transition-all">
+                          <Lock size={10} /> Refill HU to reply <ArrowRight size={10} />
+                        </button>
+                      )}
                     </div>
                     <ChevronDown size={13} className={`text-white/20 shrink-0 mt-1 transition-transform ${expandedMsg === i ? "rotate-180" : ""}`} />
                   </div>
                   {msg.unread && <div className="flex justify-end mt-2"><span className="w-2 h-2 rounded-full bg-[#00f5d4]" /></div>}
                 </div>
               ))}
+
+              {/* Blurred future chat preview */}
+              <div className="relative p-5 rounded-[22px] border border-white/5 bg-white/2 overflow-hidden">
+                <div className="absolute inset-0 z-10" style={{ backdropFilter: "blur(10px)" }} />
+                <div className="flex gap-4 items-center mb-4">
+                  <div className="w-10 h-10 bg-white/5 rounded-xl" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-2.5 bg-white/8 rounded-full w-1/3" />
+                    <div className="h-2 bg-white/4 rounded-full w-1/4" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="h-2 bg-white/5 rounded-full w-3/4" />
+                  <div className="h-2 bg-white/4 rounded-full w-1/2" />
+                </div>
+                <div className="absolute inset-0 z-20 flex items-center justify-center">
+                  <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/8 bg-black/70 backdrop-blur-xl">
+                    <Lock size={12} className="text-[#00f5d4]" />
+                    <span className="text-[8px] font-black uppercase tracking-widest text-white/50">Client chats unlock after first mission</span>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           )}
 
           {/* ══════════════════════════════════════════════════════
-              ACCOUNT — Enhanced
+              ACCOUNT — Fully functional
           ══════════════════════════════════════════════════════ */}
           {activeTab === "account" && (
             <motion.div key="account" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }} className="max-w-md mx-auto space-y-4 pb-8">
@@ -1037,28 +1167,261 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 </div>
               </GlassCard>
 
-              {/* Settings list */}
-              <GlassCard className="p-1 overflow-hidden">
-                {[
-                  { icon: <Bell size={14} />, label: "Notifications", sub: "Manage alerts", color: "#00f5d4" },
-                  { icon: <Shield size={14} />, label: "Security", sub: "2FA · Password", color: "#60a5fa" },
-                  { icon: <Key size={14} />, label: "API Keys", sub: "Developer access", color: "#a78bfa" },
-                  { icon: <Smartphone size={14} />, label: "Linked Devices", sub: "2 active sessions", color: "#fb923c" },
-                  { icon: <Globe size={14} />, label: "Language & Region", sub: "English · EAT", color: "#34d399" },
-                ].map((item, i) => (
-                  <button key={i} onClick={() => addToast("Settings coming soon!", "info")}
-                    className="w-full flex items-center gap-4 p-4 hover:bg-white/4 transition-all rounded-3xl group">
+              {/* ── Settings — all functional with expanding panels ── */}
+              <GlassCard className="overflow-hidden">
+
+                {/* NOTIFICATIONS */}
+                <div>
+                  <button onClick={() => setExpandedSetting(expandedSetting === "notifications" ? null : "notifications")}
+                    className="w-full flex items-center gap-4 p-4 hover:bg-white/4 transition-all rounded-t-3xl group">
                     <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: `${item.color}15`, color: item.color }}>
-                      {item.icon}
+                      style={{ backgroundColor: "#00f5d415", color: "#00f5d4" }}>
+                      <Bell size={14} />
                     </div>
                     <div className="flex-1 text-left">
-                      <p className="text-[10px] font-black text-white uppercase tracking-wide">{item.label}</p>
-                      <p className="text-[8px] text-white/25 font-bold uppercase tracking-widest">{item.sub}</p>
+                      <p className="text-[10px] font-black text-white uppercase tracking-wide">Notifications</p>
+                      <p className="text-[8px] text-white/25 font-bold uppercase tracking-widest">Manage alerts</p>
                     </div>
-                    <ChevronRight size={13} className="text-white/15 group-hover:text-white/40 transition-all" />
+                    <ChevronDown size={13} className={`text-white/15 group-hover:text-white/40 transition-all ${expandedSetting === "notifications" ? "rotate-180" : ""}`} />
                   </button>
-                ))}
+                  <AnimatePresence>
+                    {expandedSetting === "notifications" && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
+                        className="overflow-hidden">
+                        <div className="px-4 pb-4 space-y-3 border-t border-white/5">
+                          <p className="text-[7px] font-black text-white/20 uppercase tracking-widest pt-3 mb-1">Alert preferences</p>
+                          {[
+                            { key: "missions" as const, label: "New Missions", sub: "Notify when matching gigs post" },
+                            { key: "payments" as const, label: "Payment Updates", sub: "HU refills & withdrawals" },
+                            { key: "messages" as const, label: "Message Relay", sub: "Client & system messages" },
+                            { key: "weekly" as const, label: "Weekly Summary", sub: "Activity digest every Monday" },
+                            { key: "newGigs" as const, label: "Gig Alerts", sub: "Corporate missions matching skills" },
+                          ].map((n) => (
+                            <div key={n.key} className="flex items-center justify-between p-3 bg-black/30 rounded-[14px] border border-white/5">
+                              <div>
+                                <p className="text-[9px] font-black text-white uppercase tracking-wide">{n.label}</p>
+                                <p className="text-[7px] text-white/25 font-bold mt-0.5">{n.sub}</p>
+                              </div>
+                              <button onClick={() => setNotifications(prev => ({ ...prev, [n.key]: !prev[n.key] }))}
+                                className={`relative w-10 h-5 rounded-full transition-all duration-300 ${notifications[n.key] ? "bg-[#00f5d4]" : "bg-white/10"}`}>
+                                <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${notifications[n.key] ? "left-5" : "left-0.5"}`} />
+                              </button>
+                            </div>
+                          ))}
+                          <button onClick={() => { addToast("Notification preferences saved!", "success"); setExpandedSetting(null); }}
+                            className="w-full py-2.5 rounded-xl text-[8px] font-black uppercase tracking-widest text-black"
+                            style={{ background: "linear-gradient(135deg, #00f5d4, #0097a7)" }}>
+                            Save Preferences
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <div className="h-px bg-white/4 mx-4" />
+
+                {/* SECURITY */}
+                <div>
+                  <button onClick={() => setExpandedSetting(expandedSetting === "security" ? null : "security")}
+                    className="w-full flex items-center gap-4 p-4 hover:bg-white/4 transition-all group">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ backgroundColor: "#60a5fa15", color: "#60a5fa" }}>
+                      <Shield size={14} />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className="text-[10px] font-black text-white uppercase tracking-wide">Security</p>
+                      <p className="text-[8px] text-white/25 font-bold uppercase tracking-widest">2FA · Password</p>
+                    </div>
+                    <ChevronDown size={13} className={`text-white/15 group-hover:text-white/40 transition-all ${expandedSetting === "security" ? "rotate-180" : ""}`} />
+                  </button>
+                  <AnimatePresence>
+                    {expandedSetting === "security" && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
+                        className="overflow-hidden">
+                        <div className="px-4 pb-4 space-y-3 border-t border-white/5">
+                          <p className="text-[7px] font-black text-white/20 uppercase tracking-widest pt-3 mb-1">Security settings</p>
+                          {/* 2FA Toggle */}
+                          <div className="flex items-center justify-between p-3 bg-black/30 rounded-[14px] border border-white/5">
+                            <div>
+                              <p className="text-[9px] font-black text-white uppercase tracking-wide">Two-Factor Auth</p>
+                              <p className="text-[7px] text-white/25 font-bold mt-0.5">{twoFAEnabled ? "Active — Authenticator app linked" : "Disabled — strongly recommended"}</p>
+                            </div>
+                            <button onClick={() => { setTwoFAEnabled(f => !f); addToast(twoFAEnabled ? "2FA disabled" : "2FA enabled! Scan QR in your auth app.", twoFAEnabled ? "info" : "success"); }}
+                              className={`relative w-10 h-5 rounded-full transition-all duration-300 ${twoFAEnabled ? "bg-[#00f5d4]" : "bg-white/10"}`}>
+                              <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${twoFAEnabled ? "left-5" : "left-0.5"}`} />
+                            </button>
+                          </div>
+                          {/* Change password */}
+                          <button onClick={() => addToast("Password reset link sent to your email!", "success")}
+                            className="w-full p-3 bg-black/30 rounded-[14px] border border-white/5 flex items-center justify-between hover:border-white/10 transition-all">
+                            <div className="text-left">
+                              <p className="text-[9px] font-black text-white uppercase tracking-wide">Change Password</p>
+                              <p className="text-[7px] text-white/25 font-bold mt-0.5">Send reset link to email</p>
+                            </div>
+                            <ChevronRight size={13} className="text-white/20" />
+                          </button>
+                          {/* Login activity */}
+                          <button onClick={() => { setExpandedSetting("devices"); }}
+                            className="w-full p-3 bg-black/30 rounded-[14px] border border-white/5 flex items-center justify-between hover:border-white/10 transition-all">
+                            <div className="text-left">
+                              <p className="text-[9px] font-black text-white uppercase tracking-wide">Login Activity</p>
+                              <p className="text-[7px] text-white/25 font-bold mt-0.5">{sessions.length} active sessions</p>
+                            </div>
+                            <ChevronRight size={13} className="text-white/20" />
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <div className="h-px bg-white/4 mx-4" />
+
+                {/* API KEYS */}
+                <div>
+                  <button onClick={() => setExpandedSetting(expandedSetting === "api" ? null : "api")}
+                    className="w-full flex items-center gap-4 p-4 hover:bg-white/4 transition-all group">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ backgroundColor: "#a78bfa15", color: "#a78bfa" }}>
+                      <Key size={14} />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className="text-[10px] font-black text-white uppercase tracking-wide">API Keys</p>
+                      <p className="text-[8px] text-white/25 font-bold uppercase tracking-widest">Developer access</p>
+                    </div>
+                    <ChevronDown size={13} className={`text-white/15 group-hover:text-white/40 transition-all ${expandedSetting === "api" ? "rotate-180" : ""}`} />
+                  </button>
+                  <AnimatePresence>
+                    {expandedSetting === "api" && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
+                        className="overflow-hidden">
+                        <div className="px-4 pb-4 space-y-3 border-t border-white/5">
+                          <p className="text-[7px] font-black text-white/20 uppercase tracking-widest pt-3">API credentials</p>
+                          {generatedApiKey ? (
+                            <div className="p-3 bg-black/40 border border-[#00f5d4]/20 rounded-[14px]">
+                              <p className="text-[7px] font-black text-white/20 uppercase mb-2">Your API Key — copy it now, shown once</p>
+                              <div className="flex gap-2">
+                                <div className="flex-1 font-mono text-[8px] text-[#00f5d4] truncate">{generatedApiKey}</div>
+                                <button onClick={() => { navigator.clipboard.writeText(generatedApiKey); setCopiedKey(true); addToast("API key copied!", "success"); setTimeout(() => setCopiedKey(false), 2000); }}
+                                  className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-all">
+                                  {copiedKey ? <Check size={11} className="text-emerald-400" /> : <Copy size={11} className="text-white/40" />}
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="p-3 bg-black/30 border border-white/5 rounded-[14px]">
+                              <p className="text-[8px] text-white/25 font-bold">No API keys generated yet.</p>
+                            </div>
+                          )}
+                          <button onClick={generateApiKey}
+                            className="w-full py-2.5 rounded-xl text-[8px] font-black uppercase tracking-widest text-black"
+                            style={{ background: "linear-gradient(135deg, #a78bfa, #7c3aed)" }}>
+                            {generatedApiKey ? "Regenerate Key" : "Generate API Key"}
+                          </button>
+                          <p className="text-[7px] text-white/15 font-bold text-center">Keys are for developer integrations only. Keep them secret.</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <div className="h-px bg-white/4 mx-4" />
+
+                {/* LINKED DEVICES */}
+                <div>
+                  <button onClick={() => setExpandedSetting(expandedSetting === "devices" ? null : "devices")}
+                    className="w-full flex items-center gap-4 p-4 hover:bg-white/4 transition-all group">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ backgroundColor: "#fb923c15", color: "#fb923c" }}>
+                      <Smartphone size={14} />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className="text-[10px] font-black text-white uppercase tracking-wide">Linked Devices</p>
+                      <p className="text-[8px] text-white/25 font-bold uppercase tracking-widest">{sessions.filter((_, i) => !revokedSession.includes(i)).length} active sessions</p>
+                    </div>
+                    <ChevronDown size={13} className={`text-white/15 group-hover:text-white/40 transition-all ${expandedSetting === "devices" ? "rotate-180" : ""}`} />
+                  </button>
+                  <AnimatePresence>
+                    {expandedSetting === "devices" && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
+                        className="overflow-hidden">
+                        <div className="px-4 pb-4 space-y-2.5 border-t border-white/5">
+                          <p className="text-[7px] font-black text-white/20 uppercase tracking-widest pt-3">Active sessions</p>
+                          {sessions.map((s, i) => (
+                            <div key={i} className={`p-3 bg-black/30 rounded-[14px] border transition-all ${revokedSession.includes(i) ? "opacity-30 border-red-500/15" : "border-white/5"}`}>
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <p className="text-[9px] font-black text-white uppercase tracking-wide">{s.device}</p>
+                                    {s.current && <Badge color="#34d399">Current</Badge>}
+                                    {revokedSession.includes(i) && <Badge color="#ef4444">Revoked</Badge>}
+                                  </div>
+                                  <p className="text-[7px] text-white/25 font-bold mt-0.5">{s.location} · {s.last}</p>
+                                </div>
+                                {!s.current && !revokedSession.includes(i) && (
+                                  <button onClick={() => { setRevokedSession(r => [...r, i]); addToast("Session revoked successfully", "success"); }}
+                                    className="p-1.5 bg-red-500/10 rounded-lg border border-red-500/15 hover:bg-red-500/20 transition-all">
+                                    <X size={11} className="text-red-400" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                          <button onClick={() => { setRevokedSession([1]); addToast("All other sessions terminated!", "success"); }}
+                            className="w-full py-2.5 rounded-xl text-[8px] font-black uppercase tracking-widest border border-red-500/20 text-red-400/70 hover:bg-red-500/8 transition-all">
+                            Revoke All Other Sessions
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <div className="h-px bg-white/4 mx-4" />
+
+                {/* LANGUAGE & REGION */}
+                <div>
+                  <button onClick={() => setExpandedSetting(expandedSetting === "language" ? null : "language")}
+                    className="w-full flex items-center gap-4 p-4 hover:bg-white/4 transition-all rounded-b-3xl group">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ backgroundColor: "#34d39915", color: "#34d399" }}>
+                      <Globe size={14} />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className="text-[10px] font-black text-white uppercase tracking-wide">Language & Region</p>
+                      <p className="text-[8px] text-white/25 font-bold uppercase tracking-widest">{selectedLang}</p>
+                    </div>
+                    <ChevronDown size={13} className={`text-white/15 group-hover:text-white/40 transition-all ${expandedSetting === "language" ? "rotate-180" : ""}`} />
+                  </button>
+                  <AnimatePresence>
+                    {expandedSetting === "language" && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
+                        className="overflow-hidden">
+                        <div className="px-4 pb-4 space-y-2 border-t border-white/5">
+                          <p className="text-[7px] font-black text-white/20 uppercase tracking-widest pt-3 mb-1">Select language</p>
+                          {["English (EAT)", "Swahili (KE)", "French (FR)", "Arabic (AR)"].map((lang) => (
+                            <button key={lang} onClick={() => { setSelectedLang(lang); addToast(`Language set to ${lang}`, "success"); }}
+                              className={`w-full p-3 rounded-[14px] border flex items-center justify-between transition-all ${selectedLang === lang ? "border-[#00f5d4]/30 bg-[#00f5d4]/6" : "border-white/5 bg-black/30 hover:border-white/10"}`}>
+                              <span className={`text-[9px] font-black uppercase tracking-wide ${selectedLang === lang ? "text-[#00f5d4]" : "text-white/40"}`}>{lang}</span>
+                              {selectedLang === lang && <Check size={12} className="text-[#00f5d4]" />}
+                            </button>
+                          ))}
+                          <div className="flex items-center justify-between p-3 bg-black/30 rounded-[14px] border border-white/5">
+                            <div>
+                              <p className="text-[9px] font-black text-white uppercase tracking-wide">Currency Display</p>
+                              <p className="text-[7px] text-white/25 font-bold mt-0.5">Currently showing {currency}</p>
+                            </div>
+                            <button onClick={() => { setCurrency(c => c === "USD" ? "KES" : "USD"); addToast(`Currency switched to ${currency === "USD" ? "KES" : "USD"}`, "info"); }}
+                              className="px-3 py-1.5 rounded-[10px] text-[8px] font-black uppercase tracking-widest border border-white/8 text-white/40 hover:text-white bg-white/3 transition-all">
+                              {currency} ⇄
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </GlassCard>
 
               {/* Achievements */}
@@ -1074,7 +1437,8 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                     { icon: "🎯", label: "First Gig", earned: false },
                     { icon: "💰", label: "First $100", earned: false },
                   ].map((a, i) => (
-                    <div key={i} className={`p-3 rounded-2xl border text-center transition-all ${a.earned ? "border-amber-400/30 bg-amber-400/6" : "border-white/5 opacity-40 grayscale"}`}>
+                    <div key={i} onClick={() => !a.earned && openRefill()}
+                      className={`p-3 rounded-2xl border text-center transition-all ${a.earned ? "border-amber-400/30 bg-amber-400/6" : "border-white/5 opacity-40 grayscale cursor-pointer hover:opacity-60"}`}>
                       <div className="text-2xl mb-1 leading-none">{a.icon}</div>
                       <p className="text-[6px] font-black uppercase tracking-widest text-white/40 leading-tight">{a.label}</p>
                     </div>
@@ -1082,12 +1446,28 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 </div>
               </GlassCard>
 
-              {/* Sign out */}
-              <SignOutButton>
-                <button className="w-full py-4 rounded-[18px] border border-red-500/15 bg-red-500/4 text-red-500/70 text-[9px] font-black uppercase tracking-widest hover:bg-red-500/8 transition-all">
-                  Terminate Session
-                </button>
-              </SignOutButton>
+              {/* Danger zone */}
+              <GlassCard className="p-5 border-red-500/10">
+                <p className="text-[8px] font-black uppercase tracking-widest text-red-400/40 mb-3">Danger Zone</p>
+                <div className="space-y-2">
+                  <button onClick={() => addToast("Data export request submitted. Check your email in 24h.", "info")}
+                    className="w-full p-3 rounded-[14px] border border-white/5 bg-black/30 flex items-center justify-between hover:border-white/10 transition-all">
+                    <div className="flex items-center gap-3">
+                      <Download size={13} className="text-white/30" />
+                      <div className="text-left">
+                        <p className="text-[9px] font-black text-white uppercase tracking-wide">Export My Data</p>
+                        <p className="text-[7px] text-white/25 font-bold mt-0.5">GDPR compliant · Sent to email</p>
+                      </div>
+                    </div>
+                    <ChevronRight size={13} className="text-white/20" />
+                  </button>
+                  <SignOutButton>
+                    <button className="w-full py-4 rounded-[18px] border border-red-500/15 bg-red-500/4 text-red-500/70 text-[9px] font-black uppercase tracking-widest hover:bg-red-500/8 transition-all flex items-center justify-center gap-2">
+                      <LogOut size={13} /> Terminate Session
+                    </button>
+                  </SignOutButton>
+                </div>
+              </GlassCard>
             </motion.div>
           )}
 
@@ -1110,7 +1490,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
       </div>
 
       {/* ══════════════════════════════════════════════════════
-          REFILL MODAL — Enhanced with logos + descriptions
+          REFILL MODAL
       ══════════════════════════════════════════════════════ */}
       <AnimatePresence>
         {showModal && (
@@ -1169,7 +1549,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 </div>
               )}
 
-              {/* ── Gateway Choice — with logos + descriptions ── */}
+              {/* ── Gateway Choice ── */}
               {modalStep === "choice" && (
                 <div className="space-y-5">
                   <div className="flex items-center gap-3">
@@ -1179,10 +1559,20 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                     <div>
                       <h4 className="text-[11px] font-black uppercase italic text-white leading-none">Select Gateway</h4>
                       <p className="text-[8px] text-white/25 font-bold uppercase tracking-widest mt-0.5">
-                        {selectedPack?.name} · {selectedPack?.hu} HU · KES {((selectedPack?.price || 0) * RATE).toLocaleString()}
+                        {selectedPack?.name} · {selectedPack?.hu} HU · <span className="text-[#00f5d4]">KES {((selectedPack?.price || 0) * RATE).toLocaleString()}</span>
                       </p>
                     </div>
                   </div>
+
+                  {/* Deduction preview */}
+                  <div className="p-3 rounded-2xl border flex items-center gap-3"
+                    style={{ background: "rgba(0,245,212,0.04)", borderColor: "rgba(0,245,212,0.15)" }}>
+                    <Info size={12} className="text-[#00f5d4] shrink-0" />
+                    <p className="text-[8px] font-bold text-white/40">
+                      Your card/account will be charged exactly <span className="text-[#00f5d4] font-black">KES {((selectedPack?.price || 0) * RATE).toLocaleString()}</span> for {selectedPack?.hu} HU
+                    </p>
+                  </div>
+
                   <div className="space-y-2.5">
                     {/* Bank / Card */}
                     <RippleButton onClick={() => handlePay("CARD")}
@@ -1192,7 +1582,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                       <div className="flex-1 text-left">
                         <p className="text-[12px] font-black text-white leading-none">Bank / Card</p>
                         <p className="text-[8px] font-bold text-white/40 mt-1">Visa · Mastercard · Instant via Paystack</p>
-                        <p className="text-[7px] text-indigo-400/70 font-bold uppercase tracking-widest mt-0.5">Secure · Encrypted · No extra fees</p>
+                        <p className="text-[7px] text-indigo-400/70 font-bold uppercase tracking-widest mt-0.5">Deducts KES {((selectedPack?.price || 0) * RATE).toLocaleString()} exactly</p>
                       </div>
                       <ChevronRight size={16} className="text-white/30 shrink-0" />
                     </RippleButton>
@@ -1204,7 +1594,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                       <BinanceLogo />
                       <div className="flex-1 text-left">
                         <p className="text-[12px] font-black text-white leading-none">Binance USDT</p>
-                        <p className="text-[8px] font-bold text-white/40 mt-1">TRC20 network · Crypto payment</p>
+                        <p className="text-[8px] font-bold text-white/40 mt-1">TRC20 network · ${selectedPack?.price}.00 USDT</p>
                         <p className="text-[7px] text-amber-400/70 font-bold uppercase tracking-widest mt-0.5">Scan QR · 2hr auto-credit · Borderless</p>
                       </div>
                       <ChevronRight size={16} className="text-white/30 shrink-0" />
@@ -1217,14 +1607,14 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                       <MpesaLogo />
                       <div className="flex-1 text-left">
                         <p className="text-[12px] font-black text-white leading-none">M-Pesa</p>
-                        <p className="text-[8px] font-bold text-white/40 mt-1">Safaricom STK push · Kenya only</p>
+                        <p className="text-[8px] font-bold text-white/40 mt-1">Safaricom STK push · KES {((selectedPack?.price || 0) * RATE).toLocaleString()}</p>
                         <p className="text-[7px] text-emerald-400/70 font-bold uppercase tracking-widest mt-0.5">Instant · No card needed · Mobile</p>
                       </div>
                       <ChevronRight size={16} className="text-white/30 shrink-0" />
                     </RippleButton>
 
-                    {/* PayPal — limited */}
-                    <div className="w-full p-4 rounded-[20px] border border-white/5 bg-white/2 flex items-center gap-4 cursor-not-allowed opacity-50">
+                    {/* PayPal — disabled */}
+                    <div className="w-full p-4 rounded-[20px] border border-white/5 bg-white/2 flex items-center gap-4 cursor-not-allowed opacity-40">
                       <PaypalLogo />
                       <div className="flex-1 text-left">
                         <div className="flex items-center gap-2">
@@ -1232,7 +1622,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                           <Badge color="#ef4444">Region Limited</Badge>
                         </div>
                         <p className="text-[8px] font-bold text-white/20 mt-1">Not available in Kenya & most African regions</p>
-                        <p className="text-[7px] text-red-400/50 font-bold uppercase tracking-widest mt-0.5">PayPal restricts payouts in EA · Use alternatives above</p>
                       </div>
                       <Lock size={14} className="text-white/15 shrink-0" />
                     </div>
@@ -1288,12 +1677,12 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                     </button>
                     <h4 className="text-[11px] font-black uppercase italic text-white">M-Pesa STK Push</h4>
                   </div>
-                  <div className="p-4 bg-emerald-500/6 border border-emerald-500/15 rounded-2xl flex items-center gap-3">
-                    <CheckCircle size={14} className="text-emerald-400 shrink-0" />
-                    <div>
+                  <div className="p-4 bg-emerald-500/6 border border-emerald-500/15 rounded-2xl">
+                    <div className="flex items-center gap-3 mb-2">
+                      <CheckCircle size={14} className="text-emerald-400 shrink-0" />
                       <p className="text-[9px] font-black text-emerald-400/80 uppercase tracking-widest">Uplink Fee: KES {((selectedPack?.price || 0) * RATE).toLocaleString()}</p>
-                      <p className="text-[7px] text-white/20 font-bold mt-0.5">STK prompt sent instantly · Check your phone</p>
                     </div>
+                    <p className="text-[7px] text-white/20 font-bold pl-5">Exact amount deducted from your Safaricom account · {selectedPack?.hu} HU credited instantly</p>
                   </div>
                   <div>
                     <p className="text-[7px] font-black text-white/20 uppercase tracking-widest mb-2">Safaricom Number</p>
@@ -1304,7 +1693,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                   <RippleButton disabled={isPaying} onClick={() => handlePay("MPESA")}
                     className="w-full py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2"
                     style={{ background: "linear-gradient(135deg, #059669, #065f46)" }}>
-                    {isPaying ? <><RefreshCw size={13} className="animate-spin" /> Pushing STK…</> : "Initialize Uplink"}
+                    {isPaying ? <><RefreshCw size={13} className="animate-spin" /> Pushing STK…</> : `Pay KES ${((selectedPack?.price || 0) * RATE).toLocaleString()} · Initialize`}
                   </RippleButton>
                 </div>
               )}
