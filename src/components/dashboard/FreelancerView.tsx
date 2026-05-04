@@ -18,14 +18,8 @@ import {
 } from "lucide-react";
 
 // ─────────────────────────────────────────────
-// TYPES & PRIMITIVES
+// ATOMIC COMPONENTS
 // ─────────────────────────────────────────────
-
-interface Toast {
-  id: number;
-  msg: string;
-  type: "success" | "error" | "info";
-}
 
 const PulseDot = ({ color = "#00f5d4", size = 7 }) => (
   <span className="relative inline-flex" style={{ width: size, height: size }}>
@@ -35,7 +29,7 @@ const PulseDot = ({ color = "#00f5d4", size = 7 }) => (
 );
 
 const GlassCard = ({ children, className = "", accent = false, glow = false }: any) => (
-  <div className={`relative bg-white/3 backdrop-blur-2xl border border-white/8 rounded-[28px] transition-all duration-300 ${accent ? "border-l-[3px] border-l-[#00f5d4]" : ""} ${glow ? "shadow-[0_0_40px_rgba(0,245,212,0.08)]" : ""} ${className}`}>
+  <div className={`relative bg-white/[0.03] backdrop-blur-2xl border border-white/[0.08] rounded-[28px] transition-all duration-300 ${accent ? "border-l-[3px] border-l-[#00f5d4]" : ""} ${glow ? "shadow-[0_0_40px_rgba(0,245,212,0.08)]" : ""} ${className}`}>
     {children}
   </div>
 );
@@ -78,7 +72,7 @@ const RippleButton = ({ children, onClick, className = "", disabled = false }: a
 };
 
 // ─────────────────────────────────────────────
-// MAIN VIEW
+// MAIN VIEW COMPONENT
 // ─────────────────────────────────────────────
 
 export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetadata: any }) => {
@@ -86,7 +80,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   const [activeTab, setActiveTab] = useState("home");
   const [gigMode, setGigMode] = useState<"marketplace" | "corporate">("marketplace");
   const [currency, setCurrency] = useState<"USD" | "KES">("USD");
-  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [toasts, setToasts] = useState<{ id: number; msg: string; type: string }[]>([]);
   
   const [huBalance, setHuBalance] = useState(5);
   const [cashBalance] = useState(0.0);
@@ -109,10 +103,10 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
     { id: 2, name: "Basic", price: 6, hu: 400, desc: "Expand to local tasks." },
     { id: 3, name: "Pro Uplink", price: 10, hu: 1200, desc: "Unlock Global Corporate missions.", hot: true },
     { id: 4, name: "Elite", price: 18, hu: 2500, desc: "Priority Handshakes." },
-    { id: 5, name: "Alpha", price: 30, hu: 5000, desc: "Maximum power." },
+    { id: 5, name: "Alpha", price: 30, hu: 5000, desc: "Maximum worker power." },
   ];
 
-  const addToast = (msg: string, type: Toast["type"] = "info") => {
+  const addToast = (msg: string, type: string = "info") => {
     const id = Date.now();
     setToasts((t) => [...t, { id, msg, type }]);
     setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 3800);
@@ -139,12 +133,11 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
 
     try {
       if (method === "CARD") {
-        // Correcting the deduction: Stated USD amount converted for backend
         const res = await fetch("/api/paystack", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ 
-            amount: selectedPack.price, // Deducts full $ amount
+            amount: selectedPack.price, 
             currency: "USD", 
             email: user?.primaryEmailAddress?.emailAddress 
           }),
@@ -182,12 +175,12 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
       
       {/* Background Ambience */}
       <div className="fixed inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-0 right-0 w-125 h-125 bg-[#00f5d4] blur-[120px] rounded-full" />
-        <div className="absolute bottom-0 left-0 w-125 h-125 bg-blue-600 blur-[120px] rounded-full" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#00f5d4] blur-[120px] rounded-full" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600 blur-[120px] rounded-full" />
       </div>
 
       {/* Toasts */}
-      <div className="fixed top-5 right-4 z-999 flex flex-col gap-2 pointer-events-none text-left">
+      <div className="fixed top-5 right-4 z-[999] flex flex-col gap-2 pointer-events-none text-left">
         <AnimatePresence>
           {toasts.map(t => (
             <motion.div key={t.id} initial={{ opacity: 0, x: 80 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 80 }}
@@ -206,10 +199,10 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
           {/* ════════════════ HOME ════════════════ */}
           {activeTab === "home" && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-5 text-left">
-              <header className="relative flex justify-between items-center p-6 rounded-4xl bg-white/4 border border-white/8 shadow-2xl backdrop-blur-3xl overflow-hidden">
+              <header className="relative flex justify-between items-center p-6 rounded-[32px] bg-white/[0.04] border border-white/[0.08] shadow-2xl backdrop-blur-3xl overflow-hidden">
                 <div className="absolute top-0 left-0 w-1 h-full bg-[#00f5d4]" />
                 <div>
-                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30 italic">Global Uplink</p>
+                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30 italic">Uplink System</p>
                   <h2 className="text-3xl font-black italic uppercase tracking-tighter leading-none">{user?.firstName || "Operator"}</h2>
                 </div>
                 <div className="flex flex-col items-end gap-2">
@@ -256,14 +249,15 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {jobs.map((g: any, idx) => {
-                  const isLocked = idx > 1 && huBalance < 10;
+                  const isLocked = huBalance < 10;
                   return (
-                    <div key={g.id} className={`relative p-6 rounded-[35px] bg-white/3 border border-white/10 transition-all ${isLocked ? "blur-md pointer-events-none opacity-40 grayscale" : "hover:border-white/20 shadow-2xl"}`}>
+                    <div key={g.id} className={`relative p-6 rounded-[35px] bg-white/[0.03] border border-white/10 transition-all ${isLocked ? "blur-md pointer-events-none opacity-40 grayscale" : "hover:border-white/20 shadow-2xl"}`}>
                       {isLocked && (
-                        <div className="absolute inset-0 z-20 flex items-center justify-center">
-                          <div className="bg-black/80 px-5 py-3 rounded-2xl border border-[#00f2ff]/30 text-center shadow-2xl">
-                            <Lock size={18} className="mx-auto mb-1 text-[#00f2ff]" />
-                            <p className="text-[7px] font-black text-white uppercase tracking-widest">Refill HU to Unlock</p>
+                        <div className="absolute inset-0 z-20 flex items-center justify-center p-4">
+                          <div className="bg-black/60 backdrop-blur-xl border border-[#00f2ff]/30 p-5 rounded-3xl text-center shadow-3xl">
+                            <Lock size={20} className="mx-auto mb-2 text-[#00f2ff]" />
+                            <p className="text-[10px] font-black text-white uppercase tracking-widest mb-3">Transmission Restricted</p>
+                            <RippleButton onClick={openRefill} className="px-4 py-2 bg-[#00f2ff] text-black font-black rounded-xl text-[8px] uppercase tracking-tighter active:scale-95">Select Package</RippleButton>
                           </div>
                         </div>
                       )}
@@ -284,18 +278,18 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
             </motion.div>
           )}
 
-          {/* ════════════════ WALLET (FORMERLY VAULT) ════════════════ */}
+          {/* ════════════════ WALLET ════════════════ */}
           {activeTab === "earnings" && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-5 text-left max-w-2xl mx-auto">
                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-6 rounded-[35px] border border-white/10 bg-linear-to-br from-[#00f2ff]/20 to-transparent shadow-2xl relative overflow-hidden text-left">
+                  <div className="p-6 rounded-[35px] border border-white/10 bg-gradient-to-br from-[#00f2ff]/20 to-transparent shadow-2xl relative overflow-hidden text-left">
                      <div className="absolute top-0 right-0 w-20 h-20 bg-[#00f2ff]/5 blur-3xl rounded-full" />
                      <Zap size={20} className="text-[#00f2ff] mb-4" fill="#00f2ff"/>
                      <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1 italic">Uplink Units</p>
                      <h4 className="text-4xl font-black italic text-white leading-none">{huBalance} <span className="text-xs text-[#00f2ff]">HU</span></h4>
                      <p className="text-[7px] font-bold text-gray-600 uppercase mt-1">Available Power</p>
                   </div>
-                  <div className="p-6 rounded-[35px] border border-white/10 bg-linear-to-br from-emerald-500/10 to-transparent shadow-2xl relative overflow-hidden text-left">
+                  <div className="p-6 rounded-[35px] border border-white/10 bg-gradient-to-br from-emerald-500/10 to-transparent shadow-2xl relative overflow-hidden text-left">
                      <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/5 blur-3xl rounded-full" />
                      <DollarSign size={20} className="text-emerald-400 mb-4" />
                      <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1 italic">Settlement</p>
@@ -315,7 +309,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                       <input type="number" value={calcHU} onChange={(e) => setCalcHU(e.target.value)} className="bg-transparent w-full text-lg font-black outline-none text-white tracking-tighter" />
                     </div>
                     <RefreshCw size={14} className="text-white/10 animate-spin" />
-                    <div className="bg-black/30 p-3 rounded-2xl border border-white/5 text-right">
+                    <div className="bg-black/30 p-3 rounded-2xl border border-white/5 text-right text-left">
                       <p className="text-[6px] font-black text-white/20 uppercase mb-1">Estimate</p>
                       <p className="text-lg font-black text-emerald-400 italic">Ksh {calcResult.toLocaleString()}</p>
                     </div>
@@ -340,7 +334,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                     </GlassCard>
                  </div>
                ) : (
-                 <div className="p-16 bg-white/4 border border-red-500/20 rounded-[50px] shadow-3xl">
+                 <div className="p-16 bg-white/4 border border-red-500/20 rounded-[50px] shadow-3xl text-center">
                     <ShieldAlert size={50} className="mx-auto text-red-500 mb-6" />
                     <h3 className="text-xl font-black uppercase italic text-white mb-2 leading-none">History Locked</h3>
                     <p className="text-gray-400 text-[10px] mb-8 max-w-xs mx-auto italic leading-relaxed text-center">Verify your uplink identity to sync your work history and mission earnings log across the network.</p>
@@ -389,12 +383,12 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
           {activeTab === "support" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pt-4 max-w-xl mx-auto text-left">
                <GlassCard className="p-8 space-y-6">
-                  <div className="text-center"><h3 className="text-xl font-black uppercase italic text-[#00f2ff]">Help Center</h3><p className="text-[8px] font-bold text-gray-600 uppercase mt-1">Direct Support Relay Active</p></div>
-                  <div className="space-y-4">
+                  <div className="text-center text-left"><h3 className="text-xl font-black uppercase italic text-[#00f2ff]">Help Center</h3><p className="text-[8px] font-bold text-gray-600 uppercase mt-1">Operator Relay Active</p></div>
+                  <div className="space-y-4 text-left">
                      <div className="p-5 bg-black/40 rounded-2xl border border-white/5 cursor-pointer hover:border-[#00f2ff]/30 transition-all text-left" onClick={() => window.location.href="mailto:support@nexusgigs.me"}>
                         <p className="text-[8px] font-black text-gray-600 uppercase mb-1">Email Relay</p><p className="text-xs font-black italic text-white underline leading-none">support@nexusgigs.me</p>
                      </div>
-                     <div className="p-5 bg-black/40 rounded-2xl border border-white/5 text-left">
+                     <div className="p-5 bg-black/40 rounded-2xl border border-white/5 text-left text-left">
                         <p className="text-[8px] font-black text-gray-600 uppercase mb-1">WhatsApp Official</p><p className="text-xs font-bold text-[#00f2ff] leading-none">+254 113 637325</p>
                      </div>
                   </div>
@@ -406,7 +400,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
           {activeTab === "account" && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-md mx-auto space-y-6 pb-20">
               <div className="p-10 text-center bg-white/5 backdrop-blur-3xl rounded-[50px] border border-white/10 shadow-3xl relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-transparent via-[#00f2ff] to-transparent shadow-glow" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#00f2ff] to-transparent shadow-glow" />
                 <div className="relative w-32 h-32 mx-auto mb-8">
                    <div className="absolute inset-0 bg-[#00f2ff]/20 blur-xl rounded-full animate-pulse" />
                    <div className="relative w-full h-full bg-black/60 rounded-[45px] border-2 border-white/10 flex items-center justify-center overflow-hidden">
@@ -416,14 +410,14 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 </div>
                 <h3 className="text-3xl font-black italic uppercase tracking-tighter text-white mb-2 leading-none">{user?.fullName || "Operator"}</h3>
                 <div className="flex justify-center gap-4 mb-10">
-                   <div className="px-4 py-2 bg-black/40 rounded-full border border-white/5 flex items-center gap-2"><PulseDot color="#10b981" size={6} /><span className="text-[9px] font-black uppercase text-emerald-500 italic">Synced</span></div>
-                   <div className="px-4 py-2 bg-black/40 rounded-full border border-white/5 text-[#00f2ff] shadow-inner"><span className="text-[9px] font-black italic uppercase">{isVerified ? "Tier 1 Elite" : "Tier 0 Standard"}</span></div>
+                   <div className="px-4 py-2 bg-black/40 rounded-full border border-white/5 flex items-center gap-2"><PulseDot color="#10b981" size={6} /><span className="text-[9px] font-black uppercase text-emerald-500 italic uppercase">Synced</span></div>
+                   <div className="px-4 py-2 bg-black/40 rounded-full border border-white/5 text-[#00f2ff] shadow-inner"><span className="text-[9px] font-black uppercase italic uppercase">{isVerified ? "Tier 1 Elite" : "Tier 0 Standard"}</span></div>
                 </div>
                 <div className="grid grid-cols-2 gap-4 mb-6">
                    <button onClick={() => setActiveTab('earnings')} className="py-5 bg-white text-black rounded-[25px] font-black uppercase text-[11px] shadow-2xl flex items-center justify-center gap-2 active:scale-95 transition-all italic tracking-widest">Wallet Hub</button>
                    <button className="py-5 bg-white/5 border border-white/10 text-white rounded-[25px] font-black uppercase text-[11px] flex items-center justify-center gap-2 active:scale-95 transition-all italic tracking-widest">Settings</button>
                 </div>
-                <SignOutButton><button className="w-full py-5 bg-red-500/10 border border-red-500/20 text-red-500 font-black italic rounded-[25px] uppercase text-[10px] hover:bg-red-500/20 transition-all">Terminate Session</button></SignOutButton>
+                <SignOutButton><button className="w-full py-5 bg-red-500/10 border border-red-500/20 text-red-500 font-black italic rounded-[25px] uppercase text-[10px] hover:bg-red-500/20 transition-all italic">Terminate Session</button></SignOutButton>
               </div>
             </motion.div>
           )}
@@ -432,7 +426,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
       </div>
 
       {/* --- SLIM NAV BAR --- */}
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-100 w-[94%] max-w-xl">
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[100] w-[94%] max-w-xl">
         <div className="h-16 bg-black/85 backdrop-blur-3xl border border-white/10 rounded-full flex items-center justify-around px-2 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
           {navItems.map((item) => (
             <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex flex-col items-center gap-0.5 transition-all duration-300 ${activeTab === item.id ? 'text-[#00f2ff] scale-110' : 'text-white/20 hover:text-white'}`}>
@@ -443,24 +437,24 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
         </div>
       </div>
 
-      {/* --- REFILL MODAL (LOGOS & DESCRIPTIONS) --- */}
+      {/* --- REFILL MODAL (V5 - DYNAMIC PAYMENTS) --- */}
       <AnimatePresence>
         {showModal && (
-          <div className="fixed inset-0 z-600 flex items-center justify-center p-6 backdrop-blur-md bg-black/70">
+          <div className="fixed inset-0 z-[600] flex items-center justify-center p-6 backdrop-blur-md bg-black/70">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0" onClick={() => !isPaying && setShowModal(false)} />
             <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} className="relative w-full max-w-sm bg-[#080d19] border border-white/10 rounded-[45px] p-8 shadow-3xl overflow-hidden text-left">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-transparent via-[#00f2ff] to-transparent shadow-glow" />
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#00f2ff] to-transparent shadow-glow" />
               
               {modalStep === "packages" ? (
                 <div className="space-y-6">
-                   <div className="flex justify-between items-start text-left">
+                   <div className="flex justify-between items-start">
                       <div className="text-left"><h3 className="text-xl font-black italic uppercase tracking-tight text-white leading-none">Uplink Refill</h3><p className="text-[10px] text-white/25 uppercase mt-1 italic">Authorize mission units</p></div>
                       <button className="p-2 bg-white/5 rounded-xl border border-white/10 text-white/30 hover:text-white" onClick={() => setShowModal(false)}><X size={18}/></button>
                    </div>
-                   <div className="space-y-2.5 max-h-87.5 overflow-y-auto no-scrollbar pr-1">
+                   <div className="space-y-2.5 max-h-[350px] overflow-y-auto no-scrollbar pr-1 text-left">
                       <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-2xl mb-2 flex items-center gap-4 text-left shadow-inner">
                          <Zap size={16} className="text-red-500 shrink-0"/>
-                         <p className="text-[9px] text-red-400 font-bold uppercase tracking-widest italic leading-tight text-left">Low Power: {huBalance} HU remaining.</p>
+                         <p className="text-[9px] text-red-400 font-bold uppercase tracking-widest italic leading-tight">Insufficient Power: {huBalance} HU available.</p>
                       </div>
                       {uplinkPackages.map(pkg => (
                         <RippleButton key={pkg.id} onClick={() => { setSelectedPack(pkg); setModalStep("choice"); }} className={`w-full p-5 rounded-[25px] border transition-all group flex items-center justify-between shadow-xl ${pkg.hot ? "bg-[#00f2ff]/5 border-[#00f2ff]/40 shadow-glow" : "bg-white/3 border-white/8 hover:bg-white/5"}`}>
@@ -468,9 +462,9 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                            <div className="text-right z-10"><p className="text-sm font-black text-white italic">{pkg.hu} HU</p><p className="text-[10px] font-black text-[#00f2ff]">KES {(pkg.price * RATE).toLocaleString()}</p></div>
                         </RippleButton>))}
                    </div>
-                   <div className="p-4 bg-white/3 rounded-2xl border border-white/5 flex items-center gap-3 cursor-pointer" onClick={() => setAgreed(!agreed)}>
+                   <div className="p-4 bg-white/3 rounded-2xl border border-white/5 flex items-center gap-3 cursor-pointer text-left" onClick={() => setAgreed(!agreed)}>
                       <div className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all ${agreed ? "bg-[#00f2ff] border-[#00f2ff]" : "border-white/20"} text-left`}>{agreed && <Check size={12} className="text-black font-black"/>}</div>
-                      <p className="text-[9px] font-black text-white/30 uppercase leading-tight italic text-left">Agree to protocol rules.</p>
+                      <p className="text-[9px] font-black text-white/30 uppercase leading-tight italic text-left">I agree to refill units.</p>
                    </div>
                 </div>
               ) : modalStep === "choice" ? (
@@ -479,39 +473,39 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                       <button onClick={() => setModalStep("packages")} className="p-2 bg-white/5 rounded-lg text-white/30 hover:text-white"><ChevronDown size={14} className="rotate-90"/></button>
                       <h4 className="text-xs font-black uppercase text-white italic leading-none text-left">Gateway Hub</h4>
                    </div>
-                   <div className="space-y-3">
-                      <RippleButton onClick={() => handlePay("CARD")} className="w-full p-6 bg-indigo-600 text-white rounded-[25px] flex items-center justify-between shadow-2xl italic">
-                         <div className="flex items-center gap-4 text-left"><div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center"><Landmark size={24}/></div><div className="text-left"><p className="text-sm font-black italic">Bank / Card</p><p className="text-[9px] font-bold uppercase opacity-70 mt-1">Visa · Paystack Gateway</p></div></div>
+                   <div className="space-y-3 text-left">
+                      <RippleButton onClick={() => handlePay("CARD")} className="w-full p-6 bg-indigo-600 text-white rounded-[25px] flex items-center justify-between shadow-2xl italic text-left">
+                         <div className="flex items-center gap-4 text-left"><div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center font-black"><Landmark size={24}/></div><div className="text-left"><p className="text-sm font-black italic">Bank / Card</p><p className="text-[9px] font-bold uppercase opacity-70 mt-1 text-left">Visa · Paystack Gateway</p></div></div>
                          <ChevronRight size={18}/>
                       </RippleButton>
                       <RippleButton onClick={() => setModalStep("binance")} className="w-full p-6 bg-amber-500 text-white rounded-[25px] flex items-center justify-between shadow-2xl italic text-left">
-                         <div className="flex items-center gap-4 text-left"><div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center font-black"><Zap size={24} fill="white"/></div><div className="text-left"><p className="text-sm font-black italic">Binance USDT</p><p className="text-[9px] font-bold uppercase opacity-70 mt-1">TRC20 · Instant Credit</p></div></div>
+                         <div className="flex items-center gap-4 text-left"><div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center font-black"><Zap size={24} fill="white"/></div><div className="text-left"><p className="text-sm font-black italic">Binance USDT</p><p className="text-[9px] font-bold uppercase opacity-70 mt-1 text-left">TRC20 · Instant Credit</p></div></div>
                          <ChevronRight size={18}/>
                       </RippleButton>
                       <RippleButton onClick={() => setModalStep("mpesa")} className="w-full p-6 bg-emerald-600 text-white rounded-[25px] flex items-center justify-between shadow-2xl italic text-left">
-                         <div className="flex items-center gap-4 text-left"><div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center font-black text-lg">M</div><div className="text-left"><p className="text-sm font-black italic">M-Pesa</p><p className="text-[9px] font-bold uppercase opacity-70 mt-1">Safaricom Direct Push</p></div></div>
+                         <div className="flex items-center gap-4 text-left"><div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center font-black text-lg text-emerald-100">M</div><div className="text-left"><p className="text-sm font-black italic text-left">M-Pesa</p><p className="text-[9px] font-bold uppercase opacity-70 mt-1 text-left">Safaricom Direct Push</p></div></div>
                          <ChevronRight size={18}/>
                       </RippleButton>
                       <button disabled className="w-full p-6 bg-white/5 border border-white/10 rounded-[25px] flex items-center gap-4 opacity-40 cursor-not-allowed italic text-left">
                          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-black text-xs text-white">PP</div>
-                         <div className="text-left"><p className="text-sm font-black text-gray-500">PayPal</p><p className="text-[8px] font-bold text-red-500 uppercase tracking-widest mt-1">Account Locked</p></div>
+                         <div className="text-left"><p className="text-sm font-black text-gray-500">PayPal</p><p className="text-[8px] font-bold text-red-500 uppercase tracking-widest mt-1">Limited Access</p></div>
                       </button>
                    </div>
                 </div>
               ) : modalStep === "binance" ? (
-                <div className="space-y-6 text-center">
+                <div className="space-y-6 text-center text-left">
                   <div className="flex items-center gap-3 text-left"><button onClick={() => setModalStep("choice")} className="p-2 bg-white/5 rounded-xl text-white/30"><ChevronDown size={14} className="rotate-90"/></button><h4 className="text-xs font-black uppercase text-white italic">Binance Uplink</h4></div>
-                  <div className="bg-white rounded-4xl p-4 mx-auto border-4 border-amber-500/20"><img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=TFWxe4TFcjUNgPJVgf5iXrMsw1oe4gDv9X" alt="QR" className="w-32 h-32 mx-auto" /></div>
-                  <div className="bg-black/40 p-4 rounded-3xl border border-white/5 flex justify-between items-center text-xs font-black"><div><p className="text-[7px] text-gray-600 uppercase italic mb-1">Total</p><p>${selectedPack?.price}.00 USDT</p></div><div><p className="text-[7px] text-gray-600 uppercase italic mb-1">Network</p><p className="text-amber-500 tracking-widest">TRC20</p></div></div>
-                  <div className="space-y-2 text-left"><p className="text-[8px] font-black text-gray-600 uppercase tracking-widest italic ml-1">Uplink Address</p><div className="flex gap-2 text-left"><div className="flex-1 bg-white/3 border border-white/5 rounded-xl p-3 text-[8px] font-mono text-gray-400 truncate text-left">TFWxe4TFcjUNgPJVgf5iXrMsw1oe4gDv9X</div><button onClick={() => { navigator.clipboard.writeText("TFWxe4TFcjUNgPJVgf5iXrMsw1oe4gDv9X"); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="bg-white/5 border border-white/5 p-3 rounded-xl">{copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} className="text-gray-500" />}</button></div></div>
-                  <RippleButton onClick={() => { addToast("Terminal signal sent. Syncing in ~2h", "success"); setShowModal(false); }} className="w-full py-4 bg-[#00f2ff] text-black font-black rounded-[20px] uppercase text-[10px] shadow-glow">Finalize Transmission</RippleButton>
+                  <div className="bg-white rounded-[32px] p-4 mx-auto border-4 border-amber-500/20"><img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=TFWxe4TFcjUNgPJVgf5iXrMsw1oe4gDv9X" alt="QR" className="w-32 h-32 mx-auto" /></div>
+                  <div className="bg-black/40 p-4 rounded-3xl border border-white/5 flex justify-between items-center text-xs font-black"><div><p className="text-[7px] text-gray-600 uppercase italic leading-none mb-1">Total</p><p>${selectedPack?.price}.00 USDT</p></div><div><p className="text-[7px] text-gray-600 uppercase italic leading-none mb-1">Network</p><p className="text-amber-500 tracking-widest">TRC20</p></div></div>
+                  <div className="space-y-2 text-left text-left"><p className="text-[8px] font-black text-gray-600 uppercase tracking-widest italic ml-1">Uplink Address</p><div className="flex gap-2 text-left"><div className="flex-1 bg-white/3 border border-white/5 rounded-xl p-3 text-[8px] font-mono text-gray-400 truncate text-left">TFWxe4TFcjUNgPJVgf5iXrMsw1oe4gDv9X</div><button onClick={() => { navigator.clipboard.writeText("TFWxe4TFcjUNgPJVgf5iXrMsw1oe4gDv9X"); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="bg-white/5 border border-white/5 p-3 rounded-xl">{copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} className="text-gray-500" />}</button></div></div>
+                  <RippleButton onClick={() => { addToast("Terminal signal sent. Syncing...", "success"); setShowModal(false); }} className="w-full py-4 bg-[#00f2ff] text-black font-black rounded-[20px] uppercase text-[10px] shadow-glow transition-all">I Have Paid</RippleButton>
                 </div>
               ) : (
-                <div className="space-y-6 text-center">
-                   <div className="flex items-center gap-3 text-left"><button onClick={() => setModalStep("choice")} className="p-2 bg-white/5 rounded-lg text-white/30"><ChevronDown size={14} className="rotate-90"/></button><h4 className="text-xs font-black uppercase text-white italic leading-none text-left">M-Pesa Gateway</h4></div>
-                   <div className="bg-emerald-500/5 border border-emerald-500/20 p-5 rounded-[30px] text-left"><p className="text-[10px] font-black text-emerald-500 uppercase italic text-left tracking-widest leading-none">Authorization Fee: KES {(selectedPack?.price * RATE).toLocaleString()}</p></div>
-                   <div className="space-y-2 text-left"><p className="text-[8px] font-black text-gray-600 uppercase tracking-widest italic leading-none ml-1 text-left">Safaricom Line</p><input value={mpesaNum} onChange={(e) => setMpesaNum(e.target.value)} placeholder="2547XXXXXXXX" className="w-full bg-black/40 border border-white/10 rounded-[25px] p-5 text-2xl font-black text-white outline-none focus:border-emerald-500 text-center tracking-widest transition-all" /></div>
-                   <RippleButton disabled={isPaying} onClick={() => handlePay("MPESA")} className="w-full py-5 bg-emerald-600 text-white font-black rounded-[25px] text-[11px] uppercase shadow-2xl italic tracking-widest">{isPaying ? "Pushing STK..." : "Initiate Uplink"}</RippleButton>
+                <div className="space-y-6 text-center text-left">
+                   <div className="flex items-center gap-3 text-left"><button onClick={() => setModalStep("choice")} className="p-2 bg-white/5 rounded-lg text-white/30 hover:text-white"><ChevronDown size={14} className="rotate-90"/></button><h4 className="text-xs font-black uppercase text-white italic leading-none text-left">M-Pesa Gateway</h4></div>
+                   <div className="bg-emerald-500/5 border border-emerald-500/20 p-5 rounded-[30px] text-left"><p className="text-[10px] font-black text-emerald-500 uppercase italic text-left tracking-widest">Fee: KES {(selectedPack?.price * RATE).toLocaleString()}</p></div>
+                   <div className="space-y-2 text-left text-left"><p className="text-[8px] font-black text-gray-600 uppercase tracking-widest italic leading-none ml-1 text-left">Number</p><input value={mpesaNum} onChange={(e) => setMpesaNum(e.target.value)} placeholder="2547XXXXXXXX" className="w-full bg-black/40 border border-white/10 rounded-[25px] p-5 text-2xl font-black text-white outline-none focus:border-emerald-500 text-center tracking-widest transition-all" /></div>
+                   <RippleButton disabled={isPaying} onClick={() => handlePay("MPESA")} className="w-full py-5 bg-emerald-600 text-white font-black rounded-[25px] text-[11px] uppercase shadow-2xl italic">{isPaying ? "Pushing STK..." : "Initiate Uplink"}</RippleButton>
                 </div>
               )}
             </motion.div>
