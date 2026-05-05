@@ -26,7 +26,8 @@ import {
   Megaphone, Camera, Music, BookMarked, Truck,
   HeartHandshake, GraduationCap, Wrench, MonitorSmartphone,
   Layers3, Filter, ChevronUp, ArrowUpDown, SortAsc,
-  Banknote, Building, Coins, Wallet2,
+  Banknote, Building, Coins, Wallet2, UserCheck, Fingerprint,
+  BarChart2, Languages, Moon, Sun, ChevronLeft,
 } from "lucide-react";
 
 interface Toast {
@@ -109,7 +110,6 @@ const SectionHead = ({ label, sub }: { label: string; sub?: string }) => (
 );
 
 // ── PREMIUM CompanyLogo ─────────────────────────────────────────────────────
-// 3-tier: Clearbit → Google favicon → styled initials with brand-matched color
 const CompanyLogo = ({ name, domain, size = 44 }: { name: string; domain: string; size?: number }) => {
   const [imgSrc, setImgSrc] = useState<string | null>(`https://logo.clearbit.com/${domain}`);
   const [stage, setStage] = useState<"clearbit" | "favicon" | "initials">("clearbit");
@@ -122,7 +122,6 @@ const CompanyLogo = ({ name, domain, size = 44 }: { name: string; domain: string
     .map((w) => w[0].toUpperCase())
     .join("");
 
-  // Deterministic brand color per company initial
   const brandPalette = [
     { bg: "#EFF6FF", text: "#1D4ED8", border: "#BFDBFE" },
     { bg: "#F0FDF4", text: "#15803D", border: "#BBF7D0" },
@@ -147,28 +146,8 @@ const CompanyLogo = ({ name, domain, size = 44 }: { name: string; domain: string
 
   if (stage === "initials" || !imgSrc) {
     return (
-      <div
-        style={{
-          width: size,
-          height: size,
-          minWidth: size,
-          backgroundColor: palette.bg,
-          border: `1.5px solid ${palette.border}`,
-          borderRadius: 12,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-        }}
-      >
-        <span style={{
-          fontSize: size * 0.33,
-          fontWeight: 900,
-          color: palette.text,
-          letterSpacing: "-0.02em",
-          lineHeight: 1,
-          fontFamily: "system-ui, -apple-system, sans-serif",
-        }}>
+      <div style={{ width: size, height: size, minWidth: size, backgroundColor: palette.bg, border: `1.5px solid ${palette.border}`, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <span style={{ fontSize: size * 0.33, fontWeight: 900, color: palette.text, letterSpacing: "-0.02em", lineHeight: 1, fontFamily: "system-ui, -apple-system, sans-serif" }}>
           {initials || "?"}
         </span>
       </div>
@@ -176,25 +155,17 @@ const CompanyLogo = ({ name, domain, size = 44 }: { name: string; domain: string
   }
 
   return (
-    <div
-      style={{ width: size, height: size, minWidth: size, borderRadius: 12, flexShrink: 0 }}
-      className="overflow-hidden bg-white border border-gray-100 flex items-center justify-center shadow-sm"
-    >
-      <img
-        src={imgSrc}
-        alt={name}
+    <div style={{ width: size, height: size, minWidth: size, borderRadius: 12, flexShrink: 0 }}
+      className="overflow-hidden bg-white border border-gray-100 flex items-center justify-center shadow-sm">
+      <img src={imgSrc} alt={name}
         style={{ width: "100%", height: "100%", objectFit: "contain", padding: stage === "favicon" ? 6 : 4 }}
-        onError={handleError}
-      />
+        onError={handleError} />
     </div>
   );
 };
 
 // ── PREMIUM MarketplaceAvatar ───────────────────────────────────────────────
-// Shows a styled initials avatar with type-matched color gradient
-const MarketplaceAvatar = ({
-  initials, type, seed, size = 44,
-}: { initials: string; type: string; seed?: string; size?: number }) => {
+const MarketplaceAvatar = ({ initials, type, seed, size = 44 }: { initials: string; type: string; seed?: string; size?: number }) => {
   const typeRing: Record<string, string> = {
     "Web Dev": "#3B82F6", "Design": "#8B5CF6", "Writing": "#10B981",
     "Marketing": "#F59E0B", "Data": "#06B6D4", "AI": "#EF4444",
@@ -202,76 +173,100 @@ const MarketplaceAvatar = ({
   };
   const ring = typeRing[type] || "#3B82F6";
   const photoSeed = seed || initials;
-  // pravatar.cc returns real human photos, deterministic per seed
   const src = `https://i.pravatar.cc/150?u=${encodeURIComponent(photoSeed)}`;
   const [errored, setErrored] = useState(false);
 
   return (
-    <div
-      style={{
-        width: size, height: size, minWidth: size, borderRadius: 12,
-        padding: 2, background: `linear-gradient(135deg, ${ring}, ${ring}99)`,
-        flexShrink: 0, boxShadow: `0 2px 10px ${ring}33`,
-      }}
-    >
+    <div style={{ width: size, height: size, minWidth: size, borderRadius: 12, padding: 2, background: `linear-gradient(135deg, ${ring}, ${ring}99)`, flexShrink: 0, boxShadow: `0 2px 10px ${ring}33` }}>
       {errored ? (
-        <div style={{
-          width: "100%", height: "100%", borderRadius: 10,
-          background: `linear-gradient(135deg, ${ring}, ${ring}cc)`,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          color: "#fff", fontWeight: 900, fontSize: size * 0.32,
-          fontFamily: "system-ui, -apple-system, sans-serif",
-        }}>
+        <div style={{ width: "100%", height: "100%", borderRadius: 10, background: `linear-gradient(135deg, ${ring}, ${ring}cc)`, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 900, fontSize: size * 0.32, fontFamily: "system-ui, -apple-system, sans-serif" }}>
           {initials.slice(0, 2)}
         </div>
       ) : (
-        <img
-          src={src}
-          alt={initials}
-          onError={() => setErrored(true)}
-          style={{
-            width: "100%", height: "100%", borderRadius: 10,
-            objectFit: "cover", display: "block", background: "#f3f4f6",
-          }}
-        />
+        <img src={src} alt={initials} onError={() => setErrored(true)}
+          style={{ width: "100%", height: "100%", borderRadius: 10, objectFit: "cover", display: "block", background: "#f3f4f6" }} />
       )}
     </div>
   );
 };
 
-// Payment method logos
-const MpesaLogo = ({ size = 40 }: { size?: number }) => (
-  <div style={{ width: size, height: size, minWidth: size }} className="rounded-xl overflow-hidden bg-green-600 flex items-center justify-center shadow-sm">
-    <svg viewBox="0 0 40 40" width={size} height={size}>
-      <rect width="40" height="40" fill="#16A34A"/>
-      <text x="50%" y="54%" textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="16" fontWeight="900" fontFamily="Arial Black">M</text>
+// ── Payment Method Logos (enhanced) ────────────────────────────────────────
+
+const MpesaLogo = ({ size = 44 }: { size?: number }) => (
+  <div style={{ width: size, height: size, minWidth: size, background: "linear-gradient(135deg, #16A34A, #15803D)" }} className="rounded-xl overflow-hidden flex items-center justify-center shadow-md">
+    <svg viewBox="0 0 44 44" width={size} height={size}>
+      <rect width="44" height="44" fill="url(#mpesa-grad)" rx="10"/>
+      <defs>
+        <linearGradient id="mpesa-grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#22C55E"/>
+          <stop offset="100%" stopColor="#14532D"/>
+        </linearGradient>
+      </defs>
+      <text x="50%" y="38%" textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="13" fontWeight="900" fontFamily="Arial Black, sans-serif">M</text>
+      <text x="50%" y="68%" textAnchor="middle" dominantBaseline="middle" fill="rgba(255,255,255,0.85)" fontSize="6" fontWeight="700" fontFamily="Arial, sans-serif" letterSpacing="1">PESA</text>
     </svg>
   </div>
 );
 
-const PaystackLogo = ({ size = 40 }: { size?: number }) => (
-  <div style={{ width: size, height: size, minWidth: size }} className="rounded-xl overflow-hidden flex items-center justify-center shadow-sm bg-[#3d4eac]">
-    <svg viewBox="0 0 40 40" width={size} height={size}>
-      <rect width="40" height="40" fill="#3d4eac"/>
-      <rect x="10" y="11" width="20" height="4.5" rx="2.5" fill="white"/>
-      <rect x="10" y="17.5" width="14" height="4.5" rx="2.5" fill="white" opacity="0.7"/>
-      <rect x="10" y="24" width="18" height="4.5" rx="2.5" fill="white" opacity="0.45"/>
+const BinanceLogo = ({ size = 44 }: { size?: number }) => (
+  <div style={{ width: size, height: size, minWidth: size, background: "linear-gradient(135deg, #F3BA2F, #D4A017)" }} className="rounded-xl flex items-center justify-center shadow-md">
+    <svg viewBox="0 0 36 36" width={size - 8} height={size - 8} fill="white">
+      <path d="M18 3.5l3.2 3.2-3.2 3.2-3.2-3.2L18 3.5zm-7.3 7.3l3.2 3.2-3.2 3.2-3.2-3.2 3.2-3.2zm14.6 0l3.2 3.2-3.2 3.2-3.2-3.2 3.2-3.2zM18 18l3.2 3.2-3.2 3.2-3.2-3.2L18 18zm-7.3 7.3l3.2 3.2-3.2 3.2-3.2-3.2 3.2-3.2zm14.6 0l3.2 3.2-3.2 3.2-3.2-3.2 3.2-3.2zM18 10.7l7.3 7.3-7.3 7.3-7.3-7.3L18 10.7z"/>
     </svg>
   </div>
 );
 
-const BinanceLogo = ({ size = 40 }: { size?: number }) => (
-  <div style={{ width: size, height: size, minWidth: size }} className="rounded-xl bg-[#F3BA2F] flex items-center justify-center shadow-sm">
-    <svg viewBox="0 0 40 40" width={size - 8} height={size - 8} fill="white">
-      <path d="M20 4l3.5 3.5L20 11l-3.5-3.5L20 4zm-8 8l3.5 3.5L12 19l-3.5-3.5L12 12zm16 0l3.5 3.5L28 19l-3.5-3.5L28 12zM20 20l3.5 3.5L20 27l-3.5-3.5L20 20zm-8 8l3.5 3.5L12 35l-3.5-3.5L12 28zm16 0l3.5 3.5L28 35l-3.5-3.5L28 28zM20 12l8 8-8 8-8-8 8-8z"/>
+const BankTransferLogo = ({ size = 44 }: { size?: number }) => (
+  <div style={{ width: size, height: size, minWidth: size, background: "linear-gradient(135deg, #1E40AF, #1D4ED8)" }} className="rounded-xl flex items-center justify-center shadow-md">
+    <svg viewBox="0 0 44 44" width={size} height={size}>
+      <defs>
+        <linearGradient id="bank-grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#3B82F6"/>
+          <stop offset="100%" stopColor="#1E3A8A"/>
+        </linearGradient>
+      </defs>
+      <rect width="44" height="44" fill="url(#bank-grad)" rx="10"/>
+      {/* Bank building icon */}
+      <rect x="8" y="28" width="28" height="3.5" rx="1.5" fill="white" opacity="0.9"/>
+      <rect x="11" y="18" width="3.5" height="10" rx="1" fill="white" opacity="0.85"/>
+      <rect x="20.25" y="18" width="3.5" height="10" rx="1" fill="white" opacity="0.85"/>
+      <rect x="29.5" y="18" width="3.5" height="10" rx="1" fill="white" opacity="0.85"/>
+      <polygon points="22,8 34,17 10,17" fill="white" opacity="0.95"/>
+      <rect x="8" y="31.5" width="28" height="2" rx="1" fill="white" opacity="0.6"/>
     </svg>
   </div>
 );
 
-const PaypalLogo = ({ size = 40 }: { size?: number }) => (
-  <div style={{ width: size, height: size, minWidth: size }} className="rounded-xl bg-[#003087] flex items-center justify-center shadow-sm">
-    <svg viewBox="0 0 60 24" width={size - 6} height={16} fill="none">
-      <text x="50%" y="75%" textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="9" fontWeight="900" fontFamily="Arial">PayPal</text>
+const PaypalLogo = ({ size = 44 }: { size?: number }) => (
+  <div style={{ width: size, height: size, minWidth: size, background: "linear-gradient(135deg, #003087, #00457C)" }} className="rounded-xl flex items-center justify-center shadow-md">
+    <svg viewBox="0 0 44 44" width={size} height={size}>
+      <defs>
+        <linearGradient id="pp-grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#0070E0"/>
+          <stop offset="100%" stopColor="#003087"/>
+        </linearGradient>
+      </defs>
+      <rect width="44" height="44" fill="url(#pp-grad)" rx="10"/>
+      {/* PP letters styled like PayPal logo */}
+      <text x="50%" y="52%" textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="11" fontWeight="900" fontFamily="Arial, sans-serif" letterSpacing="-0.5">PayPal</text>
+      <rect x="11" y="30" width="22" height="1.5" rx="0.75" fill="rgba(255,255,255,0.4)"/>
+    </svg>
+  </div>
+);
+
+const PaystackLogo = ({ size = 44 }: { size?: number }) => (
+  <div style={{ width: size, height: size, minWidth: size, background: "linear-gradient(135deg, #4F61D3, #3d4eac)" }} className="rounded-xl overflow-hidden flex items-center justify-center shadow-md">
+    <svg viewBox="0 0 44 44" width={size} height={size}>
+      <rect width="44" height="44" fill="url(#ps-grad)" rx="10"/>
+      <defs>
+        <linearGradient id="ps-grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#6675E0"/>
+          <stop offset="100%" stopColor="#3B4DBF"/>
+        </linearGradient>
+      </defs>
+      <rect x="10" y="12" width="24" height="5" rx="2.5" fill="white"/>
+      <rect x="10" y="19.5" width="16" height="5" rx="2.5" fill="white" opacity="0.7"/>
+      <rect x="10" y="27" width="20" height="5" rx="2.5" fill="white" opacity="0.45"/>
     </svg>
   </div>
 );
@@ -309,6 +304,31 @@ const PremiumLockedSection = ({
   </motion.div>
 );
 
+// ── Toggle Row ──────────────────────────────────────────────────────────────
+const ToggleRow = ({ label, sub, value, onChange, icon, color = "#3B82F6" }: {
+  label: string; sub?: string; value: boolean; onChange: () => void; icon?: React.ReactNode; color?: string;
+}) => (
+  <div className="flex items-center justify-between py-3.5 border-b border-gray-50 last:border-0">
+    <div className="flex items-center gap-3">
+      {icon && <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${color}15`, color }}>{icon}</div>}
+      <div>
+        <p className="text-[11px] font-bold text-gray-800">{label}</p>
+        {sub && <p className="text-[9px] text-gray-400 font-medium mt-0.5">{sub}</p>}
+      </div>
+    </div>
+    <button onClick={onChange} className="transition-all duration-200">
+      {value
+        ? <div className="w-11 h-6 rounded-full relative transition-all" style={{ background: `linear-gradient(135deg, ${color}, ${color}cc)` }}>
+            <div className="absolute right-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all" />
+          </div>
+        : <div className="w-11 h-6 rounded-full bg-gray-200 relative">
+            <div className="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow-sm" />
+          </div>
+      }
+    </button>
+  </div>
+);
+
 // ── Main Component ──────────────────────────────────────────────────────────
 
 export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetadata: any }) => {
@@ -339,7 +359,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   const isVerified = userMetadata?.status === "Verified";
 
   const [showModal, setShowModal] = useState(false);
-  const [modalStep, setModalStep] = useState<"packages" | "choice" | "mpesa" | "binance">("packages");
+  const [modalStep, setModalStep] = useState<"packages" | "choice" | "mpesa" | "binance" | "bank">("packages");
   const [selectedPack, setSelectedPack] = useState<(typeof uplinkPackages)[0] | null>(null);
   const [agreed, setAgreed] = useState(false);
   const [mpesaNum, setMpesaNum] = useState("");
@@ -366,6 +386,14 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
     { device: "Safari · iPhone 15", location: "Nairobi, KE", last: "2 hours ago", current: false },
   ]);
   const [revokedSession, setRevokedSession] = useState<number[]>([]);
+
+  // Me tab state
+  const [activeProfileTab, setActiveProfileTab] = useState<"profile" | "security" | "notifications" | "achievements" | "settings">("profile");
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [profileBio, setProfileBio] = useState("Freelancer on Nexus. Ready to take on global opportunities.");
+  const [profileSkills, setProfileSkills] = useState(["React", "Node.js", "TypeScript"]);
+  const [profileLocation, setProfileLocation] = useState("Nairobi, Kenya");
+  const [showApiKey, setShowApiKey] = useState(false);
 
   const uplinkPackages = [
     { id: 1, name: "Starter", price: 3, hu: 150, desc: "Apply for a few small gigs today.", hot: false },
@@ -420,7 +448,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
     { id: "c13", title: "ML Infrastructure Engineer", salary: 15000, domain: "openai.com", company: "OpenAI", cost: 100, badge: "AI · Remote", dept: "AI" },
     { id: "c14", title: "Backend Engineer (Go/Rust)", salary: 12000, domain: "discord.com", company: "Discord", cost: 50, badge: "Remote · Mid", dept: "Engineering" },
     { id: "c15", title: "Data Scientist — Ads Platform", salary: 13000, domain: "twitter.com", company: "X (Twitter)", cost: 100, badge: "Data · Senior", dept: "Data" },
-    { id: "c16", title: "Site Reliability Engineer", salary: 12500, domain: "netflix.com", company: "Netflix", cost: 100, badge: "Remote · Senior", dept: "Infrastructure" },
+    { id: "c16", title: "Smart Contract Auditor", salary: 17000, domain: "binance.com", company: "Binance", cost: 100, badge: "Crypto · Senior", dept: "Security" },
     { id: "c17", title: "API Developer (Payments)", salary: 10000, domain: "paypal.com", company: "PayPal", cost: 50, badge: "FinTech · Remote", dept: "Engineering" },
     { id: "c18", title: "Content Strategy Manager", salary: 7500, domain: "hubspot.com", company: "HubSpot", cost: 30, badge: "Marketing · Remote", dept: "Marketing" },
     { id: "c19", title: "Cloud Security Architect", salary: 16000, domain: "cloudflare.com", company: "Cloudflare", cost: 100, badge: "Security · Senior", dept: "Security" },
@@ -457,13 +485,14 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   };
 
   const navItems = [
-    { id: "home",      icon: <Home size={17} />,        label: "Home"   },
-    { id: "tasks",     icon: <Briefcase size={17} />,   label: "Jobs"   },
-    { id: "contracts", icon: <FileText size={17} />,    label: "Work"   },
-    { id: "messages",  icon: <MessageSquare size={17} />, label: "Chats" },
-    { id: "earnings",  icon: <Wallet size={17} />,      label: "Wallet" },
-    { id: "analytics", icon: <BarChart3 size={17} />,   label: "Stats"  },
-    { id: "support",   icon: <LifeBuoy size={17} />,    label: "Help"   },
+    { id: "home",      icon: <Home size={17} />,         label: "Home"   },
+    { id: "tasks",     icon: <Briefcase size={17} />,    label: "Jobs"   },
+    { id: "contracts", icon: <FileText size={17} />,     label: "Work"   },
+    { id: "messages",  icon: <MessageSquare size={17} />,label: "Chats"  },
+    { id: "earnings",  icon: <Wallet size={17} />,       label: "Wallet" },
+    { id: "analytics", icon: <BarChart3 size={17} />,    label: "Stats"  },
+    { id: "support",   icon: <LifeBuoy size={17} />,     label: "Help"   },
+    { id: "me",        icon: <User size={17} />,         label: "Me"     },
   ];
 
   const messages = [
@@ -539,14 +568,22 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
     { q: "Is my information safe?", a: "Yes. All your data is protected using top-level encryption (TLS 1.3 and AES-256). We never share your personal details with anyone without your permission." },
   ];
 
+  // ── Achievements list ──
+  const achievements = [
+    { id: 1, title: "First Login", desc: "Joined the platform", icon: <Star size={16} />, color: "#F59E0B", earned: true },
+    { id: 2, title: "Profile Set Up", desc: "Completed your profile", icon: <UserCheck size={16} />, color: "#10B981", earned: true },
+    { id: 3, title: "First Application", desc: "Applied to your first job", icon: <Briefcase size={16} />, color: "#3B82F6", earned: false },
+    { id: 4, title: "First Earning", desc: "Completed a paid job", icon: <DollarSign size={16} />, color: "#8B5CF6", earned: false },
+    { id: 5, title: "Top Rated", desc: "Earned 5-star feedback", icon: <Award size={16} />, color: "#EF4444", earned: false },
+    { id: 6, title: "Verified Pro", desc: "Profile fully verified", icon: <BadgeCheck size={16} />, color: "#06B6D4", earned: false },
+    { id: 7, title: "Referral King", desc: "Referred 5 friends", icon: <Gift size={16} />, color: "#EC4899", earned: false },
+    { id: 8, title: "Elite Worker", desc: "Completed 10 jobs", icon: <Trophy size={16} />, color: "#7C3AED", earned: false },
+  ];
+
   return (
     <div
       className="min-h-screen font-sans overflow-x-hidden"
-      style={{
-        // ── CLEAN premium background — no dark blobs ──
-        background: "#F7F9FC",
-        paddingBottom: "72px",
-      }}
+      style={{ background: "#F7F9FC", paddingBottom: "80px" }}
     >
       {/* Toasts */}
       <div className="fixed top-5 right-4 z-999 flex flex-col gap-2 pointer-events-none">
@@ -573,7 +610,10 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
             <motion.div key="home" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }} className="space-y-5">
 
               {/* Greeting header */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex justify-between items-center">
+              <div className="rounded-2xl border border-gray-100 shadow-sm p-6 flex justify-between items-center overflow-hidden relative"
+                style={{ background: "linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%)" }}>
+                <div className="absolute right-0 top-0 w-48 h-48 rounded-full opacity-[0.04]"
+                  style={{ background: "radial-gradient(circle, #3B82F6, transparent)", transform: "translate(30%, -30%)" }} />
                 <div>
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Welcome back</p>
                   <h2 className="text-[26px] font-black text-gray-900 leading-none">
@@ -689,7 +729,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 </div>
               </Card>
 
-              {/* Featured companies — real logos via CompanyLogo */}
+              {/* Featured companies */}
               <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Companies Hiring Now</p>
                 <div className="flex gap-3 overflow-x-auto pb-1 no-scrollbar">
@@ -742,7 +782,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 {(["marketplace", "corporate"] as const).map((m) => (
                   <button key={m} onClick={() => setGigMode(m)}
                     className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${gigMode === m ? "bg-blue-600 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"}`}>
-                    {m === "marketplace" ? "🛒 Freelance" : "🏢 Corporate"}
+                    {m === "marketplace" ? "Freelance" : "Corporate"}
                   </button>
                 ))}
               </div>
@@ -789,7 +829,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                       return (
                         <div key={g.id} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-gray-200 transition-all group">
                           <div className="flex items-start justify-between mb-3">
-                            {/* ✅ Premium MarketplaceAvatar — replaces plain colored box */}
                             <MarketplaceAvatar initials={g.avatar} type={g.type} seed={g.client} size={44} />
                             <div className="flex gap-1 flex-wrap justify-end">
                               <Badge color={tc}>{g.type}</Badge>
@@ -858,7 +897,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                       return (
                         <div key={c.id} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-gray-200 transition-all">
                           <div className="flex items-center gap-4 mb-4">
-                            {/* ✅ CompanyLogo with 3-tier fallback */}
                             <CompanyLogo name={c.company} domain={c.domain} size={56} />
                             <div className="min-w-0 flex-1">
                               <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400 mb-0.5">{c.company}</p>
@@ -986,16 +1024,18 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                     </div>
                   </Card>
 
+                  {/* Payment Methods on file */}
                   <Card className="p-5">
                     <div className="flex items-center gap-2 mb-4">
                       <CreditCard size={15} className="text-blue-500" />
-                      <span className="text-[11px] font-black text-gray-700 uppercase tracking-wide">How to Withdraw</span>
+                      <span className="text-[11px] font-black text-gray-700 uppercase tracking-wide">Withdrawal Methods</span>
                     </div>
                     <div className="space-y-3">
                       {[
-                        { name: "M-Pesa", sub: "Instant · Safaricom · KES", status: "Active", color: "#10B981", logo: <MpesaLogo /> },
-                        { name: "Bank Transfer", sub: "1–3 business days · USD / KES", status: "Available", color: "#3B82F6", logo: <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center"><Landmark size={18} className="text-white" /></div> },
-                        { name: "Binance USDT", sub: "TRC20 · Instant · Borderless", status: "Available", color: "#F3BA2F", logo: <BinanceLogo /> },
+                        { name: "M-Pesa", sub: "Safaricom · Kenya", logo: <MpesaLogo size={40} />, status: "Available", color: "#16A34A" },
+                        { name: "Binance USDT", sub: "TRC20 · Worldwide", logo: <BinanceLogo size={40} />, status: "Available", color: "#F59E0B" },
+                        { name: "Bank Transfer", sub: "Local & SWIFT · Worldwide", logo: <BankTransferLogo size={40} />, status: "Available", color: "#3B82F6" },
+                        { name: "PayPal", sub: "Not available in Kenya", logo: <PaypalLogo size={40} />, status: "Unavailable", color: "#EF4444" },
                       ].map((m, i) => (
                         <div key={i} className="flex items-center gap-4 p-3.5 bg-gray-50 rounded-xl border border-gray-100">
                           {m.logo}
@@ -1265,27 +1305,429 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
             </motion.div>
           )}
 
+          {/* ══ ME TAB ════════════════════════════════════════════ */}
+          {activeTab === "me" && (
+            <motion.div key="me" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }} className="space-y-4 max-w-2xl mx-auto">
+
+              {/* Profile Hero Card */}
+              <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+                {/* Banner */}
+                <div className="h-24 relative" style={{ background: "linear-gradient(135deg, #0047B3 0%, #0066FF 60%, #38BDF8 100%)" }}>
+                  <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
+                </div>
+                {/* Profile info */}
+                <div className="bg-white px-6 pb-6">
+                  <div className="flex items-end justify-between -mt-8 mb-4">
+                    <div className="w-16 h-16 rounded-2xl border-4 border-white shadow-md bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                      <span className="text-white text-[22px] font-black">
+                        {(user?.firstName?.[0] || "U").toUpperCase()}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setEditingProfile(e => !e)}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-all text-[10px] font-bold text-gray-600">
+                      <Edit3 size={12} /> {editingProfile ? "Cancel" : "Edit Profile"}
+                    </button>
+                  </div>
+
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="text-[18px] font-black text-gray-900 leading-tight">
+                        {user?.firstName} {user?.lastName}
+                      </h3>
+                      <p className="text-[11px] text-gray-400 font-medium mt-0.5">{user?.primaryEmailAddress?.emailAddress}</p>
+                      <div className="flex items-center gap-2 mt-2 flex-wrap">
+                        <div className="flex items-center gap-1.5">
+                          <MapPin size={10} className="text-gray-400" />
+                          <span className="text-[10px] text-gray-400 font-medium">{profileLocation}</span>
+                        </div>
+                        <Badge color={isVerified ? "#10B981" : "#F59E0B"}>
+                          {isVerified ? <><BadgeCheck size={9} /> Verified</> : <><AlertTriangle size={9} /> Unverified</>}
+                        </Badge>
+                        <Badge color="#3B82F6"><Zap size={9} /> {huBalance} HU</Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bio */}
+                  {editingProfile ? (
+                    <div className="mt-4 space-y-3">
+                      <div>
+                        <label className="text-[9px] font-bold text-gray-400 uppercase tracking-wide mb-1 block">Bio</label>
+                        <textarea
+                          value={profileBio}
+                          onChange={e => setProfileBio(e.target.value)}
+                          rows={2}
+                          className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-[11px] text-gray-700 outline-none focus:border-blue-400 resize-none transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[9px] font-bold text-gray-400 uppercase tracking-wide mb-1 block">Location</label>
+                        <input
+                          value={profileLocation}
+                          onChange={e => setProfileLocation(e.target.value)}
+                          className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-[11px] text-gray-700 outline-none focus:border-blue-400 transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[9px] font-bold text-gray-400 uppercase tracking-wide mb-1 block">Skills (comma separated)</label>
+                        <input
+                          value={profileSkills.join(", ")}
+                          onChange={e => setProfileSkills(e.target.value.split(",").map(s => s.trim()).filter(Boolean))}
+                          className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-[11px] text-gray-700 outline-none focus:border-blue-400 transition-all"
+                        />
+                      </div>
+                      <RippleButton
+                        onClick={() => { setEditingProfile(false); addToast("Profile updated!", "success"); }}
+                        className="w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-white"
+                        style={{ background: "linear-gradient(135deg, #0066FF, #0047B3)" }}>
+                        Save Profile
+                      </RippleButton>
+                    </div>
+                  ) : (
+                    <div className="mt-3">
+                      <p className="text-[11px] text-gray-500 leading-relaxed">{profileBio}</p>
+                      <div className="flex gap-1.5 flex-wrap mt-3">
+                        {profileSkills.map((skill, i) => (
+                          <span key={i} className="px-2.5 py-1 rounded-full text-[9px] font-bold bg-blue-50 text-blue-600 border border-blue-100">{skill}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Profile completion */}
+              {!isVerified && (
+                <div className="p-4 rounded-2xl border border-amber-200 bg-linear-to-r from-amber-50 to-orange-50">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <UserCheck size={14} className="text-amber-600" />
+                      <span className="text-[11px] font-black text-amber-800">Profile Completion</span>
+                    </div>
+                    <span className="text-[12px] font-black text-amber-600">45%</span>
+                  </div>
+                  <div className="h-2 bg-amber-100 rounded-full overflow-hidden mb-3">
+                    <motion.div initial={{ width: 0 }} animate={{ width: "45%" }} transition={{ delay: 0.3, duration: 0.8 }}
+                      className="h-full rounded-full" style={{ background: "linear-gradient(90deg, #F59E0B, #EF4444)" }} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { label: "Email verified", done: true },
+                      { label: "Profile photo", done: false },
+                      { label: "ID verification", done: false },
+                      { label: "Phone number", done: false },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${item.done ? "bg-green-500" : "bg-gray-200"}`}>
+                          {item.done ? <Check size={9} className="text-white" /> : <X size={9} className="text-gray-400" />}
+                        </div>
+                        <span className={`text-[9px] font-semibold ${item.done ? "text-gray-700" : "text-gray-400"}`}>{item.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Sub-tabs */}
+              <div className="flex gap-1 p-1 rounded-xl border border-gray-200 bg-white overflow-x-auto no-scrollbar">
+                {([
+                  { id: "profile", label: "Profile", icon: <User size={12} /> },
+                  { id: "security", label: "Security", icon: <Shield size={12} /> },
+                  { id: "notifications", label: "Alerts", icon: <Bell size={12} /> },
+                  { id: "achievements", label: "Badges", icon: <Trophy size={12} /> },
+                  { id: "settings", label: "Settings", icon: <Settings size={12} /> },
+                ] as const).map((t) => (
+                  <button key={t.id} onClick={() => setActiveProfileTab(t.id)}
+                    className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeProfileTab === t.id ? "bg-blue-600 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"}`}>
+                    {t.icon} {t.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* ── Profile sub-tab ── */}
+              {activeProfileTab === "profile" && (
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
+                  <Card className="p-5">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">Account Info</p>
+                    <div className="space-y-3">
+                      {[
+                        { label: "Display Name", value: `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "—", icon: <User size={14} /> },
+                        { label: "Email", value: user?.primaryEmailAddress?.emailAddress || "—", icon: <Mail size={14} /> },
+                        { label: "Account Type", value: "Freelancer", icon: <Briefcase size={14} /> },
+                        { label: "Member Since", value: "May 2025", icon: <Calendar size={14} /> },
+                        { label: "HU Balance", value: `${huBalance} HU`, icon: <Zap size={14} /> },
+                        { label: "Cash Balance", value: fmt(cashBalance), icon: <DollarSign size={14} /> },
+                      ].map((row, i) => (
+                        <div key={i} className="flex items-center gap-3 py-2.5 border-b border-gray-50 last:border-0">
+                          <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 shrink-0">{row.icon}</div>
+                          <div className="flex-1">
+                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wide">{row.label}</p>
+                            <p className="text-[11px] font-black text-gray-900 mt-0.5">{row.value}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+
+                  <Card className="p-5">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">Quick Actions</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        { label: "Top Up HU", icon: <Zap size={16} />, color: "#3B82F6", bg: "#EFF6FF", action: openRefill },
+                        { label: "Browse Jobs", icon: <Briefcase size={16} />, color: "#8B5CF6", bg: "#F5F3FF", action: () => setActiveTab("tasks") },
+                        { label: "My Wallet", icon: <Wallet size={16} />, color: "#10B981", bg: "#ECFDF5", action: () => setActiveTab("earnings") },
+                        { label: "Get Help", icon: <LifeBuoy size={16} />, color: "#F59E0B", bg: "#FFFBEB", action: () => setActiveTab("support") },
+                      ].map((item, i) => (
+                        <button key={i} onClick={item.action}
+                          className="p-4 rounded-xl border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-all flex items-center gap-3 text-left">
+                          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: item.bg, color: item.color }}>
+                            {item.icon}
+                          </div>
+                          <span className="text-[10px] font-black text-gray-700">{item.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </Card>
+                </motion.div>
+              )}
+
+              {/* ── Security sub-tab ── */}
+              {activeProfileTab === "security" && (
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
+                  <Card className="p-5">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">Security Settings</p>
+                    <ToggleRow
+                      label="Two-Factor Authentication"
+                      sub={twoFAEnabled ? "Your account is protected with 2FA" : "Add an extra layer of protection"}
+                      value={twoFAEnabled}
+                      onChange={() => { setTwoFAEnabled(v => !v); addToast(twoFAEnabled ? "2FA disabled" : "2FA enabled — secure!", twoFAEnabled ? "info" : "success"); }}
+                      icon={<Fingerprint size={14} />}
+                      color="#10B981"
+                    />
+                    {twoFAEnabled && (
+                      <div className="mt-3 p-3 bg-green-50 border border-green-100 rounded-xl flex items-center gap-3">
+                        <CheckCircle size={14} className="text-green-500 shrink-0" />
+                        <p className="text-[10px] font-semibold text-green-700">2FA is active — your account is secured</p>
+                      </div>
+                    )}
+                  </Card>
+
+                  <Card className="p-5">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">Active Sessions</p>
+                    <div className="space-y-2">
+                      {sessions.map((s, i) => (
+                        <div key={i} className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all ${revokedSession.includes(i) ? "opacity-40 bg-gray-50 border-gray-100" : s.current ? "bg-green-50 border-green-100" : "bg-gray-50 border-gray-100"}`}>
+                          <div className="w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center shrink-0">
+                            <Smartphone size={15} className="text-gray-500" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <p className="text-[11px] font-black text-gray-900">{s.device}</p>
+                              {s.current && <Badge color="#10B981">Current</Badge>}
+                            </div>
+                            <p className="text-[9px] text-gray-400 font-medium mt-0.5">{s.location} · {s.last}</p>
+                          </div>
+                          {!s.current && !revokedSession.includes(i) && (
+                            <button
+                              onClick={() => { setRevokedSession(r => [...r, i]); addToast("Session revoked", "success"); }}
+                              className="px-3 py-1.5 rounded-lg border border-red-200 bg-red-50 text-[9px] font-bold text-red-600 hover:bg-red-100 transition-all">
+                              Revoke
+                            </button>
+                          )}
+                          {revokedSession.includes(i) && (
+                            <span className="text-[9px] font-bold text-gray-400">Revoked</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+
+                  <Card className="p-5">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">API Access</p>
+                    <p className="text-[10px] text-gray-500 font-medium mb-3">Generate an API key to connect external tools to your Nexus account.</p>
+                    {generatedApiKey ? (
+                      <div className="space-y-2">
+                        <div className="flex gap-2">
+                          <div className="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-3 font-mono text-[10px] text-gray-600 truncate">
+                            {showApiKey ? generatedApiKey : "••••••••••••••••••••••••••••••••"}
+                          </div>
+                          <button onClick={() => setShowApiKey(v => !v)} className="p-3 bg-gray-100 border border-gray-200 rounded-xl hover:bg-gray-200 transition-all">
+                            {showApiKey ? <EyeOff size={14} className="text-gray-500" /> : <Eye size={14} className="text-gray-500" />}
+                          </button>
+                          <button onClick={() => { navigator.clipboard.writeText(generatedApiKey); setCopiedKey(true); addToast("API key copied!", "success"); setTimeout(() => setCopiedKey(false), 2000); }}
+                            className="p-3 bg-gray-100 border border-gray-200 rounded-xl hover:bg-gray-200 transition-all">
+                            {copiedKey ? <Check size={14} className="text-green-500" /> : <Copy size={14} className="text-gray-500" />}
+                          </button>
+                        </div>
+                        <button onClick={() => { setGeneratedApiKey(null); addToast("API key revoked", "info"); }}
+                          className="text-[10px] font-bold text-red-500 hover:text-red-700 transition-all">
+                          Revoke Key
+                        </button>
+                      </div>
+                    ) : (
+                      <RippleButton
+                        onClick={() => { const key = "nxs_" + Math.random().toString(36).substr(2, 32); setGeneratedApiKey(key); addToast("API key generated!", "success"); }}
+                        className="w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-blue-200 text-blue-600 hover:bg-blue-50 transition-all flex items-center justify-center gap-2">
+                        <Key size={13} /> Generate API Key
+                      </RippleButton>
+                    )}
+                  </Card>
+                </motion.div>
+              )}
+
+              {/* ── Notifications sub-tab ── */}
+              {activeProfileTab === "notifications" && (
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+                  <Card className="p-5">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Notification Preferences</p>
+                    <ToggleRow label="New Job Alerts" sub="Get notified when matching jobs are posted" value={notifications.newGigs} onChange={() => setNotifications(n => ({ ...n, newGigs: !n.newGigs }))} icon={<Briefcase size={14} />} color="#3B82F6" />
+                    <ToggleRow label="Payment Updates" sub="Confirmations, withdrawals, and HU credits" value={notifications.payments} onChange={() => setNotifications(n => ({ ...n, payments: !n.payments }))} icon={<DollarSign size={14} />} color="#10B981" />
+                    <ToggleRow label="Mission Alerts" sub="Important status changes on your applications" value={notifications.missions} onChange={() => setNotifications(n => ({ ...n, missions: !n.missions }))} icon={<Target size={14} />} color="#8B5CF6" />
+                    <ToggleRow label="Message Alerts" sub="Client messages and platform announcements" value={notifications.messages} onChange={() => setNotifications(n => ({ ...n, messages: !n.messages }))} icon={<MessageSquare size={14} />} color="#F59E0B" />
+                    <ToggleRow label="Weekly Summary" sub="Performance digest every Monday morning" value={notifications.weekly} onChange={() => setNotifications(n => ({ ...n, weekly: !n.weekly }))} icon={<BarChart3 size={14} />} color="#06B6D4" />
+                  </Card>
+                </motion.div>
+              )}
+
+              {/* ── Achievements sub-tab ── */}
+              {activeProfileTab === "achievements" && (
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    {achievements.map((ach) => (
+                      <div key={ach.id}
+                        className={`p-4 rounded-2xl border flex items-start gap-3 transition-all ${ach.earned ? "bg-white border-gray-100 shadow-sm" : "bg-gray-50 border-gray-100 opacity-50"}`}>
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                          style={{ backgroundColor: ach.earned ? `${ach.color}15` : "#F3F4F6", color: ach.earned ? ach.color : "#9CA3AF" }}>
+                          {ach.icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <p className="text-[11px] font-black text-gray-900 leading-none">{ach.title}</p>
+                            {ach.earned && <Check size={10} className="text-green-500" />}
+                          </div>
+                          <p className="text-[9px] text-gray-400 font-medium mt-1">{ach.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="p-4 rounded-2xl border border-blue-100 bg-blue-50 text-center">
+                    <Trophy size={20} className="mx-auto text-blue-500 mb-2" />
+                    <p className="text-[11px] font-black text-gray-800">{achievements.filter(a => a.earned).length} of {achievements.length} badges earned</p>
+                    <p className="text-[9px] text-gray-400 font-medium mt-1">Apply to jobs to unlock more achievements</p>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ── Settings sub-tab ── */}
+              {activeProfileTab === "settings" && (
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
+                  <Card className="p-5">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">App Settings</p>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between py-3 border-b border-gray-50">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500"><Languages size={14} /></div>
+                          <div>
+                            <p className="text-[11px] font-bold text-gray-800">Language</p>
+                            <p className="text-[9px] text-gray-400 font-medium">Display language</p>
+                          </div>
+                        </div>
+                        <select value={selectedLang} onChange={e => { setSelectedLang(e.target.value); addToast("Language updated", "success"); }}
+                          className="text-[10px] font-bold text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 outline-none cursor-pointer">
+                          <option>English (EAT)</option>
+                          <option>Swahili (KE)</option>
+                          <option>French (FR)</option>
+                        </select>
+                      </div>
+                      <div className="flex items-center justify-between py-3 border-b border-gray-50">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-green-50 flex items-center justify-center text-green-500"><DollarSign size={14} /></div>
+                          <div>
+                            <p className="text-[11px] font-bold text-gray-800">Currency Display</p>
+                            <p className="text-[9px] text-gray-400 font-medium">How amounts appear</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setCurrency(c => c === "USD" ? "KES" : "USD")}
+                          className="text-[10px] font-black text-blue-600 bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-all">
+                          {currency} ⇄
+                        </button>
+                      </div>
+                      <div className="flex items-center justify-between py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-purple-50 flex items-center justify-center text-purple-500"><Globe size={14} /></div>
+                          <div>
+                            <p className="text-[11px] font-bold text-gray-800">Timezone</p>
+                            <p className="text-[9px] text-gray-400 font-medium">Your local time</p>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold text-gray-500">EAT (UTC+3)</span>
+                      </div>
+                    </div>
+                  </Card>
+
+                  <Card className="p-5">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">Danger Zone</p>
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => addToast("Data export requested — email sent within 24h", "info")}
+                        className="w-full p-3.5 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-all flex items-center gap-3 text-left">
+                        <Download size={15} className="text-gray-500 shrink-0" />
+                        <div>
+                          <p className="text-[11px] font-bold text-gray-700">Export My Data</p>
+                          <p className="text-[9px] text-gray-400 font-medium">Download all your account data</p>
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => addToast("Account deletion requires identity verification", "error")}
+                        className="w-full p-3.5 rounded-xl border border-red-100 bg-red-50 hover:bg-red-100 transition-all flex items-center gap-3 text-left">
+                        <Trash2 size={15} className="text-red-500 shrink-0" />
+                        <div>
+                          <p className="text-[11px] font-bold text-red-600">Delete Account</p>
+                          <p className="text-[9px] text-red-400 font-medium">Permanently remove your account</p>
+                        </div>
+                      </button>
+                    </div>
+                  </Card>
+
+                  {/* Sign Out */}
+                  <div className="pt-1">
+                    <SignOutButton>
+                      <button className="w-full py-4 rounded-2xl border border-gray-200 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-3 group">
+                        <LogOut size={16} className="text-gray-400 group-hover:text-red-500 transition-colors" />
+                        <span className="text-[11px] font-black text-gray-500 group-hover:text-red-500 transition-colors uppercase tracking-widest">Sign Out</span>
+                      </button>
+                    </SignOutButton>
+                  </div>
+                </motion.div>
+              )}
+
+            </motion.div>
+          )}
+
         </AnimatePresence>
       </div>
 
       {/* ══ BOTTOM NAV ════════════════════════════════════════════ */}
-      <div className="fixed bottom-0 left-0 right-0 z-100 bg-white border-t border-gray-200 shadow-[0_-4px_24px_rgba(0,0,0,0.06)]">
-        <div className="max-w-5xl mx-auto h-18 flex items-center justify-around px-1">
+      <div className="fixed bottom-0 left-0 right-0 z-100 bg-white/95 border-t border-gray-100 shadow-[0_-4px_24px_rgba(0,0,0,0.06)]" style={{ backdropFilter: "blur(12px)" }}>
+        <div className="max-w-5xl mx-auto h-18 flex items-center justify-around px-1 overflow-x-auto no-scrollbar">
           {navItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex flex-col items-center justify-center gap-0.5 h-full flex-1 transition-all duration-200 relative ${
+              className={`flex flex-col items-center justify-center gap-0.5 h-full flex-1 min-w-13 transition-all duration-200 relative ${
                 activeTab === item.id ? "text-blue-600" : "text-gray-400 hover:text-gray-600"
               }`}
             >
               {activeTab === item.id && (
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.75 rounded-b-full bg-blue-600" />
+                <motion.span layoutId="nav-indicator"
+                  className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.75 rounded-b-full bg-blue-600" />
               )}
               <div className={`transition-all duration-200 ${activeTab === item.id ? "scale-110" : "scale-100"}`}>
                 {item.icon}
               </div>
-              <span className={`text-[9px] font-bold uppercase tracking-widest leading-none ${activeTab === item.id ? "text-blue-600" : "text-gray-400"}`}>
+              <span className={`text-[8px] font-bold uppercase tracking-widest leading-none whitespace-nowrap ${activeTab === item.id ? "text-blue-600" : "text-gray-400"}`}>
                 {item.label}
               </span>
             </button>
@@ -1298,7 +1740,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
         {showModal && (
           <div className="fixed inset-0 z-600 flex items-end sm:items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
               onClick={() => !isPaying && setShowModal(false)} />
             <motion.div initial={{ scale: 0.93, y: 24 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.93, y: 24 }}
               transition={{ type: "spring", damping: 26, stiffness: 320 }}
@@ -1357,7 +1799,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
                     <button onClick={() => setModalStep("packages")} className="p-2 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all">
-                      <ChevronDown size={15} className="rotate-90" />
+                      <ChevronLeft size={15} />
                     </button>
                     <div>
                       <h4 className="text-[13px] font-black text-gray-900">Choose Payment Method</h4>
@@ -1375,31 +1817,10 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                   </div>
 
                   <div className="space-y-2.5">
-                    <RippleButton onClick={() => handlePay("CARD")}
-                      className="w-full p-4 rounded-xl flex items-center gap-4 border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 transition-all">
-                      <PaystackLogo size={44} />
-                      <div className="flex-1 text-left">
-                        <p className="text-[13px] font-black text-gray-900">Bank Card</p>
-                        <p className="text-[10px] font-medium text-gray-500 mt-0.5">Visa · Mastercard · via Paystack</p>
-                        <p className="text-[9px] text-indigo-600 font-bold mt-0.5">Charges KES {((selectedPack?.price || 0) * RATE).toLocaleString()} exactly</p>
-                      </div>
-                      <ChevronRight size={16} className="text-gray-400 shrink-0" />
-                    </RippleButton>
-
-                    <RippleButton onClick={() => setModalStep("binance")}
-                      className="w-full p-4 rounded-xl flex items-center gap-4 border border-amber-200 bg-amber-50 hover:bg-amber-100 transition-all">
-                      <BinanceLogo size={44} />
-                      <div className="flex-1 text-left">
-                        <p className="text-[13px] font-black text-gray-900">Binance USDT</p>
-                        <p className="text-[10px] font-medium text-gray-500 mt-0.5">TRC20 network · ${selectedPack?.price}.00 USDT</p>
-                        <p className="text-[9px] text-amber-600 font-bold mt-0.5">Scan QR code · Works anywhere in the world</p>
-                      </div>
-                      <ChevronRight size={16} className="text-gray-400 shrink-0" />
-                    </RippleButton>
-
+                    {/* M-Pesa */}
                     <RippleButton onClick={() => setModalStep("mpesa")}
-                      className="w-full p-4 rounded-xl flex items-center gap-4 border border-green-200 bg-green-50 hover:bg-green-100 transition-all">
-                      <MpesaLogo size={44} />
+                      className="w-full p-4 rounded-2xl flex items-center gap-4 border border-green-200 bg-green-50 hover:bg-green-100 transition-all">
+                      <MpesaLogo size={48} />
                       <div className="flex-1 text-left">
                         <p className="text-[13px] font-black text-gray-900">M-Pesa</p>
                         <p className="text-[10px] font-medium text-gray-500 mt-0.5">Safaricom STK push · KES {((selectedPack?.price || 0) * RATE).toLocaleString()}</p>
@@ -1408,8 +1829,33 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                       <ChevronRight size={16} className="text-gray-400 shrink-0" />
                     </RippleButton>
 
-                    <div className="w-full p-4 rounded-xl border border-gray-100 bg-gray-50 flex items-center gap-4 cursor-not-allowed opacity-50">
-                      <PaypalLogo size={44} />
+                    {/* Binance */}
+                    <RippleButton onClick={() => setModalStep("binance")}
+                      className="w-full p-4 rounded-2xl flex items-center gap-4 border border-amber-200 bg-amber-50 hover:bg-amber-100 transition-all">
+                      <BinanceLogo size={48} />
+                      <div className="flex-1 text-left">
+                        <p className="text-[13px] font-black text-gray-900">Binance USDT</p>
+                        <p className="text-[10px] font-medium text-gray-500 mt-0.5">TRC20 network · ${selectedPack?.price}.00 USDT</p>
+                        <p className="text-[9px] text-amber-600 font-bold mt-0.5">Scan QR code · Works anywhere in the world</p>
+                      </div>
+                      <ChevronRight size={16} className="text-gray-400 shrink-0" />
+                    </RippleButton>
+
+                    {/* Bank Transfer */}
+                    <RippleButton onClick={() => setModalStep("bank")}
+                      className="w-full p-4 rounded-2xl flex items-center gap-4 border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-all">
+                      <BankTransferLogo size={48} />
+                      <div className="flex-1 text-left">
+                        <p className="text-[13px] font-black text-gray-900">Bank Transfer</p>
+                        <p className="text-[10px] font-medium text-gray-500 mt-0.5">Local bank · KES {((selectedPack?.price || 0) * RATE).toLocaleString()}</p>
+                        <p className="text-[9px] text-blue-600 font-bold mt-0.5">Visa · Mastercard · via Paystack</p>
+                      </div>
+                      <ChevronRight size={16} className="text-gray-400 shrink-0" />
+                    </RippleButton>
+
+                    {/* PayPal (disabled) */}
+                    <div className="w-full p-4 rounded-2xl border border-gray-100 bg-gray-50 flex items-center gap-4 cursor-not-allowed opacity-50">
+                      <PaypalLogo size={48} />
                       <div className="flex-1 text-left">
                         <div className="flex items-center gap-2">
                           <p className="text-[13px] font-black text-gray-500">PayPal</p>
@@ -1427,7 +1873,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
                     <button onClick={() => setModalStep("choice")} className="p-2 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all">
-                      <ChevronDown size={15} className="rotate-90" />
+                      <ChevronLeft size={15} />
                     </button>
                     <h4 className="text-[13px] font-black text-gray-900">Pay with Binance USDT</h4>
                   </div>
@@ -1460,11 +1906,50 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 </div>
               )}
 
+              {modalStep === "bank" && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => setModalStep("choice")} className="p-2 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all">
+                      <ChevronLeft size={15} />
+                    </button>
+                    <h4 className="text-[13px] font-black text-gray-900">Pay via Bank / Card</h4>
+                  </div>
+                  <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl">
+                    <div className="flex items-center gap-3 mb-2">
+                      <CheckCircle size={15} className="text-blue-500 shrink-0" />
+                      <p className="text-[11px] font-black text-blue-800">Total: KES {((selectedPack?.price || 0) * RATE).toLocaleString()}</p>
+                    </div>
+                    <p className="text-[10px] text-blue-600 font-medium pl-6">Visa, Mastercard, and local bank cards accepted via Paystack.</p>
+                  </div>
+                  <div className="space-y-2">
+                    {[
+                      { label: "Visa / Mastercard", icon: "💳", sub: "Debit or credit card" },
+                      { label: "Equity Bank", icon: "🏦", sub: "Kenya local bank" },
+                      { label: "KCB Bank", icon: "🏛️", sub: "Kenya local bank" },
+                      { label: "Co-op Bank", icon: "🏢", sub: "Kenya local bank" },
+                    ].map((opt, i) => (
+                      <div key={i} className="flex items-center gap-3 p-3.5 bg-gray-50 border border-gray-100 rounded-xl">
+                        <span className="text-xl">{opt.icon}</span>
+                        <div>
+                          <p className="text-[11px] font-black text-gray-800">{opt.label}</p>
+                          <p className="text-[9px] text-gray-400 font-medium">{opt.sub}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <RippleButton disabled={isPaying} onClick={() => handlePay("CARD")}
+                    className="w-full py-4 rounded-xl text-[11px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2"
+                    style={{ background: "linear-gradient(135deg, #1D4ED8, #0066FF)" }}>
+                    {isPaying ? <><RefreshCw size={14} className="animate-spin" /> Redirecting…</> : `Pay KES ${((selectedPack?.price || 0) * RATE).toLocaleString()} via Paystack`}
+                  </RippleButton>
+                </div>
+              )}
+
               {modalStep === "mpesa" && (
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
                     <button onClick={() => setModalStep("choice")} className="p-2 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all">
-                      <ChevronDown size={15} className="rotate-90" />
+                      <ChevronLeft size={15} />
                     </button>
                     <h4 className="text-[13px] font-black text-gray-900">Pay with M-Pesa</h4>
                   </div>
