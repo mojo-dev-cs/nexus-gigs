@@ -21,7 +21,12 @@ import {
   ChevronsUp, Trophy, Hash, Percent, Info, Link,
   Phone, HeadphonesIcon, BookOpen, Video, FileQuestion,
   ToggleLeft, ToggleRight, Plus, Trash2, LogOut,
-  Crown, Sparkle, Gem, Radio,
+  Crown, Sparkle, Gem, Radio, MessageCircle, Cpu,
+  Database, Code, Palette, LineChart, ShoppingBag,
+  Megaphone, Camera, Music, BookMarked, Truck,
+  HeartHandshake, GraduationCap, Wrench, MonitorSmartphone,
+  Layers3, Filter, ChevronUp, ArrowUpDown, SortAsc,
+  Banknote, Building, Coins, Wallet2,
 } from "lucide-react";
 
 interface Toast {
@@ -30,11 +35,11 @@ interface Toast {
   type: "success" | "error" | "info";
 }
 
-// ── Primitives ────────────────────────────────────────────────────────────────
+// ── Primitives ─────────────────────────────────────────────────────────────
 
-const PulseDot = ({ color = "#00f5d4", size = 7 }: { color?: string; size?: number }) => (
+const PulseDot = ({ color = "#0066FF", size = 7 }: { color?: string; size?: number }) => (
   <span className="relative inline-flex" style={{ width: size, height: size }}>
-    <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-40" style={{ backgroundColor: color }} />
+    <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-30" style={{ backgroundColor: color }} />
     <span className="relative inline-flex rounded-full" style={{ width: size, height: size, backgroundColor: color }} />
   </span>
 );
@@ -69,149 +74,240 @@ const RippleButton = ({
   );
 };
 
-const GlassCard = ({ children, className = "", accent = false, glow = false, onClick }: {
-  children: React.ReactNode; className?: string; accent?: boolean; glow?: boolean; onClick?: () => void;
+const Card = ({ children, className = "", onClick }: {
+  children: React.ReactNode; className?: string; onClick?: () => void;
 }) => (
   <div onClick={onClick}
-    className={`relative bg-white/[0.035] backdrop-blur-2xl border border-white/[0.07] rounded-3xl transition-all duration-300
-      hover:border-white/12 hover:bg-white/4.5
-      ${accent ? "border-l-[3px] border-l-[#00f5d4]" : ""}
-      ${glow ? "shadow-[0_0_40px_rgba(0,245,212,0.07)]" : ""}
-      ${onClick ? "cursor-pointer" : ""} ${className}`}>
+    className={`bg-white border border-gray-100 rounded-2xl shadow-sm transition-all duration-200 hover:shadow-md ${onClick ? "cursor-pointer" : ""} ${className}`}>
     {children}
   </div>
 );
 
-const StatCard = ({ label, value, icon, color = "#00f5d4", sub }: {
+const StatCard = ({ label, value, icon, color = "#0066FF", sub }: {
   label: string; value: string | number; icon: React.ReactNode; color?: string; sub?: string;
 }) => (
-  <GlassCard className="p-4 text-center group">
+  <Card className="p-4 text-center">
     <div className="flex justify-center mb-2" style={{ color }}>{icon}</div>
-    <p className="text-[13px] font-black tracking-tight text-white leading-none">{value}</p>
-    {sub && <p className="text-[7px] text-white/20 font-bold mt-0.5 leading-none">{sub}</p>}
-    <p className="text-[8px] font-bold text-white/30 uppercase tracking-[0.12em] mt-1.5 leading-none">{label}</p>
-  </GlassCard>
+    <p className="text-[14px] font-black text-gray-800 leading-none">{value}</p>
+    {sub && <p className="text-[9px] text-gray-400 font-semibold mt-0.5 leading-none">{sub}</p>}
+    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wide mt-1.5 leading-none">{label}</p>
+  </Card>
 );
 
-const CompanyLogo = ({ name, domain, size = 44 }: { name: string; domain: string; size?: number }) => {
-  const [src, setSrc] = useState(`https://logo.clearbit.com/${domain}`);
-  return (
-    <div style={{ width: size, height: size, minWidth: size }}
-      className="rounded-[14px] overflow-hidden bg-white border border-white/10 flex items-center justify-center shadow-xl">
-      <img src={src} alt={name} className="w-full h-full object-contain p-1.5"
-        onError={() => setSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0d1117&color=00f5d4&bold=true&size=128`)} />
-    </div>
-  );
-};
-
-const Badge = ({ children, color = "#00f5d4", className = "" }: { children: React.ReactNode; color?: string; className?: string }) => (
-  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-[0.12em] border ${className}`}
-    style={{ color, borderColor: `${color}33`, backgroundColor: `${color}0f` }}>
+const Badge = ({ children, color = "#0066FF", className = "" }: { children: React.ReactNode; color?: string; className?: string }) => (
+  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold border ${className}`}
+    style={{ color, borderColor: `${color}30`, backgroundColor: `${color}0f` }}>
     {children}
   </span>
 );
 
-const SectionHead = ({ label }: { label: string }) => (
-  <div className="flex items-center gap-3 mb-1">
-    <h3 className="text-[22px] font-black italic uppercase tracking-tighter leading-none text-white">
-      {label.split(" ")[0]}{" "}
-      <span style={{ color: "#00f5d4" }}>{label.split(" ").slice(1).join(" ")}</span>
-    </h3>
-    <div className="flex-1 h-px bg-white/5" />
+const SectionHead = ({ label, sub }: { label: string; sub?: string }) => (
+  <div className="mb-2">
+    <h3 className="text-[22px] font-black text-gray-900 leading-tight">{label}</h3>
+    {sub && <p className="text-[11px] text-gray-400 font-medium mt-0.5">{sub}</p>}
   </div>
 );
 
-// Premium locked overlay for tabs/sections
+// ── PREMIUM CompanyLogo ─────────────────────────────────────────────────────
+// 3-tier: Clearbit → Google favicon → styled initials with brand-matched color
+const CompanyLogo = ({ name, domain, size = 44 }: { name: string; domain: string; size?: number }) => {
+  const [imgSrc, setImgSrc] = useState<string | null>(`https://logo.clearbit.com/${domain}`);
+  const [stage, setStage] = useState<"clearbit" | "favicon" | "initials">("clearbit");
+
+  const initials = name
+    .replace(/[^a-zA-Z\s]/g, "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("");
+
+  // Deterministic brand color per company initial
+  const brandPalette = [
+    { bg: "#EFF6FF", text: "#1D4ED8", border: "#BFDBFE" },
+    { bg: "#F0FDF4", text: "#15803D", border: "#BBF7D0" },
+    { bg: "#FDF4FF", text: "#7E22CE", border: "#E9D5FF" },
+    { bg: "#FFF7ED", text: "#C2410C", border: "#FED7AA" },
+    { bg: "#F0F9FF", text: "#0369A1", border: "#BAE6FD" },
+    { bg: "#FFF1F2", text: "#BE123C", border: "#FECDD3" },
+    { bg: "#FFFBEB", text: "#B45309", border: "#FDE68A" },
+    { bg: "#ECFDF5", text: "#047857", border: "#A7F3D0" },
+  ];
+  const palette = brandPalette[name.charCodeAt(0) % brandPalette.length];
+
+  const handleError = () => {
+    if (stage === "clearbit") {
+      setStage("favicon");
+      setImgSrc(`https://www.google.com/s2/favicons?domain=${domain}&sz=128`);
+    } else {
+      setStage("initials");
+      setImgSrc(null);
+    }
+  };
+
+  if (stage === "initials" || !imgSrc) {
+    return (
+      <div
+        style={{
+          width: size,
+          height: size,
+          minWidth: size,
+          backgroundColor: palette.bg,
+          border: `1.5px solid ${palette.border}`,
+          borderRadius: 12,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        <span style={{
+          fontSize: size * 0.33,
+          fontWeight: 900,
+          color: palette.text,
+          letterSpacing: "-0.02em",
+          lineHeight: 1,
+          fontFamily: "system-ui, -apple-system, sans-serif",
+        }}>
+          {initials || "?"}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={{ width: size, height: size, minWidth: size, borderRadius: 12, flexShrink: 0 }}
+      className="overflow-hidden bg-white border border-gray-100 flex items-center justify-center shadow-sm"
+    >
+      <img
+        src={imgSrc}
+        alt={name}
+        style={{ width: "100%", height: "100%", objectFit: "contain", padding: stage === "favicon" ? 6 : 4 }}
+        onError={handleError}
+      />
+    </div>
+  );
+};
+
+// ── PREMIUM MarketplaceAvatar ───────────────────────────────────────────────
+// Shows a styled initials avatar with type-matched color gradient
+const MarketplaceAvatar = ({
+  initials, type, size = 44,
+}: { initials: string; type: string; size?: number }) => {
+  const typeGradients: Record<string, { from: string; to: string; text: string }> = {
+    "Web Dev":   { from: "#3B82F6", to: "#1D4ED8", text: "#fff" },
+    "Design":    { from: "#8B5CF6", to: "#6D28D9", text: "#fff" },
+    "Writing":   { from: "#10B981", to: "#047857", text: "#fff" },
+    "Marketing": { from: "#F59E0B", to: "#D97706", text: "#fff" },
+    "Data":      { from: "#06B6D4", to: "#0284C7", text: "#fff" },
+    "AI":        { from: "#EF4444", to: "#B91C1C", text: "#fff" },
+    "Security":  { from: "#DC2626", to: "#991B1B", text: "#fff" },
+    "Web3":      { from: "#7C3AED", to: "#5B21B6", text: "#fff" },
+    "Video":     { from: "#EC4899", to: "#BE185D", text: "#fff" },
+  };
+  const g = typeGradients[type] || { from: "#6B7280", to: "#374151", text: "#fff" };
+
+  return (
+    <div
+      style={{
+        width: size,
+        height: size,
+        minWidth: size,
+        borderRadius: 12,
+        background: `linear-gradient(135deg, ${g.from}, ${g.to})`,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+        boxShadow: `0 2px 8px ${g.from}40`,
+      }}
+    >
+      <span style={{
+        fontSize: size * 0.32,
+        fontWeight: 900,
+        color: g.text,
+        letterSpacing: "-0.02em",
+        lineHeight: 1,
+        fontFamily: "system-ui, -apple-system, sans-serif",
+      }}>
+        {initials.slice(0, 2)}
+      </span>
+    </div>
+  );
+};
+
+// Payment method logos
+const MpesaLogo = ({ size = 40 }: { size?: number }) => (
+  <div style={{ width: size, height: size, minWidth: size }} className="rounded-xl overflow-hidden bg-green-600 flex items-center justify-center shadow-sm">
+    <svg viewBox="0 0 40 40" width={size} height={size}>
+      <rect width="40" height="40" fill="#16A34A"/>
+      <text x="50%" y="54%" textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="16" fontWeight="900" fontFamily="Arial Black">M</text>
+    </svg>
+  </div>
+);
+
+const PaystackLogo = ({ size = 40 }: { size?: number }) => (
+  <div style={{ width: size, height: size, minWidth: size }} className="rounded-xl overflow-hidden flex items-center justify-center shadow-sm bg-[#3d4eac]">
+    <svg viewBox="0 0 40 40" width={size} height={size}>
+      <rect width="40" height="40" fill="#3d4eac"/>
+      <rect x="10" y="11" width="20" height="4.5" rx="2.5" fill="white"/>
+      <rect x="10" y="17.5" width="14" height="4.5" rx="2.5" fill="white" opacity="0.7"/>
+      <rect x="10" y="24" width="18" height="4.5" rx="2.5" fill="white" opacity="0.45"/>
+    </svg>
+  </div>
+);
+
+const BinanceLogo = ({ size = 40 }: { size?: number }) => (
+  <div style={{ width: size, height: size, minWidth: size }} className="rounded-xl bg-[#F3BA2F] flex items-center justify-center shadow-sm">
+    <svg viewBox="0 0 40 40" width={size - 8} height={size - 8} fill="white">
+      <path d="M20 4l3.5 3.5L20 11l-3.5-3.5L20 4zm-8 8l3.5 3.5L12 19l-3.5-3.5L12 12zm16 0l3.5 3.5L28 19l-3.5-3.5L28 12zM20 20l3.5 3.5L20 27l-3.5-3.5L20 20zm-8 8l3.5 3.5L12 35l-3.5-3.5L12 28zm16 0l3.5 3.5L28 35l-3.5-3.5L28 28zM20 12l8 8-8 8-8-8 8-8z"/>
+    </svg>
+  </div>
+);
+
+const PaypalLogo = ({ size = 40 }: { size?: number }) => (
+  <div style={{ width: size, height: size, minWidth: size }} className="rounded-xl bg-[#003087] flex items-center justify-center shadow-sm">
+    <svg viewBox="0 0 60 24" width={size - 6} height={16} fill="none">
+      <text x="50%" y="75%" textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="9" fontWeight="900" fontFamily="Arial">PayPal</text>
+    </svg>
+  </div>
+);
+
 const PremiumLockedSection = ({
   title, description, icon, cta, onCta, features,
 }: {
   title: string; description: string; icon: React.ReactNode; cta: string; onCta: () => void; features?: string[];
 }) => (
   <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-    className="relative rounded-4xl overflow-hidden border border-white/8 p-8"
-    style={{ background: "linear-gradient(160deg, rgba(6,16,31,0.98) 0%, rgba(3,8,15,0.99) 100%)" }}>
-    {/* Ambient glow */}
-    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 blur-[60px] opacity-20 pointer-events-none"
-      style={{ background: "radial-gradient(ellipse, #00f5d4, transparent)" }} />
-    <div className="relative z-10 text-center">
-      <div className="w-16 h-16 mx-auto mb-5 rounded-[22px] flex items-center justify-center border border-white/10 relative"
-        style={{ background: "linear-gradient(135deg, rgba(0,245,212,0.12), rgba(0,245,212,0.04))" }}>
-        <div className="absolute inset-0 rounded-[22px] blur-xl opacity-30"
-          style={{ background: "radial-gradient(circle, #00f5d4, transparent)" }} />
-        <div className="relative text-[#00f5d4]">{icon}</div>
-      </div>
-      <Badge color="#00f5d4" className="mb-4"><Crown size={8} /> Premium Feature</Badge>
-      <h3 className="text-[20px] font-black italic uppercase tracking-tighter text-white mb-3 leading-none">{title}</h3>
-      <p className="text-[10px] text-white/30 font-bold leading-relaxed mb-6 max-w-xs mx-auto">{description}</p>
-      {features && (
-        <div className="grid grid-cols-2 gap-2 mb-6 text-left max-w-xs mx-auto">
-          {features.map((f, i) => (
-            <div key={i} className="flex items-center gap-2 p-2.5 bg-white/3 rounded-xl border border-white/5">
-              <div className="w-4 h-4 rounded-full bg-[#00f5d4]/15 flex items-center justify-center shrink-0">
-                <Check size={8} className="text-[#00f5d4]" />
-              </div>
-              <p className="text-[8px] font-bold text-white/40 uppercase tracking-wide">{f}</p>
-            </div>
-          ))}
-        </div>
-      )}
-      <RippleButton onClick={onCta}
-        className="px-10 py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest text-black mx-auto"
-        style={{ background: "linear-gradient(135deg, #00f5d4, #0097a7)" }}>
-        {cta}
-      </RippleButton>
+    className="relative rounded-2xl overflow-hidden border border-gray-100 bg-linear-to-br from-slate-50 to-blue-50 p-8 text-center">
+    <div className="w-16 h-16 mx-auto mb-5 rounded-2xl flex items-center justify-center bg-white border border-blue-100 shadow-sm text-blue-600">
+      {icon}
     </div>
+    <Badge color="#0066FF" className="mb-4"><Crown size={9} /> Members Only</Badge>
+    <h3 className="text-[18px] font-black text-gray-900 mb-3 leading-tight">{title}</h3>
+    <p className="text-[11px] text-gray-500 leading-relaxed mb-6 max-w-xs mx-auto">{description}</p>
+    {features && (
+      <div className="grid grid-cols-2 gap-2 mb-6 text-left max-w-xs mx-auto">
+        {features.map((f, i) => (
+          <div key={i} className="flex items-center gap-2 p-2.5 bg-white rounded-xl border border-blue-50">
+            <div className="w-4 h-4 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+              <Check size={9} className="text-blue-600" />
+            </div>
+            <p className="text-[9px] font-semibold text-gray-500">{f}</p>
+          </div>
+        ))}
+      </div>
+    )}
+    <RippleButton onClick={onCta}
+      className="px-10 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white"
+      style={{ background: "linear-gradient(135deg, #0066FF, #0047B3)" }}>
+      {cta}
+    </RippleButton>
   </motion.div>
 );
 
-// Toggle switch component
-const Toggle = ({ active, onChange }: { active: boolean; onChange: () => void }) => (
-  <button onClick={onChange}
-    className={`relative w-10 h-5.5 rounded-full transition-all duration-300 ${active ? "bg-[#00f5d4]" : "bg-white/10"}`}>
-    <div className={`absolute top-0.5 w-4 h-4 rounded-full transition-all duration-300 ${active ? "left-5 bg-black" : "left-0.5 bg-white/30"}`} />
-  </button>
-);
-
-// ── Payment method logos ──────────────────────────────────────────────────────
-
-const MpesaLogo = () => (
-  <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg overflow-hidden">
-    <svg viewBox="0 0 40 40" width="36" height="36">
-      <rect width="40" height="40" rx="8" fill="#4CAF50"/>
-      <text x="50%" y="58%" textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="14" fontWeight="900" fontFamily="Arial">M</text>
-    </svg>
-  </div>
-);
-
-const PaystackLogo = () => (
-  <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg overflow-hidden">
-    <svg viewBox="0 0 40 40" width="36" height="36">
-      <rect width="40" height="40" rx="8" fill="#3d4eac"/>
-      <rect x="10" y="12" width="20" height="4" rx="2" fill="white" opacity="1"/>
-      <rect x="10" y="18" width="14" height="4" rx="2" fill="white" opacity="0.7"/>
-      <rect x="10" y="24" width="18" height="4" rx="2" fill="white" opacity="0.5"/>
-    </svg>
-  </div>
-);
-
-const BinanceLogo = () => (
-  <div className="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center shadow-lg">
-    <svg viewBox="0 0 40 40" width="28" height="28" fill="white">
-      <path d="M20 2l4.5 4.5-4.5 4.5-4.5-4.5L20 2zm-9 9l4.5 4.5-4.5 4.5-4.5-4.5L11 11zm18 0l4.5 4.5-4.5 4.5-4.5-4.5L29 11zM20 20l4.5 4.5L20 29l-4.5-4.5L20 20zm-9 9l4.5 4.5-4.5 4.5-4.5-4.5L11 29zm18 0l4.5 4.5-4.5 4.5-4.5-4.5L29 29zM20 11l9 9-9 9-9-9 9-9z"/>
-    </svg>
-  </div>
-);
-
-const PaypalLogo = () => (
-  <div className="w-10 h-10 bg-blue-700 rounded-xl flex items-center justify-center shadow-lg">
-    <svg viewBox="0 0 40 40" width="36" height="36">
-      <rect width="40" height="40" rx="8" fill="#003087"/>
-      <text x="50%" y="56%" textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="11" fontWeight="900" fontFamily="Arial">PayPal</text>
-    </svg>
-  </div>
-);
-
-// ── Main Component ────────────────────────────────────────────────────────────
+// ── Main Component ──────────────────────────────────────────────────────────
 
 export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetadata: any }) => {
   const { user } = useUser();
@@ -220,11 +316,14 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   const RATE = 130;
   const fmt = (usd: number) =>
     currency === "USD"
-      ? `$${usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      ? `$${usd.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
       : `KES ${(usd * RATE).toLocaleString()}`;
 
   const [activeTab, setActiveTab] = useState("home");
   const [gigMode, setGigMode] = useState<"marketplace" | "corporate">("marketplace");
+  const [gigCategory, setGigCategory] = useState("All");
+  const [gigSort, setGigSort] = useState<"newest" | "highest" | "lowest">("newest");
+  const [gigSearch, setGigSearch] = useState("");
 
   const [toasts, setToasts] = useState<Toast[]>([]);
   const addToast = (msg: string, type: Toast["type"] = "info") => {
@@ -237,7 +336,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   const [cashBalance] = useState(0.0);
   const isVerified = userMetadata?.status === "Verified";
 
-  // Modal states
   const [showModal, setShowModal] = useState(false);
   const [modalStep, setModalStep] = useState<"packages" | "choice" | "mpesa" | "binance">("packages");
   const [selectedPack, setSelectedPack] = useState<(typeof uplinkPackages)[0] | null>(null);
@@ -248,13 +346,11 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   const [calcHU, setCalcHU] = useState("1200");
   const calcKES = Math.round(parseFloat(calcHU || "0") * 1.083);
 
-  // UI states
   const [expandedMsg, setExpandedMsg] = useState<number | null>(null);
   const [showBalance, setShowBalance] = useState(true);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [activeVaultTab, setActiveVaultTab] = useState<"overview" | "history" | "limits" | "referral">("overview");
 
-  // Me tab — functional state
   const [expandedSetting, setExpandedSetting] = useState<string | null>(null);
   const [notifications, setNotifications] = useState({
     missions: true, payments: true, messages: false, weekly: true, newGigs: true,
@@ -269,109 +365,160 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   ]);
   const [revokedSession, setRevokedSession] = useState<number[]>([]);
 
-  // Chat message state
-  const [chatInput, setChatInput] = useState("");
-  const [selectedChat, setSelectedChat] = useState<number | null>(null);
-
   const uplinkPackages = [
     { id: 1, name: "Starter", price: 3, hu: 150, desc: "Apply for a few small gigs today.", hot: false },
-    { id: 2, name: "Basic", price: 6, hu: 400, desc: "Expand reach to local tasks.", hot: false },
-    { id: 3, name: "Pro Uplink", price: 10, hu: 1200, desc: "Unlock Global Corporate missions.", hot: true },
-    { id: 4, name: "Elite", price: 18, hu: 2500, desc: "Priority handshakes + HR direct.", hot: false },
-    { id: 5, name: "Alpha", price: 30, hu: 5000, desc: "Maximum power for top workers.", hot: false },
+    { id: 2, name: "Basic", price: 6, hu: 400, desc: "Get access to more local tasks.", hot: false },
+    { id: 3, name: "Pro Uplink", price: 10, hu: 1200, desc: "Unlock global company missions.", hot: true },
+    { id: 4, name: "Elite", price: 18, hu: 2500, desc: "Priority access + HR direct line.", hot: false },
+    { id: 5, name: "Alpha", price: 30, hu: 5000, desc: "Full power for top workers.", hot: false },
   ];
 
+  // ── Marketplace Gigs ──
   const marketplaceGigs = useMemo(() => [
-    { id: "1", title: "API Security Penetration Test", budget: 2100, client: "SafeVault", img: "https://i.pravatar.cc/150?u=safe", type: "Security", duration: "7 Days", cost: 10 },
-    { id: "2", title: "Python Scripts for Data Analysis", budget: 110, client: "BioTech Lab", img: "https://i.pravatar.cc/150?u=lab", type: "Academic", duration: "5 Days", cost: 10 },
-    { id: "3", title: "Smart Contract Audit (Solidity)", budget: 2200, client: "Nexus Protocol", img: "https://i.pravatar.cc/150?u=crypto", type: "Web3", duration: "5 Days", cost: 10 },
-    { id: "4", title: "Next.js Speed & SEO Optimization", budget: 800, client: "E-Com Solutions", img: "https://i.pravatar.cc/150?u=ecom", type: "Startup", duration: "4 Days", cost: 10 },
-    { id: "5", title: "Mobile App UI/UX Redesign", budget: 1400, client: "AppWorks Studio", img: "https://i.pravatar.cc/150?u=appworks", type: "Design", duration: "10 Days", cost: 10 },
-    { id: "6", title: "AI Chatbot Integration (OpenAI)", budget: 950, client: "RetailBot Inc", img: "https://i.pravatar.cc/150?u=retail", type: "AI", duration: "6 Days", cost: 10 },
+    { id: "m1", title: "Fix Bugs in My WordPress Site", budget: 80, client: "BlogPro Media", avatar: "BP", type: "Web Dev", duration: "2 Days", cost: 10, level: "Basic" },
+    { id: "m2", title: "Write 5 Blog Posts About Finance", budget: 120, client: "Money Tips KE", avatar: "MT", type: "Writing", duration: "4 Days", cost: 10, level: "Basic" },
+    { id: "m3", title: "Create a Logo for My Restaurant", budget: 90, client: "Taste of Nairobi", avatar: "TN", type: "Design", duration: "3 Days", cost: 10, level: "Basic" },
+    { id: "m4", title: "Set Up My Instagram Business Page", budget: 60, client: "Fashionista KE", avatar: "FK", type: "Marketing", duration: "1 Day", cost: 10, level: "Basic" },
+    { id: "m5", title: "Excel Data Entry & Cleanup", budget: 75, client: "Accounts Plus", avatar: "AP", type: "Data", duration: "2 Days", cost: 10, level: "Basic" },
+    { id: "m6", title: "Build a Simple E-Commerce Website", budget: 450, client: "ShopEasy Ltd", avatar: "SE", type: "Web Dev", duration: "7 Days", cost: 20, level: "Standard" },
+    { id: "m7", title: "Design Pitch Deck for Startup", budget: 350, client: "Venture Lab", avatar: "VL", type: "Design", duration: "5 Days", cost: 20, level: "Standard" },
+    { id: "m8", title: "Python Script for Automated Reports", budget: 280, client: "DataFlow Inc", avatar: "DF", type: "Data", duration: "4 Days", cost: 20, level: "Standard" },
+    { id: "m9", title: "Social Media Management (1 Month)", budget: 400, client: "BrandBoost KE", avatar: "BB", type: "Marketing", duration: "30 Days", cost: 20, level: "Standard" },
+    { id: "m10", title: "Mobile App UI Design (Figma)", budget: 600, client: "AppCraft Studio", avatar: "AC", type: "Design", duration: "8 Days", cost: 20, level: "Standard" },
+    { id: "m11", title: "SEO Optimization for Small Business", budget: 320, client: "Rank Fast KE", avatar: "RF", type: "Marketing", duration: "5 Days", cost: 20, level: "Standard" },
+    { id: "m12", title: "Full-Stack Web App with React & Node", budget: 1200, client: "TechBuild Africa", avatar: "TB", type: "Web Dev", duration: "14 Days", cost: 30, level: "Advanced" },
+    { id: "m13", title: "AI Chatbot for Customer Support", budget: 950, client: "RetailBot Inc", avatar: "RB", type: "AI", duration: "10 Days", cost: 30, level: "Advanced" },
+    { id: "m14", title: "Cybersecurity Audit for Company", budget: 1500, client: "SecureNet Ltd", avatar: "SN", type: "Security", duration: "7 Days", cost: 30, level: "Advanced" },
+    { id: "m15", title: "Smart Contract Development (Solidity)", budget: 1800, client: "Nexus Protocol", avatar: "NP", type: "Web3", duration: "10 Days", cost: 30, level: "Advanced" },
+    { id: "m16", title: "Machine Learning Model for Sales Predictions", budget: 1400, client: "Predict Pro", avatar: "PP", type: "AI", duration: "12 Days", cost: 30, level: "Advanced" },
+    { id: "m17", title: "API Security Penetration Testing", budget: 2100, client: "SafeVault Corp", avatar: "SV", type: "Security", duration: "7 Days", cost: 50, level: "Expert" },
+    { id: "m18", title: "NFT Collection Smart Contracts + Frontend", budget: 2800, client: "CryptoArt Hub", avatar: "CA", type: "Web3", duration: "14 Days", cost: 50, level: "Expert" },
+    { id: "m19", title: "Enterprise CRM Custom Integration", budget: 3200, client: "SalesForce Partners", avatar: "SP", type: "Web Dev", duration: "21 Days", cost: 50, level: "Expert" },
+    { id: "m20", title: "Deep Learning Computer Vision System", budget: 4000, client: "VisionAI Labs", avatar: "VA", type: "AI", duration: "21 Days", cost: 50, level: "Expert" },
+    { id: "m21", title: "DeFi Protocol Architecture & Audit", budget: 5000, client: "DeFi Builders DAO", avatar: "DB", type: "Web3", duration: "30 Days", cost: 50, level: "Expert" },
+    { id: "m22", title: "Next.js Speed & SEO Enterprise Overhaul", budget: 1800, client: "E-Com Solutions", avatar: "EC", type: "Web Dev", duration: "10 Days", cost: 30, level: "Advanced" },
+    { id: "m23", title: "Brand Identity Design System", budget: 2200, client: "Branding Co", avatar: "BC", type: "Design", duration: "14 Days", cost: 30, level: "Advanced" },
+    { id: "m24", title: "Video Editing for YouTube Channel", budget: 200, client: "Content King KE", avatar: "CK", type: "Video", duration: "5 Days", cost: 10, level: "Basic" },
   ], []);
 
+  // ── Corporate Gigs ──
   const corporateGigs = useMemo(() => [
-    { id: "c1", title: "Remote Fleet Data Analyst", salary: 8000, domain: "tesla.com", company: "Tesla", cost: 50, badge: "EV · Remote" },
-    { id: "c2", title: "Cloud Support Engineer", salary: 9000, domain: "amazon.com", company: "Amazon", cost: 50, badge: "AWS · Senior" },
-    { id: "c3", title: "Payment Integrity Analyst", salary: 11000, domain: "stripe.com", company: "Stripe", cost: 50, badge: "FinTech · Remote" },
-    { id: "c4", title: "Security Operations Specialist", salary: 12000, domain: "kraken.com", company: "Kraken", cost: 50, badge: "Crypto · Remote" },
-    { id: "c5", title: "Frontend Engineer (React)", salary: 10500, domain: "shopify.com", company: "Shopify", cost: 50, badge: "E-Com · Remote" },
-    { id: "c6", title: "Data Platform Engineer", salary: 13500, domain: "databricks.com", company: "Databricks", cost: 50, badge: "Data · Senior" },
+    { id: "c1", title: "Remote Fleet Data Analyst", salary: 8000, domain: "tesla.com", company: "Tesla", cost: 50, badge: "EV · Remote", dept: "Engineering" },
+    { id: "c2", title: "Cloud Support Engineer", salary: 9000, domain: "amazon.com", company: "Amazon", cost: 50, badge: "AWS · Senior", dept: "Cloud" },
+    { id: "c3", title: "Payment Integrity Analyst", salary: 11000, domain: "stripe.com", company: "Stripe", cost: 50, badge: "FinTech · Remote", dept: "Finance" },
+    { id: "c4", title: "Security Operations Specialist", salary: 12000, domain: "kraken.com", company: "Kraken", cost: 50, badge: "Crypto · Remote", dept: "Security" },
+    { id: "c5", title: "Frontend Engineer (React)", salary: 10500, domain: "shopify.com", company: "Shopify", cost: 50, badge: "E-Com · Remote", dept: "Engineering" },
+    { id: "c6", title: "Data Platform Engineer", salary: 13500, domain: "databricks.com", company: "Databricks", cost: 100, badge: "Data · Senior", dept: "Data" },
+    { id: "c7", title: "Product Manager — Africa Expansion", salary: 9500, domain: "google.com", company: "Google", cost: 100, badge: "Remote · Senior", dept: "Product" },
+    { id: "c8", title: "Mobile Engineer (iOS/Android)", salary: 11000, domain: "meta.com", company: "Meta", cost: 100, badge: "Remote · Mid", dept: "Engineering" },
+    { id: "c9", title: "DevOps Engineer", salary: 10000, domain: "microsoft.com", company: "Microsoft", cost: 50, badge: "Azure · Remote", dept: "Infrastructure" },
+    { id: "c10", title: "UX Researcher", salary: 8500, domain: "airbnb.com", company: "Airbnb", cost: 50, badge: "Remote · Contract", dept: "Design" },
+    { id: "c11", title: "Blockchain Developer", salary: 14000, domain: "coinbase.com", company: "Coinbase", cost: 100, badge: "Crypto · Remote", dept: "Engineering" },
+    { id: "c12", title: "Growth Marketing Manager", salary: 9000, domain: "spotify.com", company: "Spotify", cost: 50, badge: "Marketing · Remote", dept: "Marketing" },
+    { id: "c13", title: "ML Infrastructure Engineer", salary: 15000, domain: "openai.com", company: "OpenAI", cost: 100, badge: "AI · Remote", dept: "AI" },
+    { id: "c14", title: "Backend Engineer (Go/Rust)", salary: 12000, domain: "discord.com", company: "Discord", cost: 50, badge: "Remote · Mid", dept: "Engineering" },
+    { id: "c15", title: "Data Scientist — Ads Platform", salary: 13000, domain: "twitter.com", company: "X (Twitter)", cost: 100, badge: "Data · Senior", dept: "Data" },
+    { id: "c16", title: "Site Reliability Engineer", salary: 12500, domain: "netflix.com", company: "Netflix", cost: 100, badge: "Remote · Senior", dept: "Infrastructure" },
+    { id: "c17", title: "API Developer (Payments)", salary: 10000, domain: "paypal.com", company: "PayPal", cost: 50, badge: "FinTech · Remote", dept: "Engineering" },
+    { id: "c18", title: "Content Strategy Manager", salary: 7500, domain: "hubspot.com", company: "HubSpot", cost: 30, badge: "Marketing · Remote", dept: "Marketing" },
+    { id: "c19", title: "Cloud Security Architect", salary: 16000, domain: "cloudflare.com", company: "Cloudflare", cost: 100, badge: "Security · Senior", dept: "Security" },
+    { id: "c20", title: "iOS Engineer", salary: 11500, domain: "uber.com", company: "Uber", cost: 50, badge: "Mobile · Remote", dept: "Engineering" },
+    { id: "c21", title: "Full Stack Engineer (TypeScript)", salary: 10000, domain: "notion.so", company: "Notion", cost: 50, badge: "SaaS · Remote", dept: "Engineering" },
+    { id: "c22", title: "Analytics Engineer", salary: 9500, domain: "figma.com", company: "Figma", cost: 50, badge: "Design · Remote", dept: "Data" },
   ], []);
+
+  const gigCategories = ["All", "Web Dev", "Design", "Writing", "Marketing", "Data", "AI", "Security", "Web3", "Video"];
+  const corpDepts = ["All", "Engineering", "Data", "Security", "Marketing", "Product", "Design", "AI", "Infrastructure", "Finance"];
+
+  const [corpCategory, setCorpCategory] = useState("All");
+
+  const filteredMarket = useMemo(() => {
+    let list = gigCategory === "All" ? marketplaceGigs : marketplaceGigs.filter(g => g.type === gigCategory);
+    if (gigSearch) list = list.filter(g => g.title.toLowerCase().includes(gigSearch.toLowerCase()) || g.client.toLowerCase().includes(gigSearch.toLowerCase()));
+    if (gigSort === "highest") list = [...list].sort((a, b) => b.budget - a.budget);
+    if (gigSort === "lowest") list = [...list].sort((a, b) => a.budget - b.budget);
+    return list;
+  }, [gigCategory, gigSearch, gigSort, marketplaceGigs]);
+
+  const filteredCorp = useMemo(() => {
+    return corpCategory === "All" ? corporateGigs : corporateGigs.filter(c => c.dept === corpCategory);
+  }, [corpCategory, corporateGigs]);
+
+  const typeColors: Record<string, string> = {
+    "Web Dev": "#3B82F6", "Design": "#8B5CF6", "Writing": "#10B981",
+    "Marketing": "#F59E0B", "Data": "#06B6D4", "AI": "#EF4444",
+    "Security": "#DC2626", "Web3": "#7C3AED", "Video": "#EC4899",
+  };
+
+  const levelColors: Record<string, string> = {
+    "Basic": "#10B981", "Standard": "#3B82F6", "Advanced": "#8B5CF6", "Expert": "#EF4444",
+  };
 
   const navItems = [
-    { id: "home", icon: <Home size={15} />, label: "Home" },
-    { id: "tasks", icon: <Briefcase size={15} />, label: "Gigs" },
-    { id: "contracts", icon: <FileText size={15} />, label: "Work" },
-    { id: "messages", icon: <MessageSquare size={15} />, label: "Chats" },
-    { id: "earnings", icon: <Wallet size={15} />, label: "Vault" },
-    { id: "analytics", icon: <BarChart3 size={15} />, label: "Stats" },
-    { id: "support", icon: <LifeBuoy size={15} />, label: "Help" },
-    { id: "account", icon: <User size={15} />, label: "Me" },
+    { id: "home",      icon: <Home size={17} />,        label: "Home"   },
+    { id: "tasks",     icon: <Briefcase size={17} />,   label: "Jobs"   },
+    { id: "contracts", icon: <FileText size={17} />,    label: "Work"   },
+    { id: "messages",  icon: <MessageSquare size={17} />, label: "Chats" },
+    { id: "earnings",  icon: <Wallet size={17} />,      label: "Wallet" },
+    { id: "analytics", icon: <BarChart3 size={17} />,   label: "Stats"  },
+    { id: "support",   icon: <LifeBuoy size={17} />,    label: "Help"   },
   ];
 
   const messages = [
-    { sender: "Uplink HQ", body: "Welcome to the Nexus. To keep global clients secure, you must hold Handshake Units (HU). Refilling gives you immediate access to all missions.", time: "Just now", unread: true, avatar: "🏢" },
-    { sender: "Security Bot", body: "Encryption active. Your uplink power is low (5 HU). Missions require at least 10 HU to apply. Pick a package to establish a permanent connection.", time: "14m ago", unread: true, avatar: "🤖" },
-    { sender: "Exchange Relay", body: "Rates Updated: $1.00 is trading at KES 130.00. Use the Vault Calculator to verify node liquidity before withdrawal.", time: "1h ago", unread: false, avatar: "📡" },
+    { sender: "Nexus HQ", body: "Welcome! To keep global clients safe, you need Handshake Units (HU) to apply for jobs. Top up now to start earning.", time: "Just now", unread: true, avatar: "🏢" },
+    { sender: "Security Bot", body: "Your connection is secure. You have 5 HU left. You need at least 10 HU to apply for any job. Pick a package to get started.", time: "14m ago", unread: true, avatar: "🤖" },
+    { sender: "Exchange Relay", body: "Exchange rate updated: $1.00 = KES 130. Use the Wallet calculator to check your balance before withdrawing.", time: "1h ago", unread: false, avatar: "📡" },
   ];
-
-  const typeColors: Record<string, string> = {
-    Security: "#f87171", Academic: "#60a5fa", Web3: "#a78bfa", Startup: "#fb923c", Design: "#e879f9", AI: "#34d399",
-  };
 
   const openRefill = () => { setModalStep("packages"); setShowModal(true); };
 
   const handleApply = (cost: number) => {
     if (huBalance >= cost) {
       setHuBalance((p) => p - cost);
-      addToast(`Handshake sent! −${cost} HU`, "success");
+      addToast(`Application sent! −${cost} HU used`, "success");
     } else {
-      addToast(`Need ${cost - huBalance} more HU to apply`, "error");
+      addToast(`You need ${cost - huBalance} more HU to apply`, "error");
       openRefill();
     }
   };
 
   const handlePay = async (method: "CARD" | "MPESA") => {
-    if (!agreed) return addToast("Please agree to the network rules first.", "info");
-    if (!selectedPack) return addToast("Select a package first.", "error");
+    if (!agreed) return addToast("Please agree to the terms first.", "info");
+    if (!selectedPack) return addToast("Please select a package first.", "error");
     setIsPaying(true);
     try {
       if (method === "CARD") {
-        // Charge the exact KES amount shown for the selected package
         const kesAmount = selectedPack.price * RATE;
         const res = await fetch("/api/paystack", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            amount: kesAmount,         // deduct KES as displayed (e.g. KES 1,300 for Pro Uplink)
-            currency: "KES",
+            amount: kesAmount, currency: "KES",
             email: user?.primaryEmailAddress?.emailAddress,
             metadata: { hu: selectedPack.hu, pack: selectedPack.name },
           }),
         });
         const data = await res.json();
         if (data?.data?.authorization_url) window.location.href = data.data.authorization_url;
-        else addToast("Payment gateway error.", "error");
+        else addToast("Payment error. Please try again.", "error");
       } else {
         const clean = mpesaNum.replace(/\D/g, "");
         if (!clean.startsWith("254") || clean.length !== 12) {
-          addToast("Format: 254XXXXXXXXX (12 digits)", "error"); return;
+          addToast("Please use format: 254XXXXXXXXX (12 digits)", "error"); return;
         }
         const res = await fetch("/api/intasend", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            amount: selectedPack.price * RATE,
-            phone: clean,
+            amount: selectedPack.price * RATE, phone: clean,
             email: user?.primaryEmailAddress?.emailAddress,
             metadata: { hu: selectedPack.hu },
           }),
         });
-        if (res.ok) { addToast("Check your phone for the STK prompt.", "success"); setShowModal(false); }
-        else addToast("M-Pesa connection failed.", "error");
+        if (res.ok) { addToast("Check your phone — M-Pesa prompt sent!", "success"); setShowModal(false); }
+        else addToast("M-Pesa connection failed. Try again.", "error");
       }
-    } catch { addToast("Network error. Try again.", "error"); }
+    } catch { addToast("Network error. Please try again.", "error"); }
     finally { setIsPaying(false); }
   };
 
@@ -382,313 +529,407 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const generateApiKey = () => {
-    const key = "nxs_" + Array.from({ length: 32 }, () => "abcdefghijklmnopqrstuvwxyz0123456789"[Math.floor(Math.random() * 36)]).join("");
-    setGeneratedApiKey(key);
-    addToast("API key generated!", "success");
-  };
-
   const faqItems = [
-    { q: "What are Handshake Units (HU)?", a: "HU are your access tokens to the Nexus network. Each application to a gig costs HU, which ensures only serious operators engage with global clients. They protect the ecosystem from spam." },
-    { q: "How long does M-Pesa payment take?", a: "M-Pesa STK push is instant. You'll receive a pop-up on your Safaricom phone within seconds. HU are credited to your account within 5 minutes of payment confirmation." },
-    { q: "Can I withdraw my earnings?", a: "Yes! Once your balance reaches $50, you can withdraw via M-Pesa, Bank Transfer, or Binance. Verify your profile to unlock the full withdrawal suite." },
-    { q: "What is the minimum to apply for a gig?", a: "Standard marketplace gigs require 10 HU minimum. Corporate missions from Fortune 500 companies require 50 HU due to higher client standards and verification layers." },
-    { q: "Is my data secure?", a: "All data is encrypted via TLS 1.3 and AES-256 at rest. We never share your personal information with third parties without your explicit consent." },
+    { q: "What are Handshake Units (HU)?", a: "HU are your access tokens on the Nexus platform. Each time you apply for a job, some HU are used. This keeps out fake applicants and makes sure only serious workers can apply. Higher-paying jobs cost more HU." },
+    { q: "How fast does M-Pesa payment work?", a: "M-Pesa is instant. A pop-up will appear on your Safaricom phone within a few seconds. Your HU balance is updated within 5 minutes after payment is confirmed." },
+    { q: "Can I withdraw my money?", a: "Yes! Once your balance reaches $50, you can withdraw through M-Pesa, Bank Transfer, or Binance. Make sure your profile is verified to unlock full withdrawal options." },
+    { q: "How many HU do I need to apply?", a: "Basic jobs cost 10 HU. Standard jobs cost 20 HU. Advanced jobs cost 30 HU. Expert jobs cost 50 HU. Corporate jobs from big companies cost 50–100 HU because clients have very high standards." },
+    { q: "Is my information safe?", a: "Yes. All your data is protected using top-level encryption (TLS 1.3 and AES-256). We never share your personal details with anyone without your permission." },
   ];
 
   return (
-    <div className="min-h-screen text-white font-sans pb-28 overflow-x-hidden"
-      style={{ background: "linear-gradient(160deg, #030810 0%, #050c18 60%, #03080f 100%)" }}>
-
-      {/* Ambient */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-175 h-175 rounded-full opacity-[0.04] blur-[140px]"
-          style={{ background: "radial-gradient(circle, #00f5d4, transparent)" }} />
-        <div className="absolute bottom-0 -left-40 w-150 h-150 rounded-full opacity-[0.05] blur-[120px]"
-          style={{ background: "radial-gradient(circle, #3b82f6, transparent)" }} />
-        <div className="absolute inset-0 opacity-[0.025]"
-          style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
-      </div>
+    <div
+      className="min-h-screen font-sans overflow-x-hidden"
+      style={{
+        // ── CLEAN premium background — no dark blobs ──
+        background: "#F7F9FC",
+        paddingBottom: "72px",
+      }}
+    >
+      {/* Subtle top accent line — replaces distracting blobs */}
+      <div className="fixed top-0 left-0 right-0 h-0.75 z-200"
+        style={{ background: "linear-gradient(90deg, #0047B3 0%, #0066FF 50%, #38BDF8 100%)" }} />
 
       {/* Toasts */}
       <div className="fixed top-5 right-4 z-999 flex flex-col gap-2 pointer-events-none">
         <AnimatePresence>
           {toasts.map((t) => (
             <motion.div key={t.id} initial={{ opacity: 0, x: 80, scale: 0.92 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 80, scale: 0.92 }}
-              className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-wider border backdrop-blur-2xl shadow-2xl ${
-                t.type === "success" ? "bg-emerald-500/15 border-emerald-500/25 text-emerald-400"
-                  : t.type === "error" ? "bg-red-500/15 border-red-500/25 text-red-400"
-                  : "bg-blue-500/15 border-blue-500/25 text-blue-400"}`}>
-              {t.type === "success" ? <CheckCircle size={12} /> : t.type === "error" ? <AlertTriangle size={12} /> : <BellRing size={12} />}
+              className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl text-[11px] font-bold border shadow-lg bg-white ${
+                t.type === "success" ? "border-green-200 text-green-700"
+                  : t.type === "error" ? "border-red-200 text-red-700"
+                  : "border-blue-200 text-blue-700"}`}>
+              {t.type === "success" ? <CheckCircle size={14} className="text-green-500" /> : t.type === "error" ? <AlertTriangle size={14} className="text-red-500" /> : <BellRing size={14} className="text-blue-500" />}
               <span>{t.msg}</span>
-              <button onClick={() => setToasts((p) => p.filter((x) => x.id !== t.id))} className="ml-1 opacity-40 hover:opacity-100"><X size={10} /></button>
+              <button onClick={() => setToasts((p) => p.filter((x) => x.id !== t.id))} className="ml-1 opacity-40 hover:opacity-100"><X size={12} /></button>
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
 
-      <div className="max-w-5xl mx-auto pt-5 px-4 relative z-10">
+      <div className="max-w-5xl mx-auto pt-6 px-4 relative z-10">
         <AnimatePresence mode="wait">
 
-          {/* ══════════════════════════════════════════════════════
-              HOME
-          ══════════════════════════════════════════════════════ */}
+          {/* ══ HOME ══════════════════════════════════════════════ */}
           {activeTab === "home" && (
             <motion.div key="home" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }} className="space-y-5">
-              <header className="relative flex justify-between items-center p-6 rounded-[26px] border border-white/[0.07] bg-white/[0.035] backdrop-blur-2xl overflow-hidden shadow-2xl">
-                <div className="absolute top-0 left-0 w-0.75 h-full rounded-r-full" style={{ background: "linear-gradient(to bottom, #00f5d4, transparent)" }} />
-                <div className="pl-2">
-                  <p className="text-[8px] font-black uppercase tracking-[0.25em] text-white/25 mb-1.5">Global Uplink Network</p>
-                  <h2 className="text-[26px] font-black italic uppercase tracking-tighter leading-none text-white">{user?.firstName || "Operator"}</h2>
+
+              {/* Greeting header */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex justify-between items-center">
+                <div>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Welcome back</p>
+                  <h2 className="text-[26px] font-black text-gray-900 leading-none">
+                    {user?.firstName || "Operator"}
+                  </h2>
                   <div className="flex items-center gap-2 mt-2">
-                    <PulseDot color="#00f5d4" size={6} />
-                    <span className="text-[8px] font-bold uppercase tracking-widest text-white/30">Connected</span>
+                    <PulseDot color="#10B981" size={7} />
+                    <span className="text-[10px] font-semibold text-gray-400">Connected · All systems working</span>
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                  <div className="flex items-center gap-2 bg-[#00f5d4]/10 border border-[#00f5d4]/20 px-4 py-2.5 rounded-[14px]">
-                    <Zap size={14} className="text-[#00f5d4]" fill="#00f5d4" />
-                    <span className="text-sm font-black text-white">{huBalance}</span>
-                    <span className="text-[9px] font-black text-[#00f5d4] uppercase tracking-widest">HU</span>
+                  <div className="flex items-center gap-2 bg-blue-50 border border-blue-100 px-4 py-2.5 rounded-xl">
+                    <Zap size={15} className="text-blue-600" fill="#3B82F6" />
+                    <span className="text-[16px] font-black text-gray-900">{huBalance}</span>
+                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">HU</span>
                   </div>
-                  <button onClick={() => setCurrency((c) => (c === "USD" ? "KES" : "USD"))}
-                    className="text-[7px] font-black uppercase bg-white/4 border border-white/[0.07] px-3 py-1.5 rounded-lg text-white/30 hover:text-white transition-all">
-                    {currency} ⇄
+                  <button
+                    onClick={() => setCurrency((c) => (c === "USD" ? "KES" : "USD"))}
+                    className="text-[9px] font-bold bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-all"
+                  >
+                    {currency} ⇄ Switch
                   </button>
                 </div>
-              </header>
+              </div>
 
+              {/* Main cards */}
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                <GlassCard className="md:col-span-3 p-6 space-y-4" accent glow>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "rgba(0,245,212,0.12)" }}>
-                      <ShieldCheck size={18} className="text-[#00f5d4]" />
+                <div className="md:col-span-3 rounded-2xl p-6 text-white shadow-md"
+                  style={{ background: "linear-gradient(135deg, #0047B3 0%, #0066FF 60%, #1D8EF0 100%)" }}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                      <ShieldCheck size={18} className="text-white" />
                     </div>
                     <div>
-                      <h4 className="text-[10px] font-black uppercase tracking-[0.18em] text-white">Protocol Verification</h4>
-                      <p className="text-[8px] text-white/25 font-bold uppercase tracking-widest">Uplink Authentication</p>
+                      <h4 className="text-[11px] font-black uppercase tracking-wide">Handshake Units Required</h4>
+                      <p className="text-[9px] text-blue-200 mt-0.5">How you access jobs on Nexus</p>
                     </div>
                   </div>
-                  <p className="text-[11px] text-white/40 leading-relaxed">
-                    Fortune 500 handshakes require <span className="text-[#00f5d4] font-bold">Uplink Units (HU)</span> to transmit your profile. HU filters bot applications and places you at the front of hiring queues globally.
+                  <p className="text-[12px] text-blue-100 leading-relaxed mb-5">
+                    Every job application uses <strong className="text-white">Handshake Units (HU)</strong>. This keeps out spam and puts serious workers like you first in hiring queues worldwide.
                   </p>
                   <div className="flex gap-2">
-                    <RippleButton onClick={openRefill} className="flex-1 py-3 rounded-[14px] text-[9px] font-black uppercase tracking-widest text-black"
-                      style={{ background: "linear-gradient(135deg, #00f5d4, #0097a7)" }}>
-                      Refill Uplink
+                    <RippleButton onClick={openRefill} className="flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-blue-700 bg-white hover:bg-blue-50 transition-all">
+                      Top Up HU
                     </RippleButton>
                     <button onClick={() => setActiveTab("tasks")}
-                      className="px-5 py-3 rounded-[14px] text-[9px] font-black uppercase tracking-widest border border-white/8 bg-white/4 text-white/50 hover:text-white transition-all">
-                      View Gigs →
+                      className="px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/30 text-white/80 hover:text-white hover:bg-white/10 transition-all">
+                      Browse Jobs →
                     </button>
                   </div>
-                </GlassCard>
+                </div>
                 <div className="md:col-span-2 grid grid-cols-2 gap-3">
-                  <StatCard label="Success Rate" value="0%" icon={<CheckCircle2 size={15} />} color="#34d399" />
-                  <StatCard label="System Uptime" value="99.9%" icon={<Wifi size={15} />} color="#00f5d4" />
-                  <StatCard label="Live Missions" value={marketplaceGigs.length + corporateGigs.length} icon={<Target size={15} />} color="#a78bfa" />
-                  <StatCard label="Trust Level" value="Beta" icon={<Shield size={15} />} color="#fb923c" />
+                  <StatCard label="Success Rate" value="0%" icon={<CheckCircle2 size={15} />} color="#10B981" />
+                  <StatCard label="Uptime" value="99.9%" icon={<Wifi size={15} />} color="#3B82F6" />
+                  <StatCard label="Live Jobs" value={marketplaceGigs.length + corporateGigs.length} icon={<Target size={15} />} color="#8B5CF6" />
+                  <StatCard label="Trust Level" value="Beta" icon={<Shield size={15} />} color="#F59E0B" />
                 </div>
               </div>
 
-              {/* HU info banner */}
-              <div className="p-4 rounded-2xl border flex items-center gap-4"
-                style={{ background: "linear-gradient(135deg, rgba(255,193,7,0.06), rgba(255,152,0,0.04))", borderColor: "rgba(255,193,7,0.2)" }}>
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: "linear-gradient(135deg, #ffd700, #ff8c00)" }}>
-                  <Info size={16} className="text-black" />
+              {/* Low HU warning */}
+              {huBalance < 10 && (
+                <div className="p-4 rounded-xl border border-amber-200 bg-amber-50 flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+                    <Info size={18} className="text-amber-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-[11px] font-black text-amber-800 uppercase tracking-wide">You need at least 10 HU to apply for any job</p>
+                    <p className="text-[10px] text-amber-600 font-medium mt-0.5">Current balance: {huBalance} HU · You need {10 - huBalance} more HU</p>
+                  </div>
+                  <button onClick={openRefill} className="shrink-0 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white bg-amber-500 hover:bg-amber-600 transition-all">
+                    Top Up
+                  </button>
                 </div>
-                <div>
-                  <p className="text-[9px] font-black uppercase tracking-widest text-amber-300">Minimum 10 HU required to apply for any gig</p>
-                  <p className="text-[8px] text-white/25 font-bold mt-0.5">Your current balance: {huBalance} HU · You need {Math.max(0, 10 - huBalance)} more HU</p>
-                </div>
-                <button onClick={openRefill} className="ml-auto shrink-0 px-3 py-1.5 rounded-[10px] text-[8px] font-black uppercase tracking-widest text-black"
-                  style={{ background: "linear-gradient(135deg, #ffd700, #ff8c00)" }}>
-                  Top Up
-                </button>
-              </div>
+              )}
 
               {/* Quick actions */}
               <div className="grid grid-cols-4 gap-3">
                 {[
-                  { icon: <Zap size={16} />, label: "Refill HU", color: "#00f5d4", action: openRefill },
-                  { icon: <Briefcase size={16} />, label: "Browse Gigs", color: "#a78bfa", action: () => setActiveTab("tasks") },
-                  { icon: <Wallet size={16} />, label: "Vault", color: "#34d399", action: () => setActiveTab("earnings") },
-                  { icon: <BarChart3 size={16} />, label: "My Stats", color: "#fb923c", action: () => setActiveTab("analytics") },
+                  { icon: <Zap size={18} />, label: "Top Up HU", color: "#3B82F6", bg: "#EFF6FF", action: openRefill },
+                  { icon: <Briefcase size={18} />, label: "Browse Jobs", color: "#8B5CF6", bg: "#F5F3FF", action: () => setActiveTab("tasks") },
+                  { icon: <Wallet size={18} />, label: "My Wallet", color: "#10B981", bg: "#ECFDF5", action: () => setActiveTab("earnings") },
+                  { icon: <BarChart3 size={18} />, label: "My Stats", color: "#F59E0B", bg: "#FFFBEB", action: () => setActiveTab("analytics") },
                 ].map((item, i) => (
                   <button key={i} onClick={item.action}
-                    className="p-4 rounded-[18px] border border-white/[0.07] bg-white/3 hover:border-white/12 hover:bg-white/5 transition-all text-center group">
-                    <div className="flex justify-center mb-2 transition-transform group-hover:scale-110" style={{ color: item.color }}>{item.icon}</div>
-                    <p className="text-[7px] font-black uppercase tracking-widest text-white/30 group-hover:text-white/60 transition-all leading-none">{item.label}</p>
+                    className="p-4 rounded-xl border border-gray-100 bg-white hover:border-gray-200 hover:shadow-sm transition-all text-center group">
+                    <div className="w-10 h-10 rounded-xl mx-auto mb-2 flex items-center justify-center transition-transform group-hover:scale-110"
+                      style={{ backgroundColor: item.bg, color: item.color }}>
+                      {item.icon}
+                    </div>
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-gray-800 transition-all leading-none">{item.label}</p>
                   </button>
                 ))}
               </div>
 
-              {/* Live activity */}
-              <GlassCard className="p-5">
+              {/* Live activity feed */}
+              <Card className="p-5">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <Activity size={13} className="text-[#00f5d4]" />
-                    <span className="text-[9px] font-black uppercase tracking-widest text-white/40">Network Activity</span>
+                    <Activity size={14} className="text-blue-500" />
+                    <span className="text-[11px] font-black text-gray-700 uppercase tracking-wide">Live Activity Feed</span>
                   </div>
-                  <Badge color="#34d399"><PulseDot color="#34d399" size={5} /> Live</Badge>
+                  <Badge color="#10B981"><PulseDot color="#10B981" size={5} /> Live</Badge>
                 </div>
                 <div className="space-y-3">
                   {[
-                    { msg: "Emmanuel K. earned $850 via Stripe Gig", time: "2m ago", color: "#34d399" },
-                    { msg: "David N. applied to Tesla Data Analyst role", time: "7m ago", color: "#00f5d4" },
-                    { msg: "Alice V. withdrew KES 14,000 successfully", time: "15m ago", color: "#a78bfa" },
-                    { msg: "John M. refilled 1200 HU · Pro Uplink", time: "22m ago", color: "#fb923c" },
+                    { msg: "Emmanuel K. just earned $850 via Stripe gig", time: "2m ago", color: "#10B981" },
+                    { msg: "David N. applied to Tesla Data Analyst role", time: "7m ago", color: "#3B82F6" },
+                    { msg: "Alice V. withdrew KES 14,000 successfully", time: "15m ago", color: "#8B5CF6" },
+                    { msg: "John M. topped up 1,200 HU — Pro Uplink", time: "22m ago", color: "#F59E0B" },
+                    { msg: "Sara B. completed a Security Audit — $1,500", time: "35m ago", color: "#EF4444" },
                   ].map((a, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <PulseDot color={a.color} size={5} />
-                      <p className="text-[9px] text-white/30 font-bold flex-1">{a.msg}</p>
-                      <span className="text-[7px] text-white/15 font-bold uppercase shrink-0">{a.time}</span>
+                    <div key={i} className="flex items-center gap-3 py-1">
+                      <PulseDot color={a.color} size={6} />
+                      <p className="text-[10px] text-gray-600 font-medium flex-1">{a.msg}</p>
+                      <span className="text-[9px] text-gray-400 font-medium shrink-0">{a.time}</span>
                     </div>
                   ))}
                 </div>
-              </GlassCard>
+              </Card>
 
-              {/* Ticker */}
-              <div className="relative overflow-hidden rounded-[14px] border border-white/5 bg-white/2 py-3">
+              {/* Scroll ticker */}
+              <div className="relative overflow-hidden rounded-xl border border-gray-100 bg-white py-3">
                 <motion.div className="whitespace-nowrap flex gap-16 items-center"
-                  animate={{ x: [0, -700] }} transition={{ repeat: Infinity, duration: 28, ease: "linear" }}>
-                  {["Emmanuel refilled 1200 HU", "David N. earned $850", "John M. applied for Tesla", "Alice V. withdrew KES 14,000",
-                    "System: Encryption Secure · TLS 1.3", "Kraken · Stripe · Amazon hiring now"].map((t, i) => (
-                    <span key={i} className="inline-flex items-center gap-2.5 text-[8px] font-black text-white/20 uppercase tracking-[0.18em]">
-                      <PulseDot color="#00f5d4" size={4} />{t}
+                  animate={{ x: [0, -900] }} transition={{ repeat: Infinity, duration: 30, ease: "linear" }}>
+                  {["Emmanuel refilled 1,200 HU", "David N. earned $850", "John M. applied to Tesla", "Alice V. withdrew KES 14,000",
+                    "System: All secure · TLS 1.3", "Kraken · Stripe · Amazon hiring now", "24 new jobs posted today"].map((t, i) => (
+                    <span key={i} className="inline-flex items-center gap-2.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+                      <PulseDot color="#3B82F6" size={5} />{t}
                     </span>
                   ))}
                 </motion.div>
               </div>
+
+              {/* Featured companies — real logos via CompanyLogo */}
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Companies Hiring Now</p>
+                <div className="flex gap-3 overflow-x-auto pb-1 no-scrollbar">
+                  {[
+                    { domain: "tesla.com", name: "Tesla" },
+                    { domain: "amazon.com", name: "Amazon" },
+                    { domain: "stripe.com", name: "Stripe" },
+                    { domain: "google.com", name: "Google" },
+                    { domain: "openai.com", name: "OpenAI" },
+                    { domain: "coinbase.com", name: "Coinbase" },
+                    { domain: "netflix.com", name: "Netflix" },
+                    { domain: "shopify.com", name: "Shopify" },
+                  ].map((c, i) => (
+                    <button key={i} onClick={() => { setGigMode("corporate"); setActiveTab("tasks"); }}
+                      className="shrink-0 p-3 bg-white border border-gray-100 rounded-xl hover:border-blue-200 hover:shadow-sm transition-all">
+                      <CompanyLogo name={c.name} domain={c.domain} size={38} />
+                    </button>
+                  ))}
+                </div>
+              </div>
             </motion.div>
           )}
 
-          {/* ══════════════════════════════════════════════════════
-              GIGS — Fully visible, apply button locked per HU
-          ══════════════════════════════════════════════════════ */}
+          {/* ══ GIGS ══════════════════════════════════════════════ */}
           {activeTab === "tasks" && (
-            <motion.div key="tasks" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }} className="space-y-5">
-              <div className="flex items-center justify-between">
-                <SectionHead label="Mission Feed" />
-                <Badge color="#34d399"><PulseDot color="#34d399" size={5} /> Uplink Active</Badge>
+            <motion.div key="tasks" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }} className="space-y-4">
+
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <SectionHead label="Job Board" sub={`${filteredMarket.length + filteredCorp.length} jobs available now`} />
+                <Badge color="#10B981"><PulseDot color="#10B981" size={5} /> Hiring Open</Badge>
               </div>
 
-              {/* HU warning — sticky top */}
               {huBalance < 10 && (
-                <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-                  className="p-4 rounded-2xl border flex items-center gap-4"
-                  style={{ background: "linear-gradient(135deg, rgba(255,193,7,0.08), rgba(255,152,0,0.05))", borderColor: "rgba(255,193,7,0.25)" }}>
-                  <div className="relative shrink-0">
-                    <div className="relative w-10 h-10 rounded-xl flex items-center justify-center border border-amber-400/40"
-                      style={{ background: "linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,140,0,0.15))" }}>
-                      <Lock size={18} className="text-amber-400" />
-                    </div>
+                <div className="p-4 rounded-xl border border-amber-200 bg-amber-50 flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+                    <Lock size={18} className="text-amber-600" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-amber-300">Apply buttons locked · Need {10 - huBalance} more HU</p>
-                    <p className="text-[8px] text-white/25 font-bold mt-0.5">Browse all {marketplaceGigs.length + corporateGigs.length} gigs freely — refill HU to apply</p>
+                    <p className="text-[11px] font-black text-amber-800">You can browse all jobs, but need {10 - huBalance} more HU to apply</p>
+                    <p className="text-[10px] text-amber-600 font-medium mt-0.5">Top up HU to start applying instantly</p>
                   </div>
-                  <button onClick={openRefill} className="shrink-0 px-4 py-2 rounded-[10px] text-[8px] font-black uppercase tracking-widest text-black"
-                    style={{ background: "linear-gradient(135deg, #ffd700, #ff8c00)" }}>
-                    Unlock ✦
+                  <button onClick={openRefill} className="shrink-0 px-4 py-2 rounded-xl text-[10px] font-black uppercase text-white bg-amber-500 hover:bg-amber-600 transition-all">
+                    Top Up Now
                   </button>
-                </motion.div>
+                </div>
               )}
 
-              {/* Mode toggle */}
-              <div className="flex gap-1 p-1 rounded-2xl border border-white/[0.07] bg-white/3 w-fit mx-auto">
+              {/* Mode Toggle */}
+              <div className="flex gap-1 p-1 rounded-xl border border-gray-200 bg-white w-fit">
                 {(["marketplace", "corporate"] as const).map((m) => (
                   <button key={m} onClick={() => setGigMode(m)}
-                    className={`px-8 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${gigMode === m ? "bg-[#00f5d4] text-black shadow-lg" : "text-white/30 hover:text-white/60"}`}>
-                    {m}
+                    className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${gigMode === m ? "bg-blue-600 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"}`}>
+                    {m === "marketplace" ? "🛒 Freelance" : "🏢 Corporate"}
                   </button>
                 ))}
               </div>
 
-              {gigMode === "marketplace" ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {marketplaceGigs.map((g) => {
-                    const canApply = huBalance >= g.cost;
-                    return (
-                      <div key={g.id} className="p-5 rounded-[22px] border border-white/[0.07] bg-white/[0.035] hover:border-white/[0.14] hover:bg-white/4.5 transition-all shadow-xl">
-                        <div className="flex items-start justify-between mb-4">
-                          <img src={g.img} className="w-10 h-10 rounded-xl border border-white/10 object-cover" alt={g.client} />
-                          <Badge color={typeColors[g.type] || "#00f5d4"}>{g.type}</Badge>
-                        </div>
-                        <h4 className="text-[11px] font-black uppercase text-white mb-1 leading-snug line-clamp-2">{g.title}</h4>
-                        <p className="text-[9px] text-white/30 font-bold uppercase tracking-widest mb-4">{g.client} · {g.duration}</p>
-                        <div className="flex items-center justify-between pt-3 border-t border-white/5">
-                          <div>
-                            <p className="text-[14px] font-black text-white leading-none">{fmt(g.budget)}</p>
-                            <p className="text-[7px] text-white/25 font-bold uppercase mt-0.5">Project budget</p>
+              {gigMode === "marketplace" && (
+                <>
+                  <div className="flex gap-2 flex-wrap">
+                    <div className="flex-1 min-w-50 flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5">
+                      <Search size={14} className="text-gray-400 shrink-0" />
+                      <input value={gigSearch} onChange={e => setGigSearch(e.target.value)} placeholder="Search jobs..."
+                        className="flex-1 text-[11px] outline-none text-gray-700 placeholder-gray-400 bg-transparent" />
+                    </div>
+                    <select value={gigSort} onChange={e => setGigSort(e.target.value as any)}
+                      className="bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-[11px] font-semibold text-gray-600 outline-none cursor-pointer">
+                      <option value="newest">Newest First</option>
+                      <option value="highest">Highest Pay</option>
+                      <option value="lowest">Lowest Pay</option>
+                    </select>
+                  </div>
+
+                  <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                    {gigCategories.map((cat) => (
+                      <button key={cat} onClick={() => setGigCategory(cat)}
+                        className={`shrink-0 px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all ${gigCategory === cat ? "bg-blue-600 text-white border-blue-600" : "bg-white border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700"}`}>
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-2 flex-wrap">
+                    {[["Basic", "10 HU", "#10B981"], ["Standard", "20 HU", "#3B82F6"], ["Advanced", "30 HU", "#8B5CF6"], ["Expert", "50 HU", "#EF4444"]].map(([l, h, c]) => (
+                      <div key={l} className="flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-100 rounded-lg">
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: c }} />
+                        <span className="text-[9px] font-bold text-gray-500">{l}: {h}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filteredMarket.map((g) => {
+                      const canApply = huBalance >= g.cost;
+                      const lc = levelColors[g.level] || "#3B82F6";
+                      const tc = typeColors[g.type] || "#3B82F6";
+                      return (
+                        <div key={g.id} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-gray-200 transition-all group">
+                          <div className="flex items-start justify-between mb-3">
+                            {/* ✅ Premium MarketplaceAvatar — replaces plain colored box */}
+                            <MarketplaceAvatar initials={g.avatar} type={g.type} size={44} />
+                            <div className="flex gap-1 flex-wrap justify-end">
+                              <Badge color={tc}>{g.type}</Badge>
+                              <Badge color={lc}>{g.level}</Badge>
+                            </div>
                           </div>
+                          <h4 className="text-[12px] font-black text-gray-900 mb-1 leading-snug line-clamp-2">{g.title}</h4>
+                          <p className="text-[10px] text-gray-400 font-medium mb-4">{g.client} · {g.duration}</p>
+                          <div className="flex items-center gap-1.5 mb-3 px-3 py-2 rounded-lg"
+                            style={{ backgroundColor: `${lc}10`, border: `1px solid ${lc}30` }}>
+                            <Zap size={11} style={{ color: lc }} />
+                            <span className="text-[9px] font-black uppercase" style={{ color: lc }}>Requires {g.cost} HU to apply</span>
+                          </div>
+                          <div className="flex items-center justify-between pt-3 border-t border-gray-50">
+                            <div>
+                              <p className="text-[16px] font-black text-gray-900 leading-none">{fmt(g.budget)}</p>
+                              <p className="text-[8px] text-gray-400 font-medium mt-0.5">Project budget</p>
+                            </div>
+                            {canApply ? (
+                              <RippleButton onClick={() => handleApply(g.cost)}
+                                className="px-4 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest text-white"
+                                style={{ background: `linear-gradient(135deg, ${tc}, ${tc}cc)` }}>
+                                Apply · {g.cost} HU
+                              </RippleButton>
+                            ) : (
+                              <button onClick={openRefill}
+                                className="px-4 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 border border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-100 transition-all">
+                                <Lock size={10} /> Need {g.cost} HU
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {filteredMarket.length === 0 && (
+                    <div className="text-center py-16 text-gray-400">
+                      <Search size={32} className="mx-auto mb-3 opacity-40" />
+                      <p className="text-[13px] font-semibold">No jobs match your search</p>
+                      <p className="text-[11px] mt-1">Try a different category or search term</p>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {gigMode === "corporate" && (
+                <>
+                  <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                    {corpDepts.map((d) => (
+                      <button key={d} onClick={() => setCorpCategory(d)}
+                        className={`shrink-0 px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all ${corpCategory === d ? "bg-blue-600 text-white border-blue-600" : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"}`}>
+                        {d}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-blue-50 border border-blue-100 flex items-center gap-3">
+                    <Building2 size={15} className="text-blue-600 shrink-0" />
+                    <p className="text-[10px] font-semibold text-blue-700">Corporate jobs from top companies require <strong>50–100 HU</strong> due to higher client standards and verification.</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {filteredCorp.map((c) => {
+                      const canApply = huBalance >= c.cost;
+                      const costColor = c.cost >= 100 ? "#EF4444" : "#8B5CF6";
+                      return (
+                        <div key={c.id} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-gray-200 transition-all">
+                          <div className="flex items-center gap-4 mb-4">
+                            {/* ✅ CompanyLogo with 3-tier fallback */}
+                            <CompanyLogo name={c.company} domain={c.domain} size={56} />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400 mb-0.5">{c.company}</p>
+                              <h4 className="text-[12px] font-black text-gray-900 leading-snug">{c.title}</h4>
+                              <div className="flex gap-1 mt-1 flex-wrap">
+                                <Badge color="#8B5CF6">{c.badge}</Badge>
+                                <Badge color="#06B6D4">{c.dept}</Badge>
+                              </div>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <p className="text-[16px] font-black text-gray-900 leading-none">{fmt(c.salary)}</p>
+                              <p className="text-[9px] text-gray-400 font-medium mt-0.5">per month</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 mb-3 px-3 py-2 rounded-lg"
+                            style={{ backgroundColor: `${costColor}0f`, border: `1px solid ${costColor}25` }}>
+                            <Zap size={11} style={{ color: costColor }} />
+                            <span className="text-[9px] font-black uppercase" style={{ color: costColor }}>Requires {c.cost} HU to apply</span>
+                            {c.cost >= 100 && <span className="ml-auto text-[8px] font-bold text-red-400">Premium Role</span>}
+                          </div>
+
                           {canApply ? (
-                            <RippleButton onClick={() => handleApply(g.cost)}
-                              className="px-5 py-2.5 rounded-[11px] text-[8px] font-black uppercase tracking-widest text-black"
-                              style={{ background: "linear-gradient(135deg, #00f5d4, #0097a7)" }}>
-                              Apply · {g.cost} HU
+                            <RippleButton onClick={() => handleApply(c.cost)}
+                              className="w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2"
+                              style={{ background: "linear-gradient(135deg, #0066FF, #0047B3)" }}>
+                              <Zap size={12} /> Apply · {c.cost} HU <ArrowUpRight size={12} />
                             </RippleButton>
                           ) : (
                             <button onClick={openRefill}
-                              className="px-5 py-2.5 rounded-[11px] text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 border border-amber-400/30 transition-all hover:bg-amber-400/10"
-                              style={{ color: "#fbbf24", background: "rgba(255,193,7,0.06)" }}>
-                              <Lock size={9} /> Need {g.cost} HU
+                              className="w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 border border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-100 transition-all">
+                              <Lock size={13} /> Need {c.cost} HU to Apply <ArrowUpRight size={13} />
                             </button>
                           )}
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {corporateGigs.map((c) => {
-                    const canApply = huBalance >= c.cost;
-                    return (
-                      <div key={c.id} className="p-6 rounded-[26px] border border-white/[0.07] bg-white/[0.035] hover:border-white/[0.14] hover:bg-white/5 transition-all shadow-2xl group">
-                        <div className="flex items-center gap-4 mb-5">
-                          <CompanyLogo name={c.company} domain={c.domain} size={52} />
-                          <div className="min-w-0">
-                            <p className="text-[8px] font-black uppercase tracking-[0.15em] text-white/25 mb-0.5">{c.company}</p>
-                            <h4 className="text-[11px] font-black uppercase text-white leading-snug truncate">{c.title}</h4>
-                            <Badge color="#a78bfa">{c.badge}</Badge>
-                          </div>
-                          <div className="ml-auto text-right shrink-0">
-                            <p className="text-[14px] font-black text-white leading-none">{fmt(c.salary)}</p>
-                            <p className="text-[7px] text-white/25 font-bold uppercase mt-0.5">/ month</p>
-                          </div>
-                        </div>
-                        {canApply ? (
-                          <RippleButton onClick={() => handleApply(c.cost)}
-                            className="w-full py-3.5 rounded-[14px] text-[9px] font-black uppercase tracking-widest border border-white/8 bg-white/6 text-white hover:bg-white/10 transition-all flex items-center justify-center gap-2">
-                            <Zap size={12} className="text-[#00f5d4]" /> Handshake · {c.cost} HU <ArrowUpRight size={12} />
-                          </RippleButton>
-                        ) : (
-                          <button onClick={openRefill}
-                            className="w-full py-3.5 rounded-[14px] text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2 border border-amber-400/25 transition-all hover:bg-amber-400/8"
-                            style={{ color: "#fbbf24", background: "rgba(255,193,7,0.05)" }}>
-                            <Lock size={12} /> Requires {c.cost} HU · Refill to Apply <ArrowUpRight size={12} />
-                          </button>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                </>
               )}
             </motion.div>
           )}
 
-          {/* ══════════════════════════════════════════════════════
-              VAULT
-          ══════════════════════════════════════════════════════ */}
+          {/* ══ VAULT / WALLET ════════════════════════════════════ */}
           {activeTab === "earnings" && (
             <motion.div key="earnings" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }} className="space-y-5">
-              <SectionHead label="Vault Hub" />
-              <div className="flex gap-1 p-1 rounded-2xl border border-white/[0.07] bg-white/3 w-fit">
+              <SectionHead label="My Wallet" sub="Track your earnings and withdrawals" />
+              <div className="flex gap-1 p-1 rounded-xl border border-gray-200 bg-white w-fit">
                 {(["overview", "history", "limits", "referral"] as const).map((t) => (
                   <button key={t} onClick={() => setActiveVaultTab(t)}
-                    className={`px-5 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all ${activeVaultTab === t ? "bg-[#00f5d4] text-black" : "text-white/30 hover:text-white/60"}`}>
+                    className={`px-5 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${activeVaultTab === t ? "bg-blue-600 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"}`}>
                     {t}
                   </button>
                 ))}
@@ -697,146 +938,139 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
               {activeVaultTab === "overview" && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-7 rounded-[28px] border border-[#00f5d4]/15 overflow-hidden relative"
-                      style={{ background: "linear-gradient(135deg, rgba(0,245,212,0.08) 0%, rgba(0,245,212,0.02) 100%)" }}>
-                      <div className="absolute top-0 right-0 w-40 h-40 rounded-full blur-[80px] opacity-30"
-                        style={{ background: "radial-gradient(circle, #00f5d4, transparent)" }} />
+                    <div className="p-7 rounded-2xl border border-blue-100 bg-linear-to-br from-blue-50 to-indigo-50 relative overflow-hidden">
                       <div className="flex items-center justify-between mb-5">
-                        <Zap size={20} className="text-[#00f5d4]" fill="#00f5d4" />
-                        <Badge color="#00f5d4"><PulseDot color="#00f5d4" size={4} /> Liquid</Badge>
+                        <Zap size={22} className="text-blue-600" fill="#3B82F6" />
+                        <Badge color="#3B82F6"><PulseDot color="#3B82F6" size={5} /> Active</Badge>
                       </div>
-                      <p className="text-[8px] font-black uppercase tracking-[0.2em] text-white/30 mb-1.5">Uplink Units</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-2">Handshake Units (HU)</p>
                       <div className="flex items-end gap-2 mb-1">
-                        <span className="text-[40px] font-black italic text-white leading-none">{huBalance}</span>
-                        <span className="text-[18px] font-black text-[#00f5d4] mb-1">HU</span>
+                        <span className="text-[44px] font-black text-gray-900 leading-none">{huBalance}</span>
+                        <span className="text-[20px] font-black text-blue-600 mb-1">HU</span>
                       </div>
-                      <p className="text-[8px] font-bold text-white/20 uppercase tracking-widest">Liquid Power Available</p>
+                      <p className="text-[10px] font-medium text-gray-400">Available to use on jobs</p>
                       <div className="flex gap-2 mt-5">
-                        <button onClick={openRefill} className="flex-1 px-5 py-2.5 rounded-xl text-[8px] font-black uppercase tracking-widest text-black"
-                          style={{ background: "linear-gradient(135deg, #00f5d4, #0097a7)" }}>
-                          + Refill
+                        <button onClick={openRefill} className="flex-1 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white bg-blue-600 hover:bg-blue-700 transition-all">
+                          + Top Up
                         </button>
-                        <button onClick={() => setActiveVaultTab("history")} className="px-4 py-2.5 rounded-xl text-[8px] font-black uppercase tracking-widest border border-white/8 bg-white/4 text-white/40 hover:text-white transition-all">
+                        <button onClick={() => setActiveVaultTab("history")} className="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-blue-200 text-blue-600 hover:bg-blue-50 transition-all">
                           History
                         </button>
                       </div>
                     </div>
 
-                    <div className="p-7 rounded-[28px] border border-emerald-500/15 overflow-hidden relative"
-                      style={{ background: "linear-gradient(135deg, rgba(52,211,153,0.07) 0%, rgba(52,211,153,0.02) 100%)" }}>
-                      <div className="absolute top-0 right-0 w-40 h-40 rounded-full blur-[80px] opacity-20"
-                        style={{ background: "radial-gradient(circle, #34d399, transparent)" }} />
+                    <div className="p-7 rounded-2xl border border-green-100 bg-linear-to-br from-green-50 to-emerald-50 relative overflow-hidden">
                       <div className="flex items-center justify-between mb-5">
-                        <DollarSign size={20} className="text-emerald-400" />
-                        <button onClick={() => setShowBalance(b => !b)} className="text-white/20 hover:text-white/50 transition-all">
-                          {showBalance ? <Eye size={14} /> : <EyeOff size={14} />}
+                        <DollarSign size={22} className="text-green-600" />
+                        <button onClick={() => setShowBalance(b => !b)} className="text-gray-400 hover:text-gray-600 transition-all">
+                          {showBalance ? <Eye size={16} /> : <EyeOff size={16} />}
                         </button>
                       </div>
-                      <p className="text-[8px] font-black uppercase tracking-[0.2em] text-white/30 mb-1.5">Settlement Balance</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-green-400 mb-2">Earnings Balance</p>
                       <div className="flex items-end gap-2 mb-1">
-                        <span className="text-[40px] font-black italic text-white leading-none">
+                        <span className="text-[44px] font-black text-gray-900 leading-none">
                           {showBalance ? fmt(cashBalance) : "••••••"}
                         </span>
                       </div>
-                      <p className="text-[8px] font-bold text-white/20 uppercase tracking-widest">Available for withdrawal</p>
-                      <RippleButton onClick={() => addToast("Minimum withdrawal is $50.00", "error")}
-                        className="mt-5 w-full py-3 rounded-[14px] text-[9px] font-black uppercase tracking-widest border border-white/8 bg-white/5 text-white/50 hover:text-white transition-all flex items-center justify-center gap-2">
-                        Withdraw <ArrowUpRight size={12} />
+                      <p className="text-[10px] font-medium text-gray-400">Ready to withdraw</p>
+                      <RippleButton onClick={() => addToast("Minimum withdrawal amount is $50.00", "error")}
+                        className="mt-5 w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-green-200 text-green-700 hover:bg-green-100 transition-all flex items-center justify-center gap-2">
+                        Withdraw Money <ArrowUpRight size={13} />
                       </RippleButton>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-4 gap-3">
-                    <StatCard label="Total Earned" value="$0" icon={<TrendingUp size={15} />} color="#34d399" sub="Lifetime" />
-                    <StatCard label="Withdrawn" value="$0" icon={<Download size={15} />} color="#60a5fa" sub="All time" />
-                    <StatCard label="Pending" value="$0" icon={<Clock size={15} />} color="#fb923c" sub="In review" />
-                    <StatCard label="HU Spent" value="0" icon={<Zap size={15} />} color="#00f5d4" sub="All gigs" />
+                    <StatCard label="Total Earned" value="$0" icon={<TrendingUp size={15} />} color="#10B981" sub="All time" />
+                    <StatCard label="Withdrawn" value="$0" icon={<Download size={15} />} color="#3B82F6" sub="All time" />
+                    <StatCard label="Pending" value="$0" icon={<Clock size={15} />} color="#F59E0B" sub="In review" />
+                    <StatCard label="HU Spent" value="0" icon={<Zap size={15} />} color="#8B5CF6" sub="All jobs" />
                   </div>
 
-                  <GlassCard className="p-5">
+                  <Card className="p-5">
                     <div className="flex items-center gap-2 mb-4">
-                      <Calculator size={13} className="text-[#00f5d4]" />
-                      <span className="text-[9px] font-black uppercase tracking-[0.18em] text-white/50">HU → KES Converter</span>
+                      <Calculator size={15} className="text-blue-500" />
+                      <span className="text-[11px] font-black text-gray-700 uppercase tracking-wide">HU → KES Calculator</span>
                     </div>
                     <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-                      <div className="bg-black/40 p-3 rounded-[14px] border border-white/6">
-                        <p className="text-[7px] font-black text-white/20 uppercase mb-1">Units (HU)</p>
+                      <div className="bg-gray-50 p-3 rounded-xl border border-gray-200">
+                        <p className="text-[9px] font-bold text-gray-400 uppercase mb-1">Units (HU)</p>
                         <input type="number" value={calcHU} onChange={(e) => setCalcHU(e.target.value)}
-                          className="bg-transparent w-full text-[15px] font-black outline-none text-white" />
+                          className="bg-transparent w-full text-[16px] font-black outline-none text-gray-900" />
                       </div>
-                      <RefreshCw size={13} className="text-white/15 animate-spin" style={{ animationDuration: "5s" }} />
-                      <div className="bg-black/40 p-3 rounded-[14px] border border-white/6 text-right">
-                        <p className="text-[7px] font-black text-white/20 uppercase mb-1">KES</p>
-                        <p className="text-[15px] font-black text-emerald-400 leading-none">{isNaN(calcKES) ? "—" : calcKES.toLocaleString()}</p>
+                      <RefreshCw size={14} className="text-gray-400" />
+                      <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 text-right">
+                        <p className="text-[9px] font-bold text-gray-400 uppercase mb-1">KES</p>
+                        <p className="text-[16px] font-black text-green-600 leading-none">{isNaN(calcKES) ? "—" : calcKES.toLocaleString()}</p>
                       </div>
                     </div>
-                  </GlassCard>
+                  </Card>
 
-                  <GlassCard className="p-5">
+                  <Card className="p-5">
                     <div className="flex items-center gap-2 mb-4">
-                      <CreditCard size={13} className="text-[#00f5d4]" />
-                      <span className="text-[9px] font-black uppercase tracking-[0.18em] text-white/50">Withdrawal Methods</span>
+                      <CreditCard size={15} className="text-blue-500" />
+                      <span className="text-[11px] font-black text-gray-700 uppercase tracking-wide">How to Withdraw</span>
                     </div>
-                    <div className="space-y-2.5">
+                    <div className="space-y-3">
                       {[
-                        { name: "M-Pesa", sub: "Instant · KES", status: "Active", color: "#34d399", logo: <MpesaLogo /> },
-                        { name: "Bank Transfer", sub: "1-3 days · USD/KES", status: "Available", color: "#60a5fa", logo: <div className="w-10 h-10 bg-blue-700 rounded-xl flex items-center justify-center"><Landmark size={18} className="text-white" /></div> },
-                        { name: "Binance USDT", sub: "TRC20 · Instant", status: "Available", color: "#f59e0b", logo: <BinanceLogo /> },
+                        { name: "M-Pesa", sub: "Instant · Safaricom · KES", status: "Active", color: "#10B981", logo: <MpesaLogo /> },
+                        { name: "Bank Transfer", sub: "1–3 business days · USD / KES", status: "Available", color: "#3B82F6", logo: <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center"><Landmark size={18} className="text-white" /></div> },
+                        { name: "Binance USDT", sub: "TRC20 · Instant · Borderless", status: "Available", color: "#F3BA2F", logo: <BinanceLogo /> },
                       ].map((m, i) => (
-                        <div key={i} className="flex items-center gap-4 p-3.5 bg-black/30 rounded-2xl border border-white/5">
+                        <div key={i} className="flex items-center gap-4 p-3.5 bg-gray-50 rounded-xl border border-gray-100">
                           {m.logo}
                           <div className="flex-1">
-                            <p className="text-[10px] font-black text-white">{m.name}</p>
-                            <p className="text-[8px] text-white/25 font-bold uppercase tracking-wide">{m.sub}</p>
+                            <p className="text-[11px] font-black text-gray-900">{m.name}</p>
+                            <p className="text-[9px] text-gray-400 font-medium">{m.sub}</p>
                           </div>
                           <Badge color={m.color}>{m.status}</Badge>
                         </div>
                       ))}
                     </div>
-                  </GlassCard>
+                  </Card>
                 </div>
               )}
 
               {activeVaultTab === "history" && (
                 <PremiumLockedSection
                   title="Transaction History"
-                  description="Your complete earnings ledger, withdrawal records, and HU spend history appear here once you complete your first mission or refill."
+                  description="Your full earnings record, withdrawal history, and HU spending history appear here once you complete your first job or top up."
                   icon={<Clock size={28} />}
-                  cta="Apply to First Gig"
+                  cta="Apply to First Job"
                   onCta={() => setActiveTab("tasks")}
-                  features={["Full ledger", "CSV export", "HU log", "Withdrawal history"]}
+                  features={["Full record", "CSV export", "HU log", "Withdrawals"]}
                 />
               )}
 
               {activeVaultTab === "limits" && (
                 <div className="space-y-3">
-                  <GlassCard className="p-5">
-                    <h4 className="text-[9px] font-black uppercase tracking-widest text-white/40 mb-4">Account Limits</h4>
+                  <Card className="p-5">
+                    <h4 className="text-[11px] font-black uppercase tracking-wide text-gray-500 mb-4">Withdrawal Limits</h4>
                     <div className="space-y-4">
                       {[
                         { label: "Daily Withdrawal", used: 0, limit: 500, unit: "USD" },
                         { label: "Monthly Withdrawal", used: 0, limit: 5000, unit: "USD" },
-                        { label: "HU Spend Today", used: 0, limit: 200, unit: "HU" },
+                        { label: "HU Used Today", used: 0, limit: 200, unit: "HU" },
                       ].map((item, i) => (
                         <div key={i}>
                           <div className="flex justify-between mb-1.5">
-                            <span className="text-[9px] font-black text-white/50 uppercase tracking-wider">{item.label}</span>
-                            <span className="text-[9px] font-black text-white">{item.used} / {item.limit} {item.unit}</span>
+                            <span className="text-[10px] font-bold text-gray-600">{item.label}</span>
+                            <span className="text-[10px] font-black text-gray-900">{item.used} / {item.limit} {item.unit}</span>
                           </div>
-                          <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                            <div className="h-full rounded-full" style={{ width: `${(item.used / item.limit) * 100}%`, background: "linear-gradient(90deg, #00f5d4, #0097a7)" }} />
+                          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-full rounded-full bg-blue-500" style={{ width: `${(item.used / item.limit) * 100}%` }} />
                           </div>
                         </div>
                       ))}
                     </div>
-                  </GlassCard>
-                  <div className="p-4 bg-amber-500/6 border border-amber-500/15 rounded-2xl flex items-center gap-3">
-                    <ChevronsUp size={14} className="text-amber-400 shrink-0" />
-                    <div>
-                      <p className="text-[9px] font-black text-amber-300 uppercase tracking-widest">Verify your profile to increase limits</p>
-                      <p className="text-[8px] text-white/25 font-bold mt-0.5">Verified accounts get 10x higher withdrawal limits</p>
+                  </Card>
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-3">
+                    <ChevronsUp size={16} className="text-amber-500 shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-[10px] font-black text-amber-800">Verify your profile to increase your limits</p>
+                      <p className="text-[9px] text-amber-600 font-medium mt-0.5">Verified accounts get 10x higher withdrawal limits</p>
                     </div>
-                    <button onClick={openRefill} className="ml-auto shrink-0 px-3 py-1.5 rounded-[10px] text-[7px] font-black uppercase tracking-widest text-amber-300 border border-amber-400/30 hover:bg-amber-400/10 transition-all">
+                    <button onClick={openRefill} className="shrink-0 px-3 py-1.5 rounded-xl text-[9px] font-black text-amber-700 border border-amber-300 bg-amber-100 hover:bg-amber-200 transition-all">
                       Verify
                     </button>
                   </div>
@@ -845,27 +1079,24 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
 
               {activeVaultTab === "referral" && (
                 <div className="space-y-4">
-                  <div className="p-7 rounded-[28px] border border-[#00f5d4]/15 text-center relative overflow-hidden"
-                    style={{ background: "linear-gradient(135deg, rgba(0,245,212,0.06), rgba(0,245,212,0.02))" }}>
-                    <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-[60px] opacity-20"
-                      style={{ background: "radial-gradient(circle, #00f5d4, transparent)" }} />
-                    <Gift size={32} className="mx-auto text-[#00f5d4] mb-3" />
-                    <h4 className="text-[16px] font-black italic uppercase tracking-tight text-white mb-2">Refer & Earn</h4>
-                    <p className="text-[9px] text-white/30 font-bold mb-5">Earn 50 HU for every friend who joins and refills</p>
-                    <div className="bg-black/40 p-4 rounded-2xl border border-white/6 flex items-center gap-3 text-left mb-4">
+                  <div className="p-7 rounded-2xl border border-purple-100 bg-linear-to-br from-purple-50 to-indigo-50 text-center">
+                    <Gift size={32} className="mx-auto text-purple-600 mb-3" />
+                    <h4 className="text-[18px] font-black text-gray-900 mb-2">Refer Friends & Earn</h4>
+                    <p className="text-[11px] text-gray-500 font-medium mb-5">Get 50 free HU for every friend who joins and tops up</p>
+                    <div className="bg-white p-4 rounded-xl border border-purple-100 flex items-center gap-3 text-left mb-4">
                       <div className="flex-1">
-                        <p className="text-[7px] text-white/20 uppercase font-bold mb-1">Your referral code</p>
-                        <p className="text-[14px] font-black text-[#00f5d4] tracking-widest">NEXUS-{user?.firstName?.toUpperCase() || "USER"}07</p>
+                        <p className="text-[9px] text-gray-400 font-medium mb-1">Your referral code</p>
+                        <p className="text-[16px] font-black text-blue-600 tracking-widest">NEXUS-{user?.firstName?.toUpperCase() || "USER"}07</p>
                       </div>
                       <button onClick={() => { navigator.clipboard.writeText("NEXUS-" + (user?.firstName?.toUpperCase() || "USER") + "07"); addToast("Referral code copied!", "success"); }}
-                        className="p-2.5 bg-white/5 border border-white/6 rounded-xl hover:bg-white/10 transition-all">
-                        <Copy size={14} className="text-white/30" />
+                        className="p-2.5 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-all">
+                        <Copy size={14} className="text-gray-500" />
                       </button>
                     </div>
                     <div className="grid grid-cols-3 gap-3">
-                      <StatCard label="Referred" value="0" icon={<User size={14} />} color="#00f5d4" />
-                      <StatCard label="HU Earned" value="0" icon={<Zap size={14} />} color="#34d399" />
-                      <StatCard label="$ Earned" value="$0" icon={<DollarSign size={14} />} color="#fb923c" />
+                      <StatCard label="Referred" value="0" icon={<User size={14} />} color="#8B5CF6" />
+                      <StatCard label="HU Earned" value="0" icon={<Zap size={14} />} color="#3B82F6" />
+                      <StatCard label="$ Earned" value="$0" icon={<DollarSign size={14} />} color="#10B981" />
                     </div>
                   </div>
                 </div>
@@ -873,827 +1104,406 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
             </motion.div>
           )}
 
-          {/* ══════════════════════════════════════════════════════
-              WORK — Premium locked with feature preview
-          ══════════════════════════════════════════════════════ */}
+          {/* ══ WORK ══════════════════════════════════════════════ */}
           {activeTab === "contracts" && (
             <motion.div key="contracts" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }} className="space-y-5">
-              <SectionHead label="Work Hub" />
+              <SectionHead label="My Work" sub="Your active and completed jobs" />
 
-              {/* Teaser stats — grayed out */}
-              <div className="grid grid-cols-4 gap-3 opacity-30 pointer-events-none select-none">
-                <StatCard label="Active Work" value="—" icon={<Briefcase size={15} />} color="#00f5d4" />
-                <StatCard label="Completed" value="—" icon={<CheckCircle2 size={15} />} color="#34d399" />
-                <StatCard label="Earned" value="—" icon={<DollarSign size={15} />} color="#fb923c" />
-                <StatCard label="Rating" value="—" icon={<Star size={15} />} color="#a78bfa" />
+              <div className="grid grid-cols-4 gap-3 opacity-40 pointer-events-none select-none">
+                <StatCard label="Active Jobs" value="—" icon={<Briefcase size={15} />} color="#3B82F6" />
+                <StatCard label="Completed" value="—" icon={<CheckCircle2 size={15} />} color="#10B981" />
+                <StatCard label="Earned" value="—" icon={<DollarSign size={15} />} color="#F59E0B" />
+                <StatCard label="Rating" value="—" icon={<Star size={15} />} color="#8B5CF6" />
               </div>
 
-              {/* Premium locked */}
               <PremiumLockedSection
-                title="Work History Locked"
-                description="Your active contracts, completed missions, earnings breakdown, and client ratings appear here. Apply to your first gig to unlock this hub."
+                title="No Jobs Yet"
+                description="Apply to your first job to unlock this section. You will see your active contracts, completed work, and client ratings here."
                 icon={<FileText size={28} />}
-                cta="Browse Gigs Now"
+                cta="Browse Jobs Now"
                 onCta={() => setActiveTab("tasks")}
-                features={["Active contracts", "Client messaging", "Milestone tracker", "Earnings log", "Dispute center", "Rating system"]}
+                features={["Active contracts", "Client chat", "Milestones", "Earnings log", "Dispute help", "Ratings"]}
               />
 
-              {/* Blurred mock contract card */}
-              <div className="relative p-6 rounded-[22px] border border-white/5 bg-white/2 overflow-hidden">
-                <div className="absolute inset-0 z-10" style={{ backdropFilter: "blur(12px)" }} />
+              <div className="relative p-6 rounded-2xl border border-gray-100 bg-gray-50 overflow-hidden">
+                <div className="absolute inset-0 z-10 bg-white/60" style={{ backdropFilter: "blur(8px)" }} />
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 bg-white/10 rounded-xl" />
+                  <div className="w-12 h-12 bg-gray-200 rounded-xl" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-3 bg-white/10 rounded-full w-2/3" />
-                    <div className="h-2 bg-white/5 rounded-full w-1/2" />
+                    <div className="h-3 bg-gray-200 rounded-full w-2/3" />
+                    <div className="h-2 bg-gray-100 rounded-full w-1/2" />
                   </div>
-                  <div className="h-5 bg-white/10 rounded-full w-16" />
+                  <div className="h-5 bg-gray-200 rounded-full w-16" />
                 </div>
-                <div className="h-2 bg-white/5 rounded-full w-full mb-2" />
-                <div className="h-2 bg-white/5 rounded-full w-4/5" />
-                {/* Lock badge centered */}
+                <div className="h-2 bg-gray-100 rounded-full w-full mb-2" />
+                <div className="h-2 bg-gray-100 rounded-full w-4/5" />
                 <div className="absolute inset-0 z-20 flex items-center justify-center">
-                  <div className="flex items-center gap-3 px-5 py-3 rounded-2xl border border-white/10 bg-black/60 backdrop-blur-xl">
-                    <Lock size={16} className="text-[#00f5d4]" />
-                    <span className="text-[9px] font-black uppercase tracking-widest text-white/60">Complete a gig to unlock</span>
+                  <div className="flex items-center gap-3 px-5 py-3 rounded-xl border border-gray-200 bg-white shadow-sm">
+                    <Lock size={16} className="text-blue-500" />
+                    <span className="text-[10px] font-bold text-gray-600">Apply for a job to unlock this section</span>
                   </div>
                 </div>
               </div>
             </motion.div>
           )}
 
-          {/* ══════════════════════════════════════════════════════
-              STATS
-          ══════════════════════════════════════════════════════ */}
+          {/* ══ STATS ═════════════════════════════════════════════ */}
           {activeTab === "analytics" && (
             <motion.div key="analytics" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }} className="space-y-5">
-              <SectionHead label="Performance Stats" />
+              <SectionHead label="My Stats" sub="Track your performance and earnings" />
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <StatCard label="Success Rate" value="0%" icon={<CheckCircle2 size={15} />} color="#34d399" />
-                <StatCard label="Missions" value="0" icon={<Briefcase size={15} />} color="#00f5d4" />
-                <StatCard label="Settled" value={fmt(0)} icon={<DollarSign size={15} />} color="#fb923c" />
-                <StatCard label="Uptime" value="100%" icon={<Wifi size={15} />} color="#a78bfa" />
+                <StatCard label="Success Rate" value="0%" icon={<CheckCircle2 size={15} />} color="#10B981" />
+                <StatCard label="Jobs Done" value="0" icon={<Briefcase size={15} />} color="#3B82F6" />
+                <StatCard label="Total Earned" value={fmt(0)} icon={<DollarSign size={15} />} color="#F59E0B" />
+                <StatCard label="Uptime" value="100%" icon={<Wifi size={15} />} color="#8B5CF6" />
               </div>
               <PremiumLockedSection
-                title="Analytics Dashboard"
-                description="Charts, earnings trends, application history, win rate, and client breakdown appear after your first completed mission."
+                title="Stats Unlock After First Job"
+                description="Charts, earnings history, application win rate, and client breakdown appear after you complete your first job."
                 icon={<BarChart3 size={28} />}
-                cta="Apply to First Gig"
+                cta="Apply to First Job"
                 onCta={() => setActiveTab("tasks")}
                 features={["Earnings chart", "Win rate", "Client ratings", "Skill breakdown"]}
               />
             </motion.div>
           )}
 
-          {/* ══════════════════════════════════════════════════════
-              SUPPORT
-          ══════════════════════════════════════════════════════ */}
+          {/* ══ SUPPORT ═══════════════════════════════════════════ */}
           {activeTab === "support" && (
             <motion.div key="support" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }} className="max-w-lg mx-auto space-y-5">
-              <SectionHead label="Help Center" />
+              <SectionHead label="Help Center" sub="We are here to help you" />
 
-              <div className="p-4 rounded-2xl border flex items-center gap-4"
-                style={{ background: "linear-gradient(135deg, rgba(52,211,153,0.06), rgba(52,211,153,0.02))", borderColor: "rgba(52,211,153,0.2)" }}>
-                <PulseDot color="#34d399" size={8} />
-                <div>
-                  <p className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">All Systems Operational</p>
-                  <p className="text-[8px] text-white/25 font-bold">Platform · Payments · Uplink · Vault — All running normally</p>
+              <div className="p-4 rounded-xl border border-green-200 bg-green-50 flex items-center gap-4">
+                <PulseDot color="#10B981" size={8} />
+                <div className="flex-1">
+                  <p className="text-[11px] font-black text-green-800">All Systems Running Normally</p>
+                  <p className="text-[10px] text-green-600 font-medium">Platform · Payments · Jobs · Wallet — all working fine</p>
                 </div>
-                <Badge color="#34d399" className="ml-auto">99.9%</Badge>
+                <Badge color="#10B981">99.9%</Badge>
               </div>
 
-              <GlassCard className="p-5 space-y-3" glow>
-                <p className="text-[8px] font-black uppercase tracking-[0.18em] text-white/25 mb-2">Contact Channels</p>
+              <Card className="p-5 space-y-3">
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Get in Touch</p>
                 {[
-                  { label: "Email Support", value: "support@nexusgigs.me", icon: <Mail size={15} />, sub: "Avg. reply: 2hrs", color: "#60a5fa", action: () => window.location.href = "mailto:support@nexusgigs.me" },
-                  { label: "WhatsApp Relay", value: "+254 113 637325", icon: <Phone size={15} />, sub: "Mon–Fri 08:00–20:00 EAT", color: "#34d399", action: () => window.open("https://wa.me/254113637325", "_blank") },
-                  { label: "Live Chat", value: "In-app messaging", icon: <MessageSquare size={15} />, sub: "Beta · Coming soon", color: "#a78bfa", action: undefined },
+                  { label: "Email Us", value: "support@nexusgigs.me", icon: <Mail size={16} />, sub: "We reply within 2 hours", color: "#3B82F6", action: () => window.location.href = "mailto:support@nexusgigs.me" },
+                  { label: "Chat on WhatsApp", value: "Tap to open WhatsApp", icon: <MessageCircle size={16} />, sub: "Mon–Fri · 8am–8pm EAT", color: "#25D366", action: () => window.open("https://wa.me/254113637325", "_blank") },
+                  { label: "Live Chat", value: "Coming Soon", icon: <MessageSquare size={16} />, sub: "In-app · Under development", color: "#8B5CF6", action: undefined },
                 ].map((item, i) => (
                   <div key={i} onClick={item.action}
-                    className={`p-4 bg-black/30 rounded-2xl border border-white/6 flex items-center gap-4 ${item.action ? "cursor-pointer hover:border-[#00f5d4]/30" : "opacity-60"} transition-all`}>
+                    className={`p-4 bg-gray-50 rounded-xl border border-gray-100 flex items-center gap-4 ${item.action ? "cursor-pointer hover:border-blue-200 hover:bg-blue-50" : "opacity-50"} transition-all`}>
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                       style={{ backgroundColor: `${item.color}15`, color: item.color }}>
                       {item.icon}
                     </div>
                     <div className="flex-1">
-                      <p className="text-[8px] font-black uppercase tracking-widest text-white/30">{item.label}</p>
-                      <p className="text-[11px] font-black text-white mt-0.5">{item.value}</p>
-                      <p className="text-[7px] text-white/20 font-bold uppercase tracking-wide mt-0.5">{item.sub}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400">{item.label}</p>
+                      <p className="text-[12px] font-black text-gray-900 mt-0.5">{item.value}</p>
+                      <p className="text-[9px] text-gray-400 font-medium mt-0.5">{item.sub}</p>
                     </div>
-                    {item.action && <ExternalLink size={13} className="text-white/20 shrink-0" />}
+                    {item.action && <ExternalLink size={14} className="text-gray-400 shrink-0" />}
                   </div>
                 ))}
-              </GlassCard>
+              </Card>
 
-              <GlassCard className="p-5">
+              <Card className="p-5">
                 <div className="flex items-center gap-2 mb-4">
-                  <FileQuestion size={13} className="text-[#00f5d4]" />
-                  <span className="text-[9px] font-black uppercase tracking-[0.18em] text-white/40">Frequently Asked</span>
+                  <FileQuestion size={14} className="text-blue-500" />
+                  <span className="text-[11px] font-black text-gray-700 uppercase tracking-wide">Common Questions</span>
                 </div>
                 <div className="space-y-2">
                   {faqItems.map((item, i) => (
                     <div key={i} onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
-                      className="p-4 bg-black/30 rounded-[14px] border border-white/5 cursor-pointer hover:border-white/10 transition-all">
+                      className="p-4 bg-gray-50 rounded-xl border border-gray-100 cursor-pointer hover:border-gray-200 transition-all">
                       <div className="flex items-center justify-between gap-3">
-                        <p className="text-[9px] font-black text-white/70 uppercase tracking-wide">{item.q}</p>
-                        <ChevronDown size={12} className={`text-white/20 shrink-0 transition-transform ${expandedFaq === i ? "rotate-180" : ""}`} />
+                        <p className="text-[11px] font-bold text-gray-800">{item.q}</p>
+                        <ChevronDown size={13} className={`text-gray-400 shrink-0 transition-transform ${expandedFaq === i ? "rotate-180" : ""}`} />
                       </div>
                       <AnimatePresence>
                         {expandedFaq === i && (
                           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
-                            <p className="text-[9px] text-white/35 leading-relaxed mt-3 pt-3 border-t border-white/5">{item.a}</p>
+                            <p className="text-[11px] text-gray-500 leading-relaxed mt-3 pt-3 border-t border-gray-200">{item.a}</p>
                           </motion.div>
                         )}
                       </AnimatePresence>
                     </div>
                   ))}
                 </div>
-              </GlassCard>
+              </Card>
             </motion.div>
           )}
 
-          {/* ══════════════════════════════════════════════════════
-              MESSAGES — Premium with send locked
-          ══════════════════════════════════════════════════════ */}
+          {/* ══ MESSAGES ══════════════════════════════════════════ */}
           {activeTab === "messages" && (
             <motion.div key="messages" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }} className="space-y-4">
               <div className="flex items-center justify-between">
-                <SectionHead label="System Relay" />
-                <Badge color="#fb923c"><Lock size={8} /> Reply Locked</Badge>
+                <SectionHead label="Messages" sub="System updates and client chats" />
+                <Badge color="#F59E0B"><Lock size={8} /> Replies Locked</Badge>
               </div>
 
-              {/* Locked compose bar */}
-              <div className="p-4 rounded-2xl border border-white/5 bg-white/2 flex items-center gap-3 opacity-50 cursor-not-allowed">
-                <div className="flex-1 bg-black/40 border border-white/6 rounded-xl px-4 py-3 text-[10px] text-white/15 font-bold">
-                  Apply to a gig to unlock direct client messaging…
-                </div>
-                <button className="p-3 rounded-xl border border-white/6 bg-white/3">
-                  <Lock size={14} className="text-white/20" />
-                </button>
-              </div>
-
-              {/* Premium locked messaging notice */}
-              <div className="p-4 rounded-2xl border flex items-center gap-3"
-                style={{ background: "linear-gradient(135deg, rgba(251,146,60,0.06), rgba(251,146,60,0.02))", borderColor: "rgba(251,146,60,0.2)" }}>
-                <Crown size={14} className="text-orange-400 shrink-0" />
+              <div className="p-4 rounded-xl border border-amber-200 bg-amber-50 flex items-center gap-3">
+                <Crown size={15} className="text-amber-500 shrink-0" />
                 <div className="flex-1">
-                  <p className="text-[9px] font-black text-orange-300 uppercase tracking-widest">Direct client messaging unlocks after first application</p>
-                  <p className="text-[8px] text-white/25 font-bold mt-0.5">System messages below are read-only · Refill HU and apply to enable full relay</p>
+                  <p className="text-[11px] font-black text-amber-800">Direct client messaging unlocks after your first application</p>
+                  <p className="text-[10px] text-amber-600 font-medium mt-0.5">Top up HU and apply to a job to enable full messaging</p>
                 </div>
-                <button onClick={openRefill} className="shrink-0 px-3 py-1.5 rounded-[10px] text-[8px] font-black uppercase tracking-widest text-black"
-                  style={{ background: "linear-gradient(135deg, #fb923c, #ea580c)" }}>
+                <button onClick={openRefill} className="shrink-0 px-3 py-2 rounded-xl text-[10px] font-black text-white bg-amber-500 hover:bg-amber-600 transition-all">
                   Unlock
                 </button>
               </div>
 
+              <div className="p-4 rounded-xl border border-gray-100 bg-gray-50 flex items-center gap-3 opacity-60 cursor-not-allowed">
+                <div className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 text-[11px] text-gray-400">
+                  Apply to a job to unlock direct client messaging…
+                </div>
+                <div className="p-3 rounded-xl border border-gray-200 bg-white">
+                  <Lock size={14} className="text-gray-400" />
+                </div>
+              </div>
+
               {messages.map((msg, i) => (
                 <div key={i} onClick={() => setExpandedMsg(expandedMsg === i ? null : i)}
-                  className={`p-5 rounded-[22px] border cursor-pointer transition-all ${msg.unread ? "bg-[#00f5d4]/4 border-[#00f5d4]/20" : "bg-white/3 border-white/6"}`}>
+                  className={`p-5 rounded-2xl border cursor-pointer transition-all ${msg.unread ? "bg-blue-50 border-blue-200" : "bg-white border-gray-100"}`}>
                   <div className="flex gap-4 items-start">
-                    <div className="w-10 h-10 bg-black/40 rounded-xl border border-white/8 flex items-center justify-center text-lg shrink-0 mt-0.5">
-                      {msg.avatar}
-                    </div>
+                    <div className="w-10 h-10 bg-white rounded-xl border border-gray-200 flex items-center justify-center text-lg shrink-0">{msg.avatar}</div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-center mb-1">
-                        <h4 className="text-[10px] font-black uppercase tracking-widest text-white">{msg.sender}</h4>
-                        <span className="text-[7px] text-white/20 font-bold uppercase">{msg.time}</span>
+                        <h4 className="text-[11px] font-black text-gray-900">{msg.sender}</h4>
+                        <span className="text-[9px] text-gray-400 font-medium">{msg.time}</span>
                       </div>
-                      <p className={`text-[10px] text-white/35 leading-relaxed ${expandedMsg === i ? "" : "line-clamp-1"}`}>{msg.body}</p>
+                      <p className={`text-[11px] text-gray-500 leading-relaxed ${expandedMsg === i ? "" : "line-clamp-1"}`}>{msg.body}</p>
                       {expandedMsg === i && (
                         <button onClick={(e) => { e.stopPropagation(); openRefill(); }}
-                          className="mt-3 flex items-center gap-2 text-[8px] font-black text-[#00f5d4]/60 uppercase tracking-widest hover:text-[#00f5d4] transition-all">
-                          <Lock size={10} /> Refill HU to reply <ArrowRight size={10} />
+                          className="mt-3 flex items-center gap-2 text-[10px] font-bold text-blue-600 hover:text-blue-800 transition-all">
+                          <Lock size={10} /> Top up HU to reply <ArrowRight size={10} />
                         </button>
                       )}
                     </div>
-                    <ChevronDown size={13} className={`text-white/20 shrink-0 mt-1 transition-transform ${expandedMsg === i ? "rotate-180" : ""}`} />
+                    {msg.unread && <div className="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0 mt-1" />}
                   </div>
-                  {msg.unread && <div className="flex justify-end mt-2"><span className="w-2 h-2 rounded-full bg-[#00f5d4]" /></div>}
                 </div>
               ))}
-
-              {/* Blurred future chat preview */}
-              <div className="relative p-5 rounded-[22px] border border-white/5 bg-white/2 overflow-hidden">
-                <div className="absolute inset-0 z-10" style={{ backdropFilter: "blur(10px)" }} />
-                <div className="flex gap-4 items-center mb-4">
-                  <div className="w-10 h-10 bg-white/5 rounded-xl" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-2.5 bg-white/8 rounded-full w-1/3" />
-                    <div className="h-2 bg-white/4 rounded-full w-1/4" />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="h-2 bg-white/5 rounded-full w-3/4" />
-                  <div className="h-2 bg-white/4 rounded-full w-1/2" />
-                </div>
-                <div className="absolute inset-0 z-20 flex items-center justify-center">
-                  <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/8 bg-black/70 backdrop-blur-xl">
-                    <Lock size={12} className="text-[#00f5d4]" />
-                    <span className="text-[8px] font-black uppercase tracking-widest text-white/50">Client chats unlock after first mission</span>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* ══════════════════════════════════════════════════════
-              ACCOUNT — Fully functional
-          ══════════════════════════════════════════════════════ */}
-          {activeTab === "account" && (
-            <motion.div key="account" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.28 }} className="max-w-md mx-auto space-y-4 pb-8">
-
-              {/* Profile hero */}
-              <div className="p-8 rounded-[36px] border border-white/[0.07] bg-white/[0.035] backdrop-blur-2xl text-center relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-0.5"
-                  style={{ background: "linear-gradient(90deg, transparent, #00f5d4, transparent)" }} />
-                <div className="relative w-28 h-28 mx-auto mb-6">
-                  <div className="absolute inset-0 rounded-[30px] blur-2xl opacity-30"
-                    style={{ background: "radial-gradient(circle, #00f5d4, transparent)" }} />
-                  <div className="relative w-full h-full bg-black/60 rounded-[30px] border border-white/10 flex items-center justify-center overflow-hidden">
-                    {user?.imageUrl ? <img src={user.imageUrl} className="w-full h-full object-cover" alt="" /> : <UserCircle size={60} className="text-white/20" />}
-                  </div>
-                  <div className="absolute -bottom-1 -right-1 p-2 rounded-2xl text-black" style={{ background: "linear-gradient(135deg, #00f5d4, #0097a7)" }}>
-                    <BadgeCheck size={14} />
-                  </div>
-                </div>
-                <h3 className="text-[22px] font-black italic uppercase tracking-tight text-white mb-2 leading-none">{user?.fullName || "Operator"}</h3>
-                <p className="text-[9px] text-white/25 font-bold uppercase tracking-[0.2em] mb-4">{user?.primaryEmailAddress?.emailAddress || "—"}</p>
-                <div className="flex justify-center gap-3 mb-6">
-                  <Badge color="#34d399"><PulseDot color="#34d399" size={5} /> Synced</Badge>
-                  <Badge color="#00f5d4">{isVerified ? "Elite Node" : "Standard"}</Badge>
-                  <Badge color="#fb923c">Beta</Badge>
-                </div>
-                <div className="grid grid-cols-3 gap-2 mb-6">
-                  <StatCard label="HU Balance" value={huBalance} icon={<Zap size={13} />} color="#00f5d4" />
-                  <StatCard label="Missions" value="0" icon={<Briefcase size={13} />} color="#a78bfa" />
-                  <StatCard label="Earned" value="$0" icon={<DollarSign size={13} />} color="#34d399" />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <RippleButton onClick={() => setActiveTab("earnings")}
-                    className="py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest text-black flex items-center justify-center gap-2"
-                    style={{ background: "linear-gradient(135deg, #00f5d4, #0097a7)" }}>
-                    Vault <ArrowUpRight size={13} />
-                  </RippleButton>
-                  <button onClick={openRefill} className="py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest border border-white/8 bg-white/4 text-white/40 hover:text-white flex items-center justify-center gap-2 transition-all">
-                    Refill HU <Zap size={13} className="text-[#00f5d4]" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Profile completion */}
-              <GlassCard className="p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-white/40">Profile Strength</span>
-                  <span className="text-[9px] font-black text-[#00f5d4]">40%</span>
-                </div>
-                <div className="h-2 bg-white/5 rounded-full mb-3">
-                  <div className="h-full rounded-full w-[40%]" style={{ background: "linear-gradient(90deg, #00f5d4, #0097a7)" }} />
-                </div>
-                <div className="space-y-2">
-                  {[
-                    { label: "Email verified", done: true },
-                    { label: "Phone number added", done: false },
-                    { label: "Profile photo uploaded", done: !!user?.imageUrl },
-                    { label: "First HU purchase", done: false },
-                    { label: "First gig applied", done: false },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${item.done ? "bg-[#00f5d4]" : "bg-white/5 border border-white/10"}`}>
-                        {item.done && <Check size={9} className="text-black" />}
-                      </div>
-                      <p className={`text-[9px] font-bold uppercase tracking-wide ${item.done ? "text-white/60" : "text-white/25"}`}>{item.label}</p>
-                    </div>
-                  ))}
-                </div>
-              </GlassCard>
-
-              {/* ── Settings — all functional with expanding panels ── */}
-              <GlassCard className="overflow-hidden">
-
-                {/* NOTIFICATIONS */}
-                <div>
-                  <button onClick={() => setExpandedSetting(expandedSetting === "notifications" ? null : "notifications")}
-                    className="w-full flex items-center gap-4 p-4 hover:bg-white/4 transition-all rounded-t-3xl group">
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: "#00f5d415", color: "#00f5d4" }}>
-                      <Bell size={14} />
-                    </div>
-                    <div className="flex-1 text-left">
-                      <p className="text-[10px] font-black text-white uppercase tracking-wide">Notifications</p>
-                      <p className="text-[8px] text-white/25 font-bold uppercase tracking-widest">Manage alerts</p>
-                    </div>
-                    <ChevronDown size={13} className={`text-white/15 group-hover:text-white/40 transition-all ${expandedSetting === "notifications" ? "rotate-180" : ""}`} />
-                  </button>
-                  <AnimatePresence>
-                    {expandedSetting === "notifications" && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
-                        className="overflow-hidden">
-                        <div className="px-4 pb-4 space-y-3 border-t border-white/5">
-                          <p className="text-[7px] font-black text-white/20 uppercase tracking-widest pt-3 mb-1">Alert preferences</p>
-                          {[
-                            { key: "missions" as const, label: "New Missions", sub: "Notify when matching gigs post" },
-                            { key: "payments" as const, label: "Payment Updates", sub: "HU refills & withdrawals" },
-                            { key: "messages" as const, label: "Message Relay", sub: "Client & system messages" },
-                            { key: "weekly" as const, label: "Weekly Summary", sub: "Activity digest every Monday" },
-                            { key: "newGigs" as const, label: "Gig Alerts", sub: "Corporate missions matching skills" },
-                          ].map((n) => (
-                            <div key={n.key} className="flex items-center justify-between p-3 bg-black/30 rounded-[14px] border border-white/5">
-                              <div>
-                                <p className="text-[9px] font-black text-white uppercase tracking-wide">{n.label}</p>
-                                <p className="text-[7px] text-white/25 font-bold mt-0.5">{n.sub}</p>
-                              </div>
-                              <button onClick={() => setNotifications(prev => ({ ...prev, [n.key]: !prev[n.key] }))}
-                                className={`relative w-10 h-5 rounded-full transition-all duration-300 ${notifications[n.key] ? "bg-[#00f5d4]" : "bg-white/10"}`}>
-                                <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${notifications[n.key] ? "left-5" : "left-0.5"}`} />
-                              </button>
-                            </div>
-                          ))}
-                          <button onClick={() => { addToast("Notification preferences saved!", "success"); setExpandedSetting(null); }}
-                            className="w-full py-2.5 rounded-xl text-[8px] font-black uppercase tracking-widest text-black"
-                            style={{ background: "linear-gradient(135deg, #00f5d4, #0097a7)" }}>
-                            Save Preferences
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                <div className="h-px bg-white/4 mx-4" />
-
-                {/* SECURITY */}
-                <div>
-                  <button onClick={() => setExpandedSetting(expandedSetting === "security" ? null : "security")}
-                    className="w-full flex items-center gap-4 p-4 hover:bg-white/4 transition-all group">
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: "#60a5fa15", color: "#60a5fa" }}>
-                      <Shield size={14} />
-                    </div>
-                    <div className="flex-1 text-left">
-                      <p className="text-[10px] font-black text-white uppercase tracking-wide">Security</p>
-                      <p className="text-[8px] text-white/25 font-bold uppercase tracking-widest">2FA · Password</p>
-                    </div>
-                    <ChevronDown size={13} className={`text-white/15 group-hover:text-white/40 transition-all ${expandedSetting === "security" ? "rotate-180" : ""}`} />
-                  </button>
-                  <AnimatePresence>
-                    {expandedSetting === "security" && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
-                        className="overflow-hidden">
-                        <div className="px-4 pb-4 space-y-3 border-t border-white/5">
-                          <p className="text-[7px] font-black text-white/20 uppercase tracking-widest pt-3 mb-1">Security settings</p>
-                          {/* 2FA Toggle */}
-                          <div className="flex items-center justify-between p-3 bg-black/30 rounded-[14px] border border-white/5">
-                            <div>
-                              <p className="text-[9px] font-black text-white uppercase tracking-wide">Two-Factor Auth</p>
-                              <p className="text-[7px] text-white/25 font-bold mt-0.5">{twoFAEnabled ? "Active — Authenticator app linked" : "Disabled — strongly recommended"}</p>
-                            </div>
-                            <button onClick={() => { setTwoFAEnabled(f => !f); addToast(twoFAEnabled ? "2FA disabled" : "2FA enabled! Scan QR in your auth app.", twoFAEnabled ? "info" : "success"); }}
-                              className={`relative w-10 h-5 rounded-full transition-all duration-300 ${twoFAEnabled ? "bg-[#00f5d4]" : "bg-white/10"}`}>
-                              <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all duration-300 ${twoFAEnabled ? "left-5" : "left-0.5"}`} />
-                            </button>
-                          </div>
-                          {/* Change password */}
-                          <button onClick={() => addToast("Password reset link sent to your email!", "success")}
-                            className="w-full p-3 bg-black/30 rounded-[14px] border border-white/5 flex items-center justify-between hover:border-white/10 transition-all">
-                            <div className="text-left">
-                              <p className="text-[9px] font-black text-white uppercase tracking-wide">Change Password</p>
-                              <p className="text-[7px] text-white/25 font-bold mt-0.5">Send reset link to email</p>
-                            </div>
-                            <ChevronRight size={13} className="text-white/20" />
-                          </button>
-                          {/* Login activity */}
-                          <button onClick={() => { setExpandedSetting("devices"); }}
-                            className="w-full p-3 bg-black/30 rounded-[14px] border border-white/5 flex items-center justify-between hover:border-white/10 transition-all">
-                            <div className="text-left">
-                              <p className="text-[9px] font-black text-white uppercase tracking-wide">Login Activity</p>
-                              <p className="text-[7px] text-white/25 font-bold mt-0.5">{sessions.length} active sessions</p>
-                            </div>
-                            <ChevronRight size={13} className="text-white/20" />
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                <div className="h-px bg-white/4 mx-4" />
-
-                {/* API KEYS */}
-                <div>
-                  <button onClick={() => setExpandedSetting(expandedSetting === "api" ? null : "api")}
-                    className="w-full flex items-center gap-4 p-4 hover:bg-white/4 transition-all group">
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: "#a78bfa15", color: "#a78bfa" }}>
-                      <Key size={14} />
-                    </div>
-                    <div className="flex-1 text-left">
-                      <p className="text-[10px] font-black text-white uppercase tracking-wide">API Keys</p>
-                      <p className="text-[8px] text-white/25 font-bold uppercase tracking-widest">Developer access</p>
-                    </div>
-                    <ChevronDown size={13} className={`text-white/15 group-hover:text-white/40 transition-all ${expandedSetting === "api" ? "rotate-180" : ""}`} />
-                  </button>
-                  <AnimatePresence>
-                    {expandedSetting === "api" && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
-                        className="overflow-hidden">
-                        <div className="px-4 pb-4 space-y-3 border-t border-white/5">
-                          <p className="text-[7px] font-black text-white/20 uppercase tracking-widest pt-3">API credentials</p>
-                          {generatedApiKey ? (
-                            <div className="p-3 bg-black/40 border border-[#00f5d4]/20 rounded-[14px]">
-                              <p className="text-[7px] font-black text-white/20 uppercase mb-2">Your API Key — copy it now, shown once</p>
-                              <div className="flex gap-2">
-                                <div className="flex-1 font-mono text-[8px] text-[#00f5d4] truncate">{generatedApiKey}</div>
-                                <button onClick={() => { navigator.clipboard.writeText(generatedApiKey); setCopiedKey(true); addToast("API key copied!", "success"); setTimeout(() => setCopiedKey(false), 2000); }}
-                                  className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-all">
-                                  {copiedKey ? <Check size={11} className="text-emerald-400" /> : <Copy size={11} className="text-white/40" />}
-                                </button>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="p-3 bg-black/30 border border-white/5 rounded-[14px]">
-                              <p className="text-[8px] text-white/25 font-bold">No API keys generated yet.</p>
-                            </div>
-                          )}
-                          <button onClick={generateApiKey}
-                            className="w-full py-2.5 rounded-xl text-[8px] font-black uppercase tracking-widest text-black"
-                            style={{ background: "linear-gradient(135deg, #a78bfa, #7c3aed)" }}>
-                            {generatedApiKey ? "Regenerate Key" : "Generate API Key"}
-                          </button>
-                          <p className="text-[7px] text-white/15 font-bold text-center">Keys are for developer integrations only. Keep them secret.</p>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                <div className="h-px bg-white/4 mx-4" />
-
-                {/* LINKED DEVICES */}
-                <div>
-                  <button onClick={() => setExpandedSetting(expandedSetting === "devices" ? null : "devices")}
-                    className="w-full flex items-center gap-4 p-4 hover:bg-white/4 transition-all group">
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: "#fb923c15", color: "#fb923c" }}>
-                      <Smartphone size={14} />
-                    </div>
-                    <div className="flex-1 text-left">
-                      <p className="text-[10px] font-black text-white uppercase tracking-wide">Linked Devices</p>
-                      <p className="text-[8px] text-white/25 font-bold uppercase tracking-widest">{sessions.filter((_, i) => !revokedSession.includes(i)).length} active sessions</p>
-                    </div>
-                    <ChevronDown size={13} className={`text-white/15 group-hover:text-white/40 transition-all ${expandedSetting === "devices" ? "rotate-180" : ""}`} />
-                  </button>
-                  <AnimatePresence>
-                    {expandedSetting === "devices" && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
-                        className="overflow-hidden">
-                        <div className="px-4 pb-4 space-y-2.5 border-t border-white/5">
-                          <p className="text-[7px] font-black text-white/20 uppercase tracking-widest pt-3">Active sessions</p>
-                          {sessions.map((s, i) => (
-                            <div key={i} className={`p-3 bg-black/30 rounded-[14px] border transition-all ${revokedSession.includes(i) ? "opacity-30 border-red-500/15" : "border-white/5"}`}>
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <div className="flex items-center gap-2">
-                                    <p className="text-[9px] font-black text-white uppercase tracking-wide">{s.device}</p>
-                                    {s.current && <Badge color="#34d399">Current</Badge>}
-                                    {revokedSession.includes(i) && <Badge color="#ef4444">Revoked</Badge>}
-                                  </div>
-                                  <p className="text-[7px] text-white/25 font-bold mt-0.5">{s.location} · {s.last}</p>
-                                </div>
-                                {!s.current && !revokedSession.includes(i) && (
-                                  <button onClick={() => { setRevokedSession(r => [...r, i]); addToast("Session revoked successfully", "success"); }}
-                                    className="p-1.5 bg-red-500/10 rounded-lg border border-red-500/15 hover:bg-red-500/20 transition-all">
-                                    <X size={11} className="text-red-400" />
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                          <button onClick={() => { setRevokedSession([1]); addToast("All other sessions terminated!", "success"); }}
-                            className="w-full py-2.5 rounded-xl text-[8px] font-black uppercase tracking-widest border border-red-500/20 text-red-400/70 hover:bg-red-500/8 transition-all">
-                            Revoke All Other Sessions
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                <div className="h-px bg-white/4 mx-4" />
-
-                {/* LANGUAGE & REGION */}
-                <div>
-                  <button onClick={() => setExpandedSetting(expandedSetting === "language" ? null : "language")}
-                    className="w-full flex items-center gap-4 p-4 hover:bg-white/4 transition-all rounded-b-3xl group">
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: "#34d39915", color: "#34d399" }}>
-                      <Globe size={14} />
-                    </div>
-                    <div className="flex-1 text-left">
-                      <p className="text-[10px] font-black text-white uppercase tracking-wide">Language & Region</p>
-                      <p className="text-[8px] text-white/25 font-bold uppercase tracking-widest">{selectedLang}</p>
-                    </div>
-                    <ChevronDown size={13} className={`text-white/15 group-hover:text-white/40 transition-all ${expandedSetting === "language" ? "rotate-180" : ""}`} />
-                  </button>
-                  <AnimatePresence>
-                    {expandedSetting === "language" && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
-                        className="overflow-hidden">
-                        <div className="px-4 pb-4 space-y-2 border-t border-white/5">
-                          <p className="text-[7px] font-black text-white/20 uppercase tracking-widest pt-3 mb-1">Select language</p>
-                          {["English (EAT)", "Swahili (KE)", "French (FR)", "Arabic (AR)"].map((lang) => (
-                            <button key={lang} onClick={() => { setSelectedLang(lang); addToast(`Language set to ${lang}`, "success"); }}
-                              className={`w-full p-3 rounded-[14px] border flex items-center justify-between transition-all ${selectedLang === lang ? "border-[#00f5d4]/30 bg-[#00f5d4]/6" : "border-white/5 bg-black/30 hover:border-white/10"}`}>
-                              <span className={`text-[9px] font-black uppercase tracking-wide ${selectedLang === lang ? "text-[#00f5d4]" : "text-white/40"}`}>{lang}</span>
-                              {selectedLang === lang && <Check size={12} className="text-[#00f5d4]" />}
-                            </button>
-                          ))}
-                          <div className="flex items-center justify-between p-3 bg-black/30 rounded-[14px] border border-white/5">
-                            <div>
-                              <p className="text-[9px] font-black text-white uppercase tracking-wide">Currency Display</p>
-                              <p className="text-[7px] text-white/25 font-bold mt-0.5">Currently showing {currency}</p>
-                            </div>
-                            <button onClick={() => { setCurrency(c => c === "USD" ? "KES" : "USD"); addToast(`Currency switched to ${currency === "USD" ? "KES" : "USD"}`, "info"); }}
-                              className="px-3 py-1.5 rounded-[10px] text-[8px] font-black uppercase tracking-widest border border-white/8 text-white/40 hover:text-white bg-white/3 transition-all">
-                              {currency} ⇄
-                            </button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </GlassCard>
-
-              {/* Achievements */}
-              <GlassCard className="p-5">
-                <div className="flex items-center gap-2 mb-4">
-                  <Trophy size={13} className="text-amber-400" />
-                  <span className="text-[9px] font-black uppercase tracking-[0.18em] text-white/40">Achievements</span>
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {[
-                    { icon: "🌐", label: "Nexus Join", earned: true },
-                    { icon: "⚡", label: "First HU", earned: false },
-                    { icon: "🎯", label: "First Gig", earned: false },
-                    { icon: "💰", label: "First $100", earned: false },
-                  ].map((a, i) => (
-                    <div key={i} onClick={() => !a.earned && openRefill()}
-                      className={`p-3 rounded-2xl border text-center transition-all ${a.earned ? "border-amber-400/30 bg-amber-400/6" : "border-white/5 opacity-40 grayscale cursor-pointer hover:opacity-60"}`}>
-                      <div className="text-2xl mb-1 leading-none">{a.icon}</div>
-                      <p className="text-[6px] font-black uppercase tracking-widest text-white/40 leading-tight">{a.label}</p>
-                    </div>
-                  ))}
-                </div>
-              </GlassCard>
-
-              {/* Danger zone */}
-              <GlassCard className="p-5 border-red-500/10">
-                <p className="text-[8px] font-black uppercase tracking-widest text-red-400/40 mb-3">Danger Zone</p>
-                <div className="space-y-2">
-                  <button onClick={() => addToast("Data export request submitted. Check your email in 24h.", "info")}
-                    className="w-full p-3 rounded-[14px] border border-white/5 bg-black/30 flex items-center justify-between hover:border-white/10 transition-all">
-                    <div className="flex items-center gap-3">
-                      <Download size={13} className="text-white/30" />
-                      <div className="text-left">
-                        <p className="text-[9px] font-black text-white uppercase tracking-wide">Export My Data</p>
-                        <p className="text-[7px] text-white/25 font-bold mt-0.5">GDPR compliant · Sent to email</p>
-                      </div>
-                    </div>
-                    <ChevronRight size={13} className="text-white/20" />
-                  </button>
-                  <SignOutButton>
-                    <button className="w-full py-4 rounded-[18px] border border-red-500/15 bg-red-500/4 text-red-500/70 text-[9px] font-black uppercase tracking-widest hover:bg-red-500/8 transition-all flex items-center justify-center gap-2">
-                      <LogOut size={13} /> Terminate Session
-                    </button>
-                  </SignOutButton>
-                </div>
-              </GlassCard>
             </motion.div>
           )}
 
         </AnimatePresence>
       </div>
 
-      {/* Nav Bar */}
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-100 w-[95%] max-w-lg">
-        <div className="h-15 bg-black/80 backdrop-blur-3xl border border-white/8 rounded-full flex items-center justify-around px-2 shadow-[0_20px_60px_rgba(0,0,0,0.7)]">
+      {/* ══ BOTTOM NAV ════════════════════════════════════════════ */}
+      <div className="fixed bottom-0 left-0 right-0 z-100 bg-white border-t border-gray-200 shadow-[0_-4px_24px_rgba(0,0,0,0.06)]">
+        <div className="max-w-5xl mx-auto h-18 flex items-center justify-around px-1">
           {navItems.map((item) => (
-            <button key={item.id} onClick={() => setActiveTab(item.id)}
-              className={`flex flex-col items-center gap-0.5 transition-all duration-200 ${activeTab === item.id ? "text-[#00f5d4] scale-110" : "text-white/20 hover:text-white/50"}`}>
-              <div className={`transition-all duration-200 ${activeTab === item.id ? "bg-[#00f5d4]/10 border border-[#00f5d4]/20 p-2 rounded-[10px]" : "p-2"}`}>
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`flex flex-col items-center justify-center gap-0.5 h-full flex-1 transition-all duration-200 relative ${
+                activeTab === item.id ? "text-blue-600" : "text-gray-400 hover:text-gray-600"
+              }`}
+            >
+              {activeTab === item.id && (
+                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.75 rounded-b-full bg-blue-600" />
+              )}
+              <div className={`transition-all duration-200 ${activeTab === item.id ? "scale-110" : "scale-100"}`}>
                 {item.icon}
               </div>
-              <span className="text-[6px] font-black uppercase tracking-widest leading-none opacity-70">{item.label}</span>
+              <span className={`text-[9px] font-bold uppercase tracking-widest leading-none ${activeTab === item.id ? "text-blue-600" : "text-gray-400"}`}>
+                {item.label}
+              </span>
             </button>
           ))}
         </div>
       </div>
 
-      {/* ══════════════════════════════════════════════════════
-          REFILL MODAL
-      ══════════════════════════════════════════════════════ */}
+      {/* ══ REFILL MODAL ══════════════════════════════════════════ */}
       <AnimatePresence>
         {showModal && (
           <div className="fixed inset-0 z-600 flex items-end sm:items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
               onClick={() => !isPaying && setShowModal(false)} />
             <motion.div initial={{ scale: 0.93, y: 24 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.93, y: 24 }}
               transition={{ type: "spring", damping: 26, stiffness: 320 }}
-              className="relative w-full max-w-sm bg-[#06101f] border border-white/8 rounded-[36px] p-7 shadow-[0_40px_100px_rgba(0,0,0,0.8)] overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-0.5"
-                style={{ background: "linear-gradient(90deg, transparent, #00f5d4, transparent)" }} />
+              className="relative w-full max-w-sm bg-white border border-gray-200 rounded-3xl p-7 shadow-2xl overflow-hidden">
 
-              {/* ── Packages ── */}
               {modalStep === "packages" && (
-                <div className="space-y-5">
+                <div className="space-y-4">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="text-[18px] font-black italic uppercase tracking-tight text-white leading-none">Refill Power</h3>
-                      <p className="text-[8px] text-white/25 font-bold uppercase tracking-widest mt-1">Choose uplink package</p>
+                      <h3 className="text-[20px] font-black text-gray-900 leading-none">Top Up HU</h3>
+                      <p className="text-[11px] text-gray-400 font-medium mt-1">Pick a package to get started</p>
                     </div>
-                    <button onClick={() => setShowModal(false)} className="p-2 bg-white/5 rounded-[10px] border border-white/6 text-white/30 hover:text-white transition-all">
+                    <button onClick={() => setShowModal(false)} className="p-2 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all">
                       <X size={16} />
                     </button>
                   </div>
-                  <div className="flex items-center gap-3 p-4 bg-red-500/[0.07] border border-red-500/15 rounded-2xl">
-                    <Zap size={14} className="text-red-400 shrink-0" />
-                    <p className="text-[9px] text-red-400/80 font-bold uppercase tracking-widest">Low power detected · {huBalance} HU remaining</p>
-                  </div>
-                  <div className="space-y-2 max-h-75 overflow-y-auto no-scrollbar">
+
+                  {huBalance < 10 && (
+                    <div className="flex items-center gap-3 p-3 bg-red-50 border border-red-100 rounded-xl">
+                      <Zap size={14} className="text-red-500 shrink-0" />
+                      <p className="text-[10px] text-red-600 font-bold">You only have {huBalance} HU left. Minimum to apply: 10 HU</p>
+                    </div>
+                  )}
+
+                  <div className="space-y-2 max-h-72 overflow-y-auto no-scrollbar">
                     {uplinkPackages.map((pkg) => (
                       <RippleButton key={pkg.id} onClick={() => { setSelectedPack(pkg); setModalStep("choice"); }}
-                        className={`w-full p-4 rounded-[18px] border flex items-center justify-between transition-all ${
-                          pkg.hot ? "border-[#00f5d4]/30 bg-[#00f5d4]/6" : "border-white/6 bg-white/3 hover:bg-white/5"}`}>
+                        className={`w-full p-4 rounded-xl border flex items-center justify-between transition-all ${
+                          pkg.hot ? "border-blue-300 bg-blue-50" : "border-gray-100 bg-gray-50 hover:bg-gray-100"}`}>
                         <div className="text-left">
                           <div className="flex items-center gap-2 mb-0.5">
-                            <h5 className="text-[11px] font-black uppercase text-white leading-none">{pkg.name}</h5>
-                            {pkg.hot && <Badge color="#00f5d4"><Flame size={8} /> Popular</Badge>}
+                            <h5 className="text-[12px] font-black text-gray-900">{pkg.name}</h5>
+                            {pkg.hot && <Badge color="#3B82F6"><Flame size={9} /> Most Popular</Badge>}
                           </div>
-                          <p className="text-[8px] font-bold text-white/25 uppercase tracking-wide">{pkg.desc}</p>
+                          <p className="text-[10px] font-medium text-gray-500">{pkg.desc}</p>
                         </div>
                         <div className="text-right shrink-0 ml-4">
-                          <p className="text-[13px] font-black text-white leading-none">{pkg.hu} HU</p>
-                          <p className="text-[9px] font-black text-[#00f5d4] leading-none mt-1">KES {(pkg.price * RATE).toLocaleString()}</p>
+                          <p className="text-[14px] font-black text-gray-900">{pkg.hu} HU</p>
+                          <p className="text-[11px] font-black text-blue-600">KES {(pkg.price * RATE).toLocaleString()}</p>
                         </div>
                       </RippleButton>
                     ))}
                   </div>
+
                   <div onClick={() => setAgreed((a) => !a)}
-                    className="flex items-center gap-3 p-3.5 bg-white/3 border border-white/5 rounded-[14px] cursor-pointer">
-                    <div className={`w-5 h-5 rounded-[7px] border-2 flex items-center justify-center shrink-0 transition-all ${agreed ? "border-[#00f5d4] bg-[#00f5d4]" : "border-white/15"}`}>
-                      {agreed && <Check size={11} className="text-black font-black" />}
+                    className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-100 rounded-xl cursor-pointer hover:bg-gray-100 transition-all">
+                    <div className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all ${agreed ? "border-blue-500 bg-blue-500" : "border-gray-300"}`}>
+                      {agreed && <Check size={11} className="text-white font-black" />}
                     </div>
-                    <p className="text-[8px] font-bold text-white/25 uppercase leading-tight tracking-wide">I agree to the refill protocol and network rules.</p>
+                    <p className="text-[10px] font-medium text-gray-500">I agree to the refill terms and platform rules.</p>
                   </div>
                 </div>
               )}
 
-              {/* ── Gateway Choice ── */}
               {modalStep === "choice" && (
-                <div className="space-y-5">
+                <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <button onClick={() => setModalStep("packages")} className="p-2 bg-white/5 rounded-[10px] border border-white/6 text-white/30">
-                      <ChevronDown size={14} className="rotate-90" />
+                    <button onClick={() => setModalStep("packages")} className="p-2 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all">
+                      <ChevronDown size={15} className="rotate-90" />
                     </button>
                     <div>
-                      <h4 className="text-[11px] font-black uppercase italic text-white leading-none">Select Gateway</h4>
-                      <p className="text-[8px] text-white/25 font-bold uppercase tracking-widest mt-0.5">
-                        {selectedPack?.name} · {selectedPack?.hu} HU · <span className="text-[#00f5d4]">KES {((selectedPack?.price || 0) * RATE).toLocaleString()}</span>
+                      <h4 className="text-[13px] font-black text-gray-900">Choose Payment Method</h4>
+                      <p className="text-[10px] text-gray-400 font-medium mt-0.5">
+                        {selectedPack?.name} · {selectedPack?.hu} HU · <span className="text-blue-600 font-black">KES {((selectedPack?.price || 0) * RATE).toLocaleString()}</span>
                       </p>
                     </div>
                   </div>
 
-                  {/* Deduction preview */}
-                  <div className="p-3 rounded-2xl border flex items-center gap-3"
-                    style={{ background: "rgba(0,245,212,0.04)", borderColor: "rgba(0,245,212,0.15)" }}>
-                    <Info size={12} className="text-[#00f5d4] shrink-0" />
-                    <p className="text-[8px] font-bold text-white/40">
-                      Your card/account will be charged exactly <span className="text-[#00f5d4] font-black">KES {((selectedPack?.price || 0) * RATE).toLocaleString()}</span> for {selectedPack?.hu} HU
+                  <div className="p-3 rounded-xl border border-blue-100 bg-blue-50 flex items-center gap-3">
+                    <Info size={13} className="text-blue-500 shrink-0" />
+                    <p className="text-[10px] font-medium text-blue-700">
+                      You will be charged exactly <strong>KES {((selectedPack?.price || 0) * RATE).toLocaleString()}</strong> for {selectedPack?.hu} HU
                     </p>
                   </div>
 
                   <div className="space-y-2.5">
-                    {/* Bank / Card */}
                     <RippleButton onClick={() => handlePay("CARD")}
-                      className="w-full p-4 rounded-[20px] flex items-center gap-4 border border-indigo-500/30 transition-all hover:border-indigo-400/50"
-                      style={{ background: "linear-gradient(135deg, rgba(79,70,229,0.18), rgba(79,70,229,0.08))" }}>
-                      <PaystackLogo />
+                      className="w-full p-4 rounded-xl flex items-center gap-4 border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 transition-all">
+                      <PaystackLogo size={44} />
                       <div className="flex-1 text-left">
-                        <p className="text-[12px] font-black text-white leading-none">Bank / Card</p>
-                        <p className="text-[8px] font-bold text-white/40 mt-1">Visa · Mastercard · Instant via Paystack</p>
-                        <p className="text-[7px] text-indigo-400/70 font-bold uppercase tracking-widest mt-0.5">Deducts KES {((selectedPack?.price || 0) * RATE).toLocaleString()} exactly</p>
+                        <p className="text-[13px] font-black text-gray-900">Bank Card</p>
+                        <p className="text-[10px] font-medium text-gray-500 mt-0.5">Visa · Mastercard · via Paystack</p>
+                        <p className="text-[9px] text-indigo-600 font-bold mt-0.5">Charges KES {((selectedPack?.price || 0) * RATE).toLocaleString()} exactly</p>
                       </div>
-                      <ChevronRight size={16} className="text-white/30 shrink-0" />
+                      <ChevronRight size={16} className="text-gray-400 shrink-0" />
                     </RippleButton>
 
-                    {/* Binance */}
                     <RippleButton onClick={() => setModalStep("binance")}
-                      className="w-full p-4 rounded-[20px] flex items-center gap-4 border border-amber-500/30 transition-all hover:border-amber-400/50"
-                      style={{ background: "linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.06))" }}>
-                      <BinanceLogo />
+                      className="w-full p-4 rounded-xl flex items-center gap-4 border border-amber-200 bg-amber-50 hover:bg-amber-100 transition-all">
+                      <BinanceLogo size={44} />
                       <div className="flex-1 text-left">
-                        <p className="text-[12px] font-black text-white leading-none">Binance USDT</p>
-                        <p className="text-[8px] font-bold text-white/40 mt-1">TRC20 network · ${selectedPack?.price}.00 USDT</p>
-                        <p className="text-[7px] text-amber-400/70 font-bold uppercase tracking-widest mt-0.5">Scan QR · 2hr auto-credit · Borderless</p>
+                        <p className="text-[13px] font-black text-gray-900">Binance USDT</p>
+                        <p className="text-[10px] font-medium text-gray-500 mt-0.5">TRC20 network · ${selectedPack?.price}.00 USDT</p>
+                        <p className="text-[9px] text-amber-600 font-bold mt-0.5">Scan QR code · Works anywhere in the world</p>
                       </div>
-                      <ChevronRight size={16} className="text-white/30 shrink-0" />
+                      <ChevronRight size={16} className="text-gray-400 shrink-0" />
                     </RippleButton>
 
-                    {/* M-Pesa */}
                     <RippleButton onClick={() => setModalStep("mpesa")}
-                      className="w-full p-4 rounded-[20px] flex items-center gap-4 border border-emerald-500/30 transition-all hover:border-emerald-400/50"
-                      style={{ background: "linear-gradient(135deg, rgba(5,150,105,0.18), rgba(5,150,105,0.07))" }}>
-                      <MpesaLogo />
+                      className="w-full p-4 rounded-xl flex items-center gap-4 border border-green-200 bg-green-50 hover:bg-green-100 transition-all">
+                      <MpesaLogo size={44} />
                       <div className="flex-1 text-left">
-                        <p className="text-[12px] font-black text-white leading-none">M-Pesa</p>
-                        <p className="text-[8px] font-bold text-white/40 mt-1">Safaricom STK push · KES {((selectedPack?.price || 0) * RATE).toLocaleString()}</p>
-                        <p className="text-[7px] text-emerald-400/70 font-bold uppercase tracking-widest mt-0.5">Instant · No card needed · Mobile</p>
+                        <p className="text-[13px] font-black text-gray-900">M-Pesa</p>
+                        <p className="text-[10px] font-medium text-gray-500 mt-0.5">Safaricom STK push · KES {((selectedPack?.price || 0) * RATE).toLocaleString()}</p>
+                        <p className="text-[9px] text-green-600 font-bold mt-0.5">Instant · No card needed · Kenya only</p>
                       </div>
-                      <ChevronRight size={16} className="text-white/30 shrink-0" />
+                      <ChevronRight size={16} className="text-gray-400 shrink-0" />
                     </RippleButton>
 
-                    {/* PayPal — disabled */}
-                    <div className="w-full p-4 rounded-[20px] border border-white/5 bg-white/2 flex items-center gap-4 cursor-not-allowed opacity-40">
-                      <PaypalLogo />
+                    <div className="w-full p-4 rounded-xl border border-gray-100 bg-gray-50 flex items-center gap-4 cursor-not-allowed opacity-50">
+                      <PaypalLogo size={44} />
                       <div className="flex-1 text-left">
                         <div className="flex items-center gap-2">
-                          <p className="text-[12px] font-black text-white/40 leading-none">PayPal</p>
-                          <Badge color="#ef4444">Region Limited</Badge>
+                          <p className="text-[13px] font-black text-gray-500">PayPal</p>
+                          <Badge color="#EF4444">Not Available</Badge>
                         </div>
-                        <p className="text-[8px] font-bold text-white/20 mt-1">Not available in Kenya & most African regions</p>
+                        <p className="text-[10px] font-medium text-gray-400 mt-0.5">Not available in Kenya and most African countries</p>
                       </div>
-                      <Lock size={14} className="text-white/15 shrink-0" />
+                      <Lock size={14} className="text-gray-400 shrink-0" />
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* ── Binance ── */}
               {modalStep === "binance" && (
-                <div className="space-y-5">
+                <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <button onClick={() => setModalStep("choice")} className="p-2 bg-white/5 rounded-[10px] border border-white/6 text-white/30">
-                      <ChevronDown size={14} className="rotate-90" />
+                    <button onClick={() => setModalStep("choice")} className="p-2 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all">
+                      <ChevronDown size={15} className="rotate-90" />
                     </button>
-                    <h4 className="text-[11px] font-black uppercase italic text-white">Binance USDT · TRC20</h4>
+                    <h4 className="text-[13px] font-black text-gray-900">Pay with Binance USDT</h4>
                   </div>
-                  <div className="bg-white rounded-[20px] p-4 mx-auto w-fit border-4 border-amber-400/20">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=TFWxe4TFcjUNgPJVgf5iXrMsw1oe4gDv9X" alt="QR" className="w-36 h-36 block" />
+                  <div className="bg-gray-50 rounded-2xl p-4 mx-auto w-fit border border-gray-200">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=TFWxe4TFcjUNgPJVgf5iXrMsw1oe4gDv9X" alt="QR" className="w-36 h-36 block rounded-xl" />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-black/40 p-3.5 rounded-[14px] border border-white/6">
-                      <p className="text-[7px] text-white/20 uppercase font-bold mb-1">Amount</p>
-                      <p className="text-[12px] font-black text-white">${selectedPack?.price}.00 USDT</p>
+                    <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                      <p className="text-[9px] text-gray-400 font-medium mb-1">Amount</p>
+                      <p className="text-[14px] font-black text-gray-900">${selectedPack?.price}.00 USDT</p>
                     </div>
-                    <div className="bg-black/40 p-3.5 rounded-[14px] border border-white/6">
-                      <p className="text-[7px] text-white/20 uppercase font-bold mb-1">Network</p>
-                      <p className="text-[12px] font-black text-amber-400">TRC20</p>
+                    <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                      <p className="text-[9px] text-gray-400 font-medium mb-1">Network</p>
+                      <p className="text-[14px] font-black text-amber-600">TRC20</p>
                     </div>
                   </div>
                   <div>
-                    <p className="text-[7px] font-black text-white/20 uppercase tracking-widest mb-2">Uplink Address</p>
+                    <p className="text-[10px] font-bold text-gray-500 mb-2">Wallet Address</p>
                     <div className="flex gap-2">
-                      <div className="flex-1 bg-black/40 border border-white/6 rounded-xl p-3 text-[8px] font-mono text-white/35 truncate">TFWxe4TFcjUNgPJVgf5iXrMsw1oe4gDv9X</div>
-                      <button onClick={copyAddress} className="p-3 bg-white/5 border border-white/6 rounded-xl hover:bg-white/10 transition-all">
-                        {copied ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} className="text-white/30" />}
+                      <div className="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-3 text-[10px] font-mono text-gray-500 truncate">TFWxe4TFcjUNgPJVgf5iXrMsw1oe4gDv9X</div>
+                      <button onClick={copyAddress} className="p-3 bg-gray-100 border border-gray-200 rounded-xl hover:bg-gray-200 transition-all">
+                        {copied ? <Check size={14} className="text-green-500" /> : <Copy size={14} className="text-gray-500" />}
                       </button>
                     </div>
                   </div>
-                  <RippleButton onClick={() => { addToast("Signal received. Syncing in ~2h", "success"); setShowModal(false); }}
-                    className="w-full py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest text-black"
-                    style={{ background: "linear-gradient(135deg, #00f5d4, #0097a7)" }}>
-                    I Have Paid
+                  <RippleButton onClick={() => { addToast("Payment received. Your HU will be credited in ~2 hours.", "success"); setShowModal(false); }}
+                    className="w-full py-4 rounded-xl text-[10px] font-black uppercase tracking-widest text-white bg-blue-600 hover:bg-blue-700 transition-all">
+                    I Have Paid — Confirm
                   </RippleButton>
                 </div>
               )}
 
-              {/* ── M-Pesa ── */}
               {modalStep === "mpesa" && (
-                <div className="space-y-5">
+                <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <button onClick={() => setModalStep("choice")} className="p-2 bg-white/5 rounded-[10px] border border-white/6 text-white/30">
-                      <ChevronDown size={14} className="rotate-90" />
+                    <button onClick={() => setModalStep("choice")} className="p-2 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all">
+                      <ChevronDown size={15} className="rotate-90" />
                     </button>
-                    <h4 className="text-[11px] font-black uppercase italic text-white">M-Pesa STK Push</h4>
+                    <h4 className="text-[13px] font-black text-gray-900">Pay with M-Pesa</h4>
                   </div>
-                  <div className="p-4 bg-emerald-500/6 border border-emerald-500/15 rounded-2xl">
+                  <div className="p-4 bg-green-50 border border-green-100 rounded-xl">
                     <div className="flex items-center gap-3 mb-2">
-                      <CheckCircle size={14} className="text-emerald-400 shrink-0" />
-                      <p className="text-[9px] font-black text-emerald-400/80 uppercase tracking-widest">Uplink Fee: KES {((selectedPack?.price || 0) * RATE).toLocaleString()}</p>
+                      <CheckCircle size={15} className="text-green-500 shrink-0" />
+                      <p className="text-[11px] font-black text-green-800">Total: KES {((selectedPack?.price || 0) * RATE).toLocaleString()}</p>
                     </div>
-                    <p className="text-[7px] text-white/20 font-bold pl-5">Exact amount deducted from your Safaricom account · {selectedPack?.hu} HU credited instantly</p>
+                    <p className="text-[10px] text-green-600 font-medium pl-6">This exact amount will be taken from your Safaricom account. You get {selectedPack?.hu} HU right away.</p>
                   </div>
                   <div>
-                    <p className="text-[7px] font-black text-white/20 uppercase tracking-widest mb-2">Safaricom Number</p>
+                    <p className="text-[10px] font-bold text-gray-600 mb-2">Your Safaricom Number</p>
                     <input value={mpesaNum} onChange={(e) => setMpesaNum(e.target.value)} placeholder="254712345678"
-                      className="w-full bg-black/40 border border-white/8 rounded-2xl p-4 text-[18px] font-black text-white outline-none focus:border-emerald-500/50 text-center tracking-widest transition-all placeholder:text-white/15" />
-                    <p className="text-[7px] text-white/20 font-bold uppercase tracking-widest mt-2 text-center">Format: 254XXXXXXXXX · 12 digits</p>
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-[18px] font-black text-gray-900 outline-none focus:border-blue-400 text-center tracking-widest transition-all placeholder:text-gray-300 focus:bg-white" />
+                    <p className="text-[10px] text-gray-400 font-medium mt-2 text-center">Format: 254XXXXXXXXX — 12 digits total</p>
                   </div>
                   <RippleButton disabled={isPaying} onClick={() => handlePay("MPESA")}
-                    className="w-full py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2"
-                    style={{ background: "linear-gradient(135deg, #059669, #065f46)" }}>
-                    {isPaying ? <><RefreshCw size={13} className="animate-spin" /> Pushing STK…</> : `Pay KES ${((selectedPack?.price || 0) * RATE).toLocaleString()} · Initialize`}
+                    className="w-full py-4 rounded-xl text-[11px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 transition-all">
+                    {isPaying ? <><RefreshCw size={14} className="animate-spin" /> Sending prompt…</> : `Pay KES ${((selectedPack?.price || 0) * RATE).toLocaleString()} — Send to My Phone`}
                   </RippleButton>
                 </div>
               )}
@@ -1708,4 +1518,4 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
       `}</style>
     </div>
   );
-};
+};5
