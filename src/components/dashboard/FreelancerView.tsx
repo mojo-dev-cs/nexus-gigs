@@ -1518,4 +1518,4 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
       `}</style>
     </div>
   );
-};5
+};
