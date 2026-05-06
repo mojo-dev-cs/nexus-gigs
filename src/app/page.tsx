@@ -13,7 +13,8 @@ import {
   ShieldCheck, Landmark, Smartphone, GraduationCap, Link2, ChevronDown, X,
   Search, RefreshCw, Eye, EyeOff, Calculator, Settings, BadgeCheck, Wifi,
   User as UserIcon, MousePointer2, ListChecks, Check, Mail, MapPin, Clock,
-  TrendingUp, Award, Heart, Coffee
+  TrendingUp, Award, Heart, Coffee, Quote, PlayCircle, MessageCircle, Bitcoin,
+  CreditCard, Crown, Languages, BarChart3, HeartHandshake
 } from "lucide-react";
 
 // ─────────────────────────────────────────────
@@ -193,38 +194,90 @@ const Nav = ({ onSignIn, onSignUp }: { onSignIn?: () => void; onSignUp?: () => v
 };
 
 // ─────────────────────────────────────────────
-// LANDING PAGE
+// LANDING PAGE — Premium Global
 // ─────────────────────────────────────────────
 
+// Brand chips for global payment rails
+const BrandMpesa = ({ size = 30 }: { size?: number }) => (
+  <div style={{ height: size, padding: "0 12px", borderRadius: 10, background: "linear-gradient(135deg, #22C55E, #15803D)", display: "flex", alignItems: "center", color: "#fff", fontWeight: 900, fontStyle: "italic", fontSize: size * 0.46, letterSpacing: 0.5, boxShadow: "0 4px 14px rgba(34,197,94,0.35)" }}>M-PESA</div>
+);
+const BrandPayPal = ({ size = 30 }: { size?: number }) => (
+  <div style={{ height: size, padding: "0 12px", borderRadius: 10, background: "#003087", display: "flex", alignItems: "center", gap: 4, color: "#fff", fontWeight: 900, fontStyle: "italic", fontSize: size * 0.5, boxShadow: "0 4px 14px rgba(0,48,135,0.45)" }}>
+    <span>Pay</span><span style={{ color: "#009CDE" }}>Pal</span>
+  </div>
+);
+const BrandBinance = ({ size = 30 }: { size?: number }) => (
+  <div style={{ height: size, padding: "0 12px", borderRadius: 10, background: "#0B0E11", display: "flex", alignItems: "center", gap: 6, color: "#F0B90B", fontWeight: 900, fontSize: size * 0.46, boxShadow: "0 4px 14px rgba(240,185,11,0.25)", border: "1px solid rgba(240,185,11,0.35)" }}>
+    <Bitcoin size={size * 0.5} /> BINANCE
+  </div>
+);
+const BrandStripe = ({ size = 30 }: { size?: number }) => (
+  <div style={{ height: size, padding: "0 14px", borderRadius: 10, background: "#635BFF", display: "flex", alignItems: "center", color: "#fff", fontWeight: 900, fontStyle: "italic", fontSize: size * 0.5, boxShadow: "0 4px 14px rgba(99,91,255,0.4)" }}>stripe</div>
+);
+const BrandBank = ({ size = 30 }: { size?: number }) => (
+  <div style={{ height: size, padding: "0 12px", borderRadius: 10, background: "linear-gradient(135deg, #0F172A, #1E293B)", display: "flex", alignItems: "center", gap: 6, color: "#fff", fontWeight: 800, fontSize: size * 0.4, border: "1px solid rgba(255,255,255,0.1)" }}>
+    <Landmark size={size * 0.5} /> BANK WIRE
+  </div>
+);
+
 const LandingPage = () => {
+  const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+
   const heroStats = [
-    { value: 12400, suffix: "+", label: "Professionals" },
-    { value: 98, suffix: "%", label: "Satisfaction" },
-    { value: 3200, suffix: "+", label: "Projects Done" },
-    { value: 45, suffix: "M+", label: "KES Paid Out" },
+    { value: 184, suffix: "+", label: "Countries Served" },
+    { value: 420000, suffix: "+", label: "Verified Talent" },
+    { value: 92, suffix: "M+", label: "USD Paid Out" },
+    { value: 97, suffix: "%", label: "Client Satisfaction" },
   ];
 
   const steps = [
-    { icon: <UserPlus size={20} />, title: "Create Your Profile", desc: "Sign up and complete our quick vetting process to verify your identity and skills." },
-    { icon: <BadgeCheck size={20} />, title: "Get Verified", desc: "Our AI-powered system reviews your credentials and assigns you a trust score." },
-    { icon: <Search size={20} />, title: "Find Opportunities", desc: "Browse curated job listings matched to your skills and location preferences." },
-    { icon: <DollarSign size={20} />, title: "Earn Securely", desc: "Get paid instantly via M-Pesa, bank transfer, or USDT with escrow protection." },
+    { icon: <UserPlus size={20} />, title: "Create Your Profile", desc: "Sign up free in 60 seconds. Verify your identity, skills and KYC in under 3 minutes." },
+    { icon: <BadgeCheck size={20} />, title: "Get Vetted Globally", desc: "Our AI reviews credentials, builds your trust score and matches you with global demand." },
+    { icon: <Search size={20} />, title: "Win Premium Gigs", desc: "Spend Hustle Units to apply to hand-picked briefs from clients in 180+ countries." },
+    { icon: <DollarSign size={20} />, title: "Earn in Your Currency", desc: "Withdraw to M-Pesa, PayPal, Stripe, Binance Pay or local bank — instant or same-day." },
   ];
 
   const features = [
-    { icon: <ShieldCheck size={22} />, title: "End-to-End Encrypted", desc: "All data and transactions secured with military-grade encryption." },
-    { icon: <Zap size={22} />, title: "Instant Payouts", desc: "Receive payments within minutes via M-Pesa STK push — no delays." },
-    { icon: <Globe size={22} />, title: "Work Anywhere", desc: "Connect with clients globally. Your location is your superpower." },
-    { icon: <Cpu size={22} />, title: "AI Skill Matching", desc: "Our system matches you to the most relevant opportunities automatically." },
-    { icon: <Users size={22} />, title: "Verified Community", desc: "Every member passes identity verification before joining the network." },
-    { icon: <TrendingUp size={22} />, title: "Career Growth Tools", desc: "Track earnings, build reputation, and level up your profile over time." },
+    { icon: <ShieldCheck size={22} />, title: "Escrow-Protected Pay", desc: "Every contract is funded upfront. Funds release only when both sides sign off.", color: "#3b82f6" },
+    { icon: <Zap size={22} />, title: "Instant Global Payouts", desc: "Mobile money in seconds, crypto in minutes, bank wires in 1–2 days. 70+ currencies.", color: "#00f2ff" },
+    { icon: <Globe size={22} />, title: "Truly Borderless", desc: "Live in 184 countries. Auto-FX at mid-market rates with zero hidden conversion fees.", color: "#6366f1" },
+    { icon: <Cpu size={22} />, title: "AI Skill Matching", desc: "Smart routing connects your skills to the highest-paying compatible briefs daily.", color: "#8b5cf6" },
+    { icon: <Lock size={22} />, title: "Bank-grade Security", desc: "AES-256 at rest, TLS 1.3 in flight, hardware-key 2FA and biometric login.", color: "#22C55E" },
+    { icon: <BarChart3 size={22} />, title: "Real-time Insights", desc: "Live earnings, win-rate, reputation and conversion analytics in one dashboard.", color: "#F59E0B" },
   ];
 
-  const whyRemote = [
-    { icon: <Clock size={20} />, stat: "2.4× more", label: "productive than office workers", color: "#3b82f6" },
-    { icon: <Heart size={20} />, stat: "87%", label: "report better work-life balance", color: "#6366f1" },
-    { icon: <DollarSign size={20} />, stat: "KES 50K+", label: "average monthly remote earnings", color: "#00f2ff" },
-    { icon: <Globe size={20} />, stat: "195", label: "countries you can work from", color: "#8b5cf6" },
+  const REGIONS = [
+    { flag: "🇰🇪", name: "Kenya" }, { flag: "🇳🇬", name: "Nigeria" },
+    { flag: "🇿🇦", name: "South Africa" }, { flag: "🇬🇭", name: "Ghana" },
+    { flag: "🇪🇬", name: "Egypt" }, { flag: "🇺🇸", name: "United States" },
+    { flag: "🇬🇧", name: "United Kingdom" }, { flag: "🇩🇪", name: "Germany" },
+    { flag: "🇫🇷", name: "France" }, { flag: "🇮🇳", name: "India" },
+    { flag: "🇵🇭", name: "Philippines" }, { flag: "🇧🇷", name: "Brazil" },
+    { flag: "🇦🇪", name: "UAE" }, { flag: "🇸🇬", name: "Singapore" },
+    { flag: "🇦🇺", name: "Australia" }, { flag: "🇨🇦", name: "Canada" },
+    { flag: "🇯🇵", name: "Japan" }, { flag: "🇲🇽", name: "Mexico" },
+  ];
+
+  const TESTIMONIALS = [
+    { name: "Amara O.", role: "Brand Designer · Lagos 🇳🇬", quote: "I went from chasing invoices to getting paid the same day. NexusGigs feels built for global freelancers first.", color: "#8b5cf6" },
+    { name: "Daniel K.", role: "Full-stack Dev · Nairobi 🇰🇪", quote: "Escrow plus M-Pesa is a cheat code. No more ghost clients, no more 5-day bank waits.", color: "#3b82f6" },
+    { name: "Priya S.", role: "AI Engineer · Bengaluru 🇮🇳", quote: "Brief quality is in a different league. Real budgets, real briefs, real clients worldwide.", color: "#00f2ff" },
+    { name: "Liam R.", role: "Motion Designer · London 🇬🇧", quote: "The cleanest freelance UX I've used in years. The mobile experience is absurdly good.", color: "#F59E0B" },
+  ];
+
+  const PLANS = [
+    { name: "Starter", price: { monthly: 0, yearly: 0 }, blurb: "Try the network risk-free.", cta: "Start free", features: ["5 free Hustle Units", "Apply to public gigs", "Email support", "Basic analytics"] },
+    { name: "Pro", price: { monthly: 19, yearly: 190 }, blurb: "For active freelancers.", cta: "Go Pro", featured: true, features: ["Unlimited HU refills", "Priority gig matching", "0% withdrawal fee (mobile money)", "Advanced analytics & insights", "24/7 priority support"] },
+    { name: "Agency", price: { monthly: 79, yearly: 790 }, blurb: "Teams, studios & enterprises.", cta: "Talk to sales", features: ["Multi-seat workspace", "Team escrow & invoicing", "API & webhooks", "Dedicated success manager", "Custom contracts & SLAs"] },
+  ];
+
+  const FAQ = [
+    { q: "What are Hustle Units (HU)?", a: "HU are in-app credits you spend to apply for gigs. They keep the marketplace spam-free and ensure clients only hear from serious freelancers. Your first 5 HU are on us." },
+    { q: "Which countries do you support?", a: "NexusGigs is live in 184 countries. Withdrawals settle in 70+ local currencies via mobile money, bank, PayPal, Stripe and Binance Pay." },
+    { q: "How fast are payouts?", a: "Mobile money (M-Pesa, MoMo, GCash) is instant. PayPal/Binance settles in minutes. Bank wires arrive in 1–2 business days." },
+    { q: "Is my money safe?", a: "Every contract is escrow-funded. Funds are held by a regulated partner and released only when both sides sign off on delivery." },
+    { q: "What's your fee?", a: "Freelancers keep 100% of pay on Pro & Agency plans. Clients pay a small 3% processing fee. No hidden cuts, no FX markup." },
   ];
 
   return (
@@ -232,47 +285,56 @@ const LandingPage = () => {
       <ParticleField />
       <Nav />
 
-      {/* HERO */}
-      <section className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 pt-20 text-center">
+      {/* ─────── HERO ─────── */}
+      <section className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 pt-28 pb-20 text-center">
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="max-w-5xl mx-auto">
 
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8"
             style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.25)" }}>
             <motion.div animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 2, repeat: Infinity }} className="w-2 h-2 rounded-full bg-blue-400" />
-            <span className="text-blue-400 text-[10px] font-bold uppercase tracking-widest">Elite Tech Protocol • Now Accepting Applications</span>
+            <span className="text-blue-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5">
+              <Globe size={11} /> Now Live in 184 Countries
+            </span>
           </motion.div>
 
-          <h1 className="text-6xl md:text-[7.5rem] font-black leading-[0.85] tracking-[-0.04em] mb-8"
+          <h1 className="text-6xl md:text-[7.25rem] font-black leading-[0.88] tracking-[-0.04em] mb-8"
             style={{ fontFamily: "'Space Grotesk', system-ui, sans-serif" }}>
             <motion.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="block text-white">
-              Your Skills.
+              The freelance economy,
             </motion.span>
             <motion.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }} className="block"
               style={{ background: "linear-gradient(135deg, #3b82f6 0%, #00f2ff 50%, #6366f1 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-              Global Income.
-            </motion.span>
-            <motion.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="block text-white">
-              Zero Limits.
+              rebuilt for the world.
             </motion.span>
           </h1>
 
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
-            className="max-w-xl mx-auto text-gray-400 text-lg leading-relaxed mb-12">
-            NexusGigs connects Africa's top talent with global clients. Vetted professionals. Secure escrow payments. Real remote freedom.
+            className="max-w-2xl mx-auto text-gray-400 text-lg leading-relaxed mb-10">
+            NexusGigs connects vetted freelancers with serious clients across 184 countries.
+            Escrow-protected contracts, instant global payouts and zero platform fees on Pro.
           </motion.p>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }} className="flex flex-col sm:flex-row gap-4 justify-center mb-20">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }} className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
             <SignUpButton mode="modal">
               <button className="px-10 py-4 rounded-full font-black text-xs uppercase tracking-widest text-white flex items-center gap-3 justify-center transition-all hover:scale-105 active:scale-95"
                 style={{ background: "linear-gradient(135deg, #3b82f6, #6366f1)", boxShadow: "0 0 40px rgba(59,130,246,0.4)" }}>
-                Start Earning Today <ArrowRight size={14} />
+                Start Earning Free <ArrowRight size={14} />
               </button>
             </SignUpButton>
             <button className="px-10 py-4 rounded-full font-black text-xs uppercase tracking-widest text-gray-300 flex items-center gap-3 justify-center transition-all hover:text-white"
               style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
-              <Briefcase size={14} /> Hire Talent
+              <PlayCircle size={14} /> Watch 90s Demo
             </button>
+          </motion.div>
+
+          {/* Trust ribbon */}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.0 }}
+            className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] text-gray-500 mb-14">
+            <span className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-green-400" /> 5 free HU on signup</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-green-400" /> No card required</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-green-400" /> Cancel anytime</span>
+            <span className="flex items-center gap-1.5"><ShieldCheck size={12} className="text-blue-400" /> SOC 2 · GDPR · PCI-DSS</span>
           </motion.div>
 
           {/* Stats */}
@@ -280,7 +342,7 @@ const LandingPage = () => {
             className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
             {heroStats.map((stat, i) => (
               <GlassCard key={i} className="p-5 text-center" hover={false}>
-                <p className="text-3xl font-black text-white mb-1" style={{ fontFamily: "'Space Grotesk', system-ui" }}>
+                <p className="text-3xl font-black mb-1" style={{ fontFamily: "'Space Grotesk', system-ui", background: "linear-gradient(135deg, #3b82f6, #00f2ff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                   <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                 </p>
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-500">{stat.label}</p>
@@ -295,78 +357,90 @@ const LandingPage = () => {
         </motion.div>
       </section>
 
-      {/* WHY REMOTE */}
-      <section className="relative z-10 py-32 px-6">
+      {/* ─────── GLOBAL REACH ─────── */}
+      <section className="relative z-10 py-24 px-6">
         <div className="max-w-6xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4" style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)" }}>
-              <Globe size={11} className="text-indigo-400" />
-              <span className="text-indigo-400 text-[9px] font-bold uppercase tracking-widest">The Remote Revolution</span>
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4" style={{ background: "rgba(0,242,255,0.08)", border: "1px solid rgba(0,242,255,0.2)" }}>
+              <Globe size={11} className="text-cyan-400" />
+              <span className="text-cyan-400 text-[9px] font-bold uppercase tracking-widest">Global Reach</span>
             </div>
-            <h2 className="text-5xl md:text-6xl font-black text-white mb-4 leading-tight" style={{ fontFamily: "'Space Grotesk', system-ui" }}>
-              Why Working Remote<br />Changes Everything
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-3" style={{ fontFamily: "'Space Grotesk', system-ui" }}>
+              Live across 6 continents.
             </h2>
-            <p className="text-gray-400 max-w-xl mx-auto">The world has shifted. Top talent no longer needs to be in the same city as their clients. Your geography should never limit your potential.</p>
+            <p className="text-gray-400 max-w-xl mx-auto">From Lagos to London, Manila to Manhattan — NexusGigs settles work and payments in 70+ local currencies.</p>
           </motion.div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
-            {whyRemote.map((item, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
-                <GlassCard className="p-6 text-center h-full">
-                  <div className="w-10 h-10 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: `${item.color}20`, color: item.color }}>
-                    {item.icon}
-                  </div>
-                  <p className="text-2xl font-black text-white mb-1" style={{ fontFamily: "'Space Grotesk', system-ui", color: item.color }}>{item.stat}</p>
-                  <p className="text-[10px] text-gray-400 uppercase tracking-wide font-semibold">{item.label}</p>
-                </GlassCard>
+          <div className="flex flex-wrap justify-center gap-2.5 max-w-4xl mx-auto">
+            {REGIONS.map((r) => (
+              <motion.div key={r.name} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold text-gray-200"
+                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                <span className="text-base leading-none">{r.flag}</span> {r.name}
               </motion.div>
             ))}
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <GlassCard className="p-8">
-              <h3 className="text-2xl font-black text-white mb-4" style={{ fontFamily: "'Space Grotesk', system-ui" }}>Built for African Talent</h3>
-              <p className="text-gray-400 text-sm leading-relaxed mb-6">Kenya, Nigeria, Uganda, Tanzania — Africa is home to some of the world's fastest-growing tech talent. NexusGigs is built specifically to connect this talent with global opportunities, with payment rails that actually work here.</p>
-              {["M-Pesa instant payouts", "Multi-currency support", "Local bank transfers", "USDT/Crypto options"].map(f => (
-                <div key={f} className="flex items-center gap-3 mb-2">
-                  <div className="w-4 h-4 rounded-full flex items-center justify-center" style={{ background: "rgba(59,130,246,0.2)" }}>
-                    <Check size={10} className="text-blue-400" />
-                  </div>
-                  <span className="text-gray-300 text-sm">{f}</span>
-                </div>
-              ))}
-            </GlassCard>
-            <GlassCard className="p-8">
-              <h3 className="text-2xl font-black text-white mb-4" style={{ fontFamily: "'Space Grotesk', system-ui" }}>Global Clients, Local Freedom</h3>
-              <p className="text-gray-400 text-sm leading-relaxed mb-6">Work on projects from clients in the US, UK, Europe, and beyond — while keeping the lifestyle you love. Set your own hours, choose your projects, build your reputation.</p>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { label: "Avg. Hourly Rate", value: "KES 2,500+" },
-                  { label: "Top Earner/Month", value: "KES 180K+" },
-                  { label: "Projects/Month", value: "200+" },
-                  { label: "Response Time", value: "< 2 hrs" },
-                ].map(s => (
-                  <div key={s.label} className="p-3 rounded-2xl" style={{ background: "rgba(59,130,246,0.06)", border: "1px solid rgba(59,130,246,0.1)" }}>
-                    <p className="text-blue-300 font-black text-lg" style={{ fontFamily: "'Space Grotesk', system-ui" }}>{s.value}</p>
-                    <p className="text-gray-500 text-[10px] uppercase tracking-wide">{s.label}</p>
-                  </div>
-                ))}
-              </div>
-            </GlassCard>
+            <div className="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-bold text-white"
+              style={{ background: "linear-gradient(135deg, #3b82f6, #6366f1)", boxShadow: "0 0 20px rgba(59,130,246,0.35)" }}>
+              <Globe size={12} /> +166 more
+            </div>
           </div>
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
-      <section className="relative z-10 py-32 px-6">
+      {/* ─────── PAYMENT RAILS ─────── */}
+      <section className="relative z-10 py-24 px-6">
+        <div className="max-w-6xl mx-auto">
+          <GlassCard className="p-10 md:p-14 relative overflow-hidden" hover={false}>
+            <div aria-hidden className="absolute -right-20 -top-20 w-72 h-72 rounded-full opacity-30"
+              style={{ background: "radial-gradient(circle, rgba(0,242,255,0.4), transparent)", filter: "blur(60px)" }} />
+            <div className="grid lg:grid-cols-2 gap-10 items-center relative">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4" style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)" }}>
+                  <CreditCard size={11} className="text-indigo-400" />
+                  <span className="text-indigo-400 text-[9px] font-bold uppercase tracking-widest">Global Payments</span>
+                </div>
+                <h2 className="text-4xl md:text-5xl font-black text-white mb-4 leading-tight" style={{ fontFamily: "'Space Grotesk', system-ui" }}>
+                  Get paid the way <em>you</em> want.
+                </h2>
+                <p className="text-gray-400 text-sm leading-relaxed mb-6 max-w-lg">
+                  Five payout rails. 70+ currencies. Instant settlement on mobile money. We handle FX, compliance and reconciliation so you never lose to hidden fees.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <BrandMpesa />
+                  <BrandPayPal />
+                  <BrandBinance />
+                  <BrandStripe />
+                  <BrandBank />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { i: <Clock size={18} />, t: "Instant", d: "Mobile money & crypto", c: "#00f2ff" },
+                  { i: <ShieldCheck size={18} />, t: "Escrow-secured", d: "Held by regulated partner", c: "#3b82f6" },
+                  { i: <Languages size={18} />, t: "70+ currencies", d: "Auto-FX at mid-market", c: "#6366f1" },
+                  { i: <BadgeCheck size={18} />, t: "0% platform fee", d: "On Pro & Agency", c: "#22C55E" },
+                ].map((c) => (
+                  <div key={c.t} className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-2.5" style={{ background: `${c.c}1f`, color: c.c }}>{c.i}</div>
+                    <div className="font-black text-white text-sm">{c.t}</div>
+                    <div className="text-[11px] text-gray-500 mt-0.5">{c.d}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </GlassCard>
+        </div>
+      </section>
+
+      {/* ─────── HOW IT WORKS ─────── */}
+      <section className="relative z-10 py-24 px-6">
         <div className="max-w-5xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-20">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4" style={{ background: "rgba(0,242,255,0.1)", border: "1px solid rgba(0,242,255,0.2)" }}>
               <ListChecks size={11} className="text-cyan-400" />
-              <span className="text-cyan-400 text-[9px] font-bold uppercase tracking-widest">Simple Process</span>
+              <span className="text-cyan-400 text-[9px] font-bold uppercase tracking-widest">How It Works</span>
             </div>
             <h2 className="text-5xl md:text-6xl font-black text-white" style={{ fontFamily: "'Space Grotesk', system-ui" }}>
-              Start in 4 Steps
+              From signup to payout<br /><span style={{ color: "#3b82f6" }}>in 4 steps.</span>
             </h2>
           </motion.div>
 
@@ -398,19 +472,23 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* FEATURES GRID */}
-      <section className="relative z-10 py-32 px-6">
+      {/* ─────── FEATURES GRID ─────── */}
+      <section className="relative z-10 py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4" style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.25)" }}>
+              <Sparkles size={11} className="text-blue-400" />
+              <span className="text-blue-400 text-[9px] font-bold uppercase tracking-widest">Why NexusGigs</span>
+            </div>
             <h2 className="text-5xl md:text-6xl font-black text-white mb-4" style={{ fontFamily: "'Space Grotesk', system-ui" }}>
-              Everything You Need<br /><span style={{ color: "#3b82f6" }}>To Succeed</span>
+              Everything a modern<br /><span style={{ color: "#3b82f6" }}>freelancer needs.</span>
             </h2>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {features.map((f, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
+              <motion.div key={i} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
                 <GlassCard className="p-8 h-full">
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style={{ background: "rgba(59,130,246,0.1)", color: "#3b82f6" }}>
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style={{ background: `${f.color}1f`, color: f.color }}>
                     {f.icon}
                   </div>
                   <h3 className="text-lg font-black text-white mb-3" style={{ fontFamily: "'Space Grotesk', system-ui" }}>{f.title}</h3>
@@ -422,29 +500,206 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="relative z-10 py-32 px-6">
+      {/* ─────── TESTIMONIALS ─────── */}
+      <section className="relative z-10 py-24 px-6">
+        <div className="max-w-6xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4" style={{ background: "rgba(236,72,153,0.1)", border: "1px solid rgba(236,72,153,0.2)" }}>
+              <HeartHandshake size={11} className="text-pink-400" />
+              <span className="text-pink-400 text-[9px] font-bold uppercase tracking-widest">Loved Worldwide</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-white" style={{ fontFamily: "'Space Grotesk', system-ui" }}>
+              Trusted by 420,000+ freelancers.
+            </h2>
+          </motion.div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {TESTIMONIALS.map((t, i) => (
+              <motion.div key={t.name} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
+                <GlassCard className="p-6 h-full">
+                  <Quote size={20} style={{ color: t.color }} />
+                  <p className="text-sm text-gray-300 mt-3 leading-relaxed">"{t.quote}"</p>
+                  <div className="mt-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-black"
+                      style={{ background: `linear-gradient(135deg, ${t.color}, ${t.color}99)`, boxShadow: `0 4px 12px ${t.color}55` }}>
+                      {t.name[0]}
+                    </div>
+                    <div>
+                      <div className="text-sm font-black text-white">{t.name}</div>
+                      <div className="text-[10px] text-gray-500">{t.role}</div>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex gap-0.5">
+                    {[...Array(5)].map((_, k) => <Star key={k} size={11} fill="#F59E0B" stroke="#F59E0B" />)}
+                  </div>
+                </GlassCard>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─────── PRICING ─────── */}
+      <section className="relative z-10 py-24 px-6">
+        <div className="max-w-6xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4" style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)" }}>
+              <Crown size={11} className="text-amber-400" />
+              <span className="text-amber-400 text-[9px] font-bold uppercase tracking-widest">Pricing</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-3" style={{ fontFamily: "'Space Grotesk', system-ui" }}>
+              Simple, transparent, global.
+            </h2>
+            <p className="text-gray-400">No commission cuts. No hidden FX. Cancel anytime.</p>
+            <div className="inline-flex items-center mt-6 p-1 rounded-full" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              {(["monthly", "yearly"] as const).map((b) => (
+                <button key={b} onClick={() => setBilling(b)}
+                  className={`px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${billing === b ? "text-white" : "text-gray-500"}`}
+                  style={billing === b ? { background: "linear-gradient(135deg, #3b82f6, #6366f1)", boxShadow: "0 0 20px rgba(59,130,246,0.4)" } : undefined}>
+                  {b} {b === "yearly" && <span className="ml-1 text-[9px] text-green-400">−17%</span>}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+          <div className="grid md:grid-cols-3 gap-5">
+            {PLANS.map((p) => (
+              <motion.div key={p.name} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+                className="relative rounded-3xl p-8"
+                style={{
+                  background: p.featured ? "linear-gradient(135deg, rgba(59,130,246,0.12), rgba(99,102,241,0.08))" : "rgba(255,255,255,0.03)",
+                  border: p.featured ? "1px solid rgba(59,130,246,0.4)" : "1px solid rgba(255,255,255,0.08)",
+                  boxShadow: p.featured ? "0 0 40px rgba(59,130,246,0.2)" : "none",
+                }}>
+                {p.featured && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[9px] font-black tracking-widest text-white"
+                    style={{ background: "linear-gradient(135deg, #3b82f6, #6366f1)" }}>MOST POPULAR</div>
+                )}
+                <div className="text-[10px] font-bold uppercase tracking-widest text-gray-500">{p.name}</div>
+                <div className="mt-3 flex items-baseline gap-1">
+                  <span className="text-4xl font-black text-white" style={{ fontFamily: "'Space Grotesk', system-ui" }}>${p.price[billing]}</span>
+                  <span className="text-xs text-gray-500">/ {billing === "monthly" ? "mo" : "yr"}</span>
+                </div>
+                <div className="text-sm text-gray-400 mt-1">{p.blurb}</div>
+                <SignUpButton mode="modal">
+                  <button className="mt-5 w-full py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    style={p.featured
+                      ? { background: "linear-gradient(135deg, #3b82f6, #6366f1)", color: "white", boxShadow: "0 0 24px rgba(59,130,246,0.4)" }
+                      : { background: "rgba(255,255,255,0.05)", color: "white", border: "1px solid rgba(255,255,255,0.1)" }}>
+                    {p.cta}
+                  </button>
+                </SignUpButton>
+                <ul className="mt-6 space-y-2.5">
+                  {p.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-sm text-gray-300">
+                      <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-green-400" /> {f}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─────── FAQ ─────── */}
+      <section className="relative z-10 py-24 px-6">
+        <div className="max-w-3xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4" style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.25)" }}>
+              <MessageCircle size={11} className="text-blue-400" />
+              <span className="text-blue-400 text-[9px] font-bold uppercase tracking-widest">FAQ</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-white" style={{ fontFamily: "'Space Grotesk', system-ui" }}>Questions, answered.</h2>
+          </motion.div>
+          <div className="space-y-3">
+            {FAQ.map((f, i) => (
+              <GlassCard key={i} className="overflow-hidden" hover={false}>
+                <button onClick={() => setOpenFaq(openFaq === i ? null : i)} className="w-full flex items-center justify-between p-5 text-left">
+                  <span className="font-black text-white text-sm">{f.q}</span>
+                  <ChevronDown size={18} className="transition-transform shrink-0 text-gray-500" style={{ transform: openFaq === i ? "rotate(180deg)" : "none" }} />
+                </button>
+                <AnimatePresence>
+                  {openFaq === i && (
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+                      <div className="px-5 pb-5 text-sm text-gray-400 leading-relaxed">{f.a}</div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </GlassCard>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─────── CTA ─────── */}
+      <section className="relative z-10 py-24 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <GlassCard className="p-16" hover={false}>
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-              <div className="w-20 h-20 rounded-3xl mx-auto mb-8 flex items-center justify-center" style={{ background: "linear-gradient(135deg, rgba(59,130,246,0.2), rgba(99,102,241,0.2))", border: "1px solid rgba(59,130,246,0.3)" }}>
+          <GlassCard className="p-16 relative overflow-hidden" hover={false}>
+            <div aria-hidden className="absolute inset-0 opacity-30 pointer-events-none"
+              style={{ background: "radial-gradient(circle at 30% 20%, rgba(59,130,246,0.4), transparent 60%), radial-gradient(circle at 70% 80%, rgba(99,102,241,0.3), transparent 60%)", filter: "blur(40px)" }} />
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative">
+              <div className="w-20 h-20 rounded-3xl mx-auto mb-8 flex items-center justify-center"
+                style={{ background: "linear-gradient(135deg, rgba(59,130,246,0.25), rgba(99,102,241,0.25))", border: "1px solid rgba(59,130,246,0.4)" }}>
                 <Rocket size={36} className="text-blue-400" />
               </div>
-              <h2 className="text-5xl font-black text-white mb-4" style={{ fontFamily: "'Space Grotesk', system-ui" }}>Ready to Launch?</h2>
-              <p className="text-gray-400 mb-10 text-lg">Join thousands of professionals already earning remotely on NexusGigs.</p>
-              <SignUpButton mode="modal">
-                <button className="px-14 py-5 rounded-full font-black text-sm uppercase tracking-widest text-white inline-flex items-center gap-3 transition-all hover:scale-105 active:scale-95"
-                  style={{ background: "linear-gradient(135deg, #3b82f6, #6366f1)", boxShadow: "0 0 60px rgba(59,130,246,0.5)" }}>
-                  Create Free Account <ArrowRight size={16} />
-                </button>
-              </SignUpButton>
+              <h2 className="text-4xl md:text-5xl font-black text-white mb-4" style={{ fontFamily: "'Space Grotesk', system-ui" }}>Ready to go global?</h2>
+              <p className="text-gray-400 mb-10 text-lg max-w-xl mx-auto">Join 420,000+ freelancers earning on NexusGigs across 184 countries. Your first 5 Hustle Units are on us.</p>
+              <div className="flex flex-wrap justify-center gap-3">
+                <SignUpButton mode="modal">
+                  <button className="px-12 py-5 rounded-full font-black text-sm uppercase tracking-widest text-white inline-flex items-center gap-3 transition-all hover:scale-105 active:scale-95"
+                    style={{ background: "linear-gradient(135deg, #3b82f6, #6366f1)", boxShadow: "0 0 60px rgba(59,130,246,0.5)" }}>
+                    Create Free Account <ArrowRight size={16} />
+                  </button>
+                </SignUpButton>
+                <SignInButton mode="modal">
+                  <button className="px-12 py-5 rounded-full font-black text-sm uppercase tracking-widest text-gray-300 inline-flex items-center gap-3 transition-all hover:text-white"
+                    style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)" }}>
+                    I already have one
+                  </button>
+                </SignInButton>
+              </div>
             </motion.div>
           </GlassCard>
         </div>
       </section>
 
-      <footer className="relative z-10 py-10 px-6 border-t border-white/5 text-center">
-        <p className="text-gray-600 text-[11px] uppercase tracking-widest">© 2024 NexusGigs • Built for Africa's Remote Future</p>
+      {/* ─────── FOOTER ─────── */}
+      <footer className="relative z-10 pt-16 pb-10 px-6 border-t border-white/5">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-5 gap-10 mb-10">
+          <div className="md:col-span-2">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #00f2ff, #3b82f6)" }}>
+                <Terminal size={16} className="text-[#020617]" />
+              </div>
+              <span className="text-white font-black text-lg tracking-tight" style={{ fontFamily: "'Space Grotesk', system-ui" }}>
+                NEXUS<span style={{ color: "#3b82f6" }}>GIGS</span>
+              </span>
+            </div>
+            <p className="text-gray-500 text-sm max-w-xs leading-relaxed">The freelance economy, rebuilt for the world. Escrow-secured, instantly paid, globally connected.</p>
+            <div className="mt-4 flex items-center gap-2 text-[10px] text-gray-500 uppercase tracking-widest">
+              <motion.div animate={{ scale: [1, 1.4, 1] }} transition={{ duration: 2, repeat: Infinity }} className="w-1.5 h-1.5 rounded-full bg-green-400" />
+              All systems operational
+            </div>
+          </div>
+          {[
+            { h: "Product", l: ["Features", "Pricing", "Regions", "Changelog"] },
+            { h: "Company", l: ["About", "Careers", "Press", "Contact"] },
+            { h: "Legal", l: ["Privacy", "Terms", "Security", "Compliance"] },
+          ].map((c) => (
+            <div key={c.h}>
+              <div className="text-[10px] font-black tracking-widest text-gray-500 uppercase mb-3">{c.h}</div>
+              <ul className="space-y-2 text-sm text-gray-400">
+                {c.l.map((x) => <li key={x}><a href="#" className="hover:text-white transition-colors">{x}</a></li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className="max-w-6xl mx-auto pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-gray-600 uppercase tracking-widest">
+          <div>© {new Date().getFullYear()} NexusGigs Global Inc. · 184 Countries</div>
+          <div className="flex items-center gap-5">
+            <a href="mailto:hello@nexusgigs.com" className="flex items-center gap-1.5 hover:text-white"><Mail size={11} /> hello@nexusgigs.com</a>
+            <a href="#" className="flex items-center gap-1.5 hover:text-white"><MessageCircle size={11} /> Live Chat</a>
+          </div>
+        </div>
       </footer>
     </div>
   );
