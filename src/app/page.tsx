@@ -65,17 +65,17 @@ const Nav = () => {
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 w-full z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-white/90 backdrop-blur-2xl border-b border-black/10 shadow-2xl shadow-gray-300/30"
+          ? "bg-[rgba(2,4,15,0.82)] backdrop-blur-2xl border-b border-white/6 shadow-2xl shadow-black/30"
           : "bg-transparent"
       }`}
     >
       <div className="max-w-7xl mx-auto px-5 md:px-10 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg, #f0f0f0, #e0e0e0)" }}>
-            <Terminal size={13} className="text-black" />
+            style={{ background: "linear-gradient(135deg, #6366f1, #3b82f6)" }}>
+            <Terminal size={13} className="text-white" />
           </div>
-          <span className="text-black font-black text-[16px] tracking-tight" style={{ fontFamily: "'Syne', sans-serif" }}>
+          <span className="text-white font-black text-[16px] tracking-tight" style={{ fontFamily: "'Syne', sans-serif" }}>
             nexus<span style={{ color: "#6366f1" }}>gigs</span>
           </span>
         </div>
@@ -83,7 +83,7 @@ const Nav = () => {
         <nav className="hidden md:flex items-center gap-7">
           {["Features", "How It Works", "Talent", "Pricing", "For Business"].map((item) => (
             <a key={item} href="#"
-              className="text-[12px] font-medium text-black/50 hover:text-black transition-colors tracking-wide">
+              className="text-[12px] font-medium text-white/50 hover:text-white transition-colors tracking-wide">
               {item}
             </a>
           ))}
@@ -91,19 +91,19 @@ const Nav = () => {
 
         <div className="hidden md:flex items-center gap-2.5">
           <SignInButton mode="modal">
-            <button className="text-[12px] font-semibold text-black/60 hover:text-black transition-colors px-4 py-2">
+            <button className="text-[12px] font-semibold text-white/60 hover:text-white transition-colors px-4 py-2">
               Sign in
             </button>
           </SignInButton>
           <SignUpButton mode="modal">
-            <button className="px-5 py-2.5 rounded-full text-[12px] font-semibold text-black transition-all hover:opacity-90 hover:scale-[1.02]"
-              style={{ background: "linear-gradient(135deg, #e0e0e0, #f0f0f0)" }}>
+            <button className="px-5 py-2.5 rounded-full text-[12px] font-semibold text-white transition-all hover:opacity-90 hover:scale-[1.02]"
+              style={{ background: "linear-gradient(135deg, #6366f1, #3b82f6)" }}>
               Get started free
             </button>
           </SignUpButton>
         </div>
 
-        <button className="md:hidden p-2 text-black/60" onClick={() => setMobileOpen(!mobileOpen)}>
+        <button className="md:hidden p-2 text-white/60" onClick={() => setMobileOpen(!mobileOpen)}>
           {mobileOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
       </div>
@@ -114,19 +114,19 @@ const Nav = () => {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="md:hidden bg-white/95 backdrop-blur-2xl border-t border-black/10 px-5 pb-5 overflow-hidden"
+            className="md:hidden bg-[rgba(2,4,15,0.95)] backdrop-blur-2xl border-t border-white/6 px-5 pb-5 overflow-hidden"
           >
             <div className="flex flex-col gap-4 pt-4">
               {["Features", "How It Works", "Talent", "Pricing", "For Business"].map((item) => (
-                <a key={item} href="#" className="text-[13px] font-medium text-black/50">{item}</a>
+                <a key={item} href="#" className="text-[13px] font-medium text-white/50">{item}</a>
               ))}
-              <div className="flex flex-col gap-2 pt-3 border-t border-black/10">
+              <div className="flex flex-col gap-2 pt-3 border-t border-white/6">
                 <SignInButton mode="modal">
-                  <button className="w-full py-3 rounded-xl text-[12px] font-semibold text-black/70 border border-black/10">Sign in</button>
+                  <button className="w-full py-3 rounded-xl text-[12px] font-semibold text-white/70 border border-white/10">Sign in</button>
                 </SignInButton>
                 <SignUpButton mode="modal">
-                  <button className="w-full py-3 rounded-xl text-[12px] font-semibold text-black"
-                    style={{ background: "linear-gradient(135deg, #e0e0e0, #f0f0f0)" }}>
+                  <button className="w-full py-3 rounded-xl text-[12px] font-semibold text-white"
+                    style={{ background: "linear-gradient(135deg, #6366f1, #3b82f6)" }}>
                     Get started free
                   </button>
                 </SignUpButton>
@@ -147,12 +147,12 @@ const GlassCard = ({ children, className = "", hover = true }: {
   children: React.ReactNode; className?: string; hover?: boolean;
 }) => (
   <div className={`
-    rounded-2xl border border-black/9 transition-all duration-300
-    ${hover ? "hover:border-black/18 hover:shadow-2xl hover:shadow-indigo-500/5" : ""}
+    rounded-2xl border border-white/9 transition-all duration-300
+    ${hover ? "hover:border-white/18 hover:shadow-2xl hover:shadow-indigo-500/5" : ""}
     ${className}
   `}
     style={{
-      background: "rgba(0,0,0,0.04)",
+      background: "rgba(255,255,255,0.04)",
       backdropFilter: "blur(20px)",
     }}>
     {children}
@@ -287,18 +287,18 @@ const LandingPage = () => {
   ];
 
   return (
-    <div className="min-h-screen text-black" style={{
-      background: "#ffffff",
+    <div className="min-h-screen text-white" style={{
+      background: "#02040f",
       fontFamily: "'DM Sans', system-ui, sans-serif"
     }}>
       {/* Ambient orbs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute top-[-20%] right-[-10%] w-175 h-175 rounded-full opacity-[0.12]"
-          style={{ background: "radial-gradient(circle, #ffffff, transparent 70%)", filter: "blur(60px)" }} />
+          style={{ background: "radial-gradient(circle, #6366f1, transparent 70%)", filter: "blur(60px)" }} />
         <div className="absolute bottom-[20%] left-[-10%] w-125 h-125 rounded-full opacity-[0.08]"
-          style={{ background: "radial-gradient(circle, #f0f0f0, transparent 70%)", filter: "blur(60px)" }} />
+          style={{ background: "radial-gradient(circle, #3b82f6, transparent 70%)", filter: "blur(60px)" }} />
         <div className="absolute top-[50%] left-[40%] w-100 h-100 rounded-full opacity-[0.06]"
-          style={{ background: "radial-gradient(circle, #e0e0e0, transparent 70%)", filter: "blur(80px)" }} />
+          style={{ background: "radial-gradient(circle, #8b5cf6, transparent 70%)", filter: "blur(80px)" }} />
       </div>
 
       <Nav />
@@ -312,10 +312,10 @@ const LandingPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-8"
-              style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.3)" }}
+              style={{ background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.3)" }}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-200 animate-pulse" />
-              <span className="text-indigo-600 text-[11px] font-semibold tracking-wide flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+              <span className="text-indigo-300 text-[11px] font-semibold tracking-wide flex items-center gap-1.5">
                 <Globe size={10} /> Now live in 184 countries
               </span>
             </motion.div>
@@ -338,7 +338,7 @@ const LandingPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="max-w-lg mx-auto text-[14px] text-black/45 leading-relaxed mb-9"
+              className="max-w-lg mx-auto text-[14px] text-white/45 leading-relaxed mb-9"
             >
               NexusGigs connects vetted freelancers with serious clients across 184 countries.
               Escrow-protected contracts, instant global payouts, zero platform fees on Pro.
@@ -356,8 +356,8 @@ const LandingPage = () => {
                   Start earning — it's free <ArrowRight size={14} />
                 </button>
               </SignUpButton>
-              <button className="px-7 py-3.5 rounded-full text-[13px] font-semibold text-black/70 border border-black/10 hover:border-black/20 hover:text-black transition-all flex items-center gap-2"
-                style={{ background: "rgba(0,0,0,0.04)", backdropFilter: "blur(10px)" }}>
+              <button className="px-7 py-3.5 rounded-full text-[13px] font-semibold text-white/70 border border-white/10 hover:border-white/20 hover:text-white transition-all flex items-center gap-2"
+                style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(10px)" }}>
                 <PlayCircle size={14} /> Watch 90s demo
               </button>
             </motion.div>
@@ -366,7 +366,7 @@ const LandingPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.65 }}
-              className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-[11px] text-black/35"
+              className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-[11px] text-white/35"
             >
               <span className="flex items-center gap-1.5"><CheckCircle2 size={11} className="text-green-400" /> 5 free HU on signup</span>
               <span className="flex items-center gap-1.5"><CheckCircle2 size={11} className="text-green-400" /> No card required</span>
@@ -384,10 +384,10 @@ const LandingPage = () => {
           >
             {heroStats.map((stat, i) => (
               <GlassCard key={i} className="text-center p-5">
-                <p className="text-[32px] font-black text-black leading-none mb-0.5" style={{ fontFamily: "'Syne', sans-serif" }}>
+                <p className="text-[32px] font-black text-white leading-none mb-0.5" style={{ fontFamily: "'Syne', sans-serif" }}>
                   <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                 </p>
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-black/35">{stat.label}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-white/35">{stat.label}</p>
               </GlassCard>
             ))}
           </motion.div>
@@ -399,14 +399,14 @@ const LandingPage = () => {
             transition={{ delay: 0.9 }}
             className="mt-10 flex flex-wrap justify-center items-center gap-2.5"
           >
-            <span className="text-[10px] font-semibold text-black/30 uppercase tracking-widest">Pay & withdraw via</span>
+            <span className="text-[10px] font-semibold text-white/30 uppercase tracking-widest">Pay & withdraw via</span>
             {paymentMethods.map((p, i) => (
               <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-xl"
-                style={{ background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.08)" }}>
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
                 {p.icon}
                 <div>
-                  <p className="text-[10px] font-black text-black leading-none">{p.name}</p>
-                  <p className="text-[8px] text-black/35 mt-0.5">{p.sub}</p>
+                  <p className="text-[10px] font-black text-white leading-none">{p.name}</p>
+                  <p className="text-[8px] text-white/35 mt-0.5">{p.sub}</p>
                 </div>
               </div>
             ))}
@@ -415,7 +415,7 @@ const LandingPage = () => {
       </section>
 
       {/* ─────── TICKER ─────── */}
-      <div className="py-4 overflow-hidden relative z-10" style={{ borderTop: "1px solid rgba(0,0,0,0.05)", borderBottom: "1px solid rgba(0,0,0,0.05)", background: "rgba(0,0,0,0.02)" }}>
+      <div className="py-4 overflow-hidden relative z-10" style={{ borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.02)" }}>
         <motion.div
           className="whitespace-nowrap flex gap-14 items-center"
           animate={{ x: [0, -1200] }}
@@ -432,8 +432,8 @@ const LandingPage = () => {
             "David N. applied to Tesla Data Analyst",
             "Alice V. withdrew KES 14,000",
           ].map((t, i) => (
-            <span key={i} className="inline-flex items-center gap-3 text-[11px] font-medium text-black/35">
-              <span className="w-1 h-1 rounded-full bg-indigo-200 shrink-0" />
+            <span key={i} className="inline-flex items-center gap-3 text-[11px] font-medium text-white/35">
+              <span className="w-1 h-1 rounded-full bg-indigo-400 shrink-0" />
               {t}
             </span>
           ))}
@@ -444,8 +444,8 @@ const LandingPage = () => {
       <section className="py-20 px-5 relative z-10">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-black/10 mb-4 text-[10px] font-semibold text-black/50"
-              style={{ background: "rgba(0,0,0,0.04)" }}>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 mb-4 text-[10px] font-semibold text-white/50"
+              style={{ background: "rgba(255,255,255,0.04)" }}>
               <Sparkles size={10} className="text-indigo-400" /> Platform features
             </div>
             <h2 className="text-[36px] md:text-[48px] font-black leading-[0.95] tracking-tight text-white mb-3" style={{ fontFamily: "'Syne', sans-serif" }}>
@@ -717,23 +717,23 @@ const LandingPage = () => {
       </section>
 
       {/* ─────── FOOTER ─────── */}
-      <footer className="border-t border-black/5 py-12 px-5 relative z-10">
+      <footer className="border-t border-white/5 py-12 px-5 relative z-10">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-5 gap-10 mb-10">
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center"
-                  style={{ background: "linear-gradient(135deg, #f0f0f0, #e0e0e0)" }}>
-                  <Terminal size={12} className="text-black" />
+                  style={{ background: "linear-gradient(135deg, #6366f1, #3b82f6)" }}>
+                  <Terminal size={12} className="text-white" />
                 </div>
-                <span className="text-black font-black text-[15px]" style={{ fontFamily: "'Syne', sans-serif" }}>
+                <span className="text-white font-black text-[15px]" style={{ fontFamily: "'Syne', sans-serif" }}>
                   nexus<span style={{ color: "#6366f1" }}>gigs</span>
                 </span>
               </div>
-              <p className="text-[12px] text-black/30 max-w-xs leading-relaxed">
+              <p className="text-[12px] text-white/30 max-w-xs leading-relaxed">
                 The freelance economy, rebuilt for the world. Escrow-secured, instantly paid, globally connected.
               </p>
-              <div className="mt-4 flex items-center gap-2 text-[10px] text-black/25">
+              <div className="mt-4 flex items-center gap-2 text-[10px] text-white/25">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
                 All systems operational
               </div>
@@ -744,24 +744,24 @@ const LandingPage = () => {
               { h: "Legal", l: ["Privacy", "Terms", "Security", "Compliance"] },
             ].map((c) => (
               <div key={c.h}>
-                <p className="text-[10px] font-bold tracking-widest text-black/25 uppercase mb-3">{c.h}</p>
+                <p className="text-[10px] font-bold tracking-widest text-white/25 uppercase mb-3">{c.h}</p>
                 <ul className="space-y-2">
                   {c.l.map((x) => (
                     <li key={x}>
-                      <a href="#" className="text-[12px] text-black/35 hover:text-black/70 transition-colors">{x}</a>
+                      <a href="#" className="text-[12px] text-white/35 hover:text-white/70 transition-colors">{x}</a>
                     </li>
                   ))}
                 </ul>
               </div>
             ))}
           </div>
-          <div className="pt-7 border-t border-black/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-black/25">
+          <div className="pt-7 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-white/25">
             <span>© 2016–{new Date().getFullYear()} NexusGigs Global Inc. · 184 Countries</span>
             <div className="flex items-center gap-5">
-              <a href="mailto:hello@nexusgigs.com" className="flex items-center gap-1.5 hover:text-black/50 transition-colors">
+              <a href="mailto:hello@nexusgigs.com" className="flex items-center gap-1.5 hover:text-white/50 transition-colors">
                 <Mail size={10} /> hello@nexusgigs.com
               </a>
-              <a href="#" className="flex items-center gap-1.5 hover:text-black/50 transition-colors">
+              <a href="#" className="flex items-center gap-1.5 hover:text-white/50 transition-colors">
                 <MessageCircle size={10} /> Live Chat
               </a>
             </div>
