@@ -30,7 +30,7 @@ import {
   BarChart2, Languages, Moon, Sun, ChevronLeft,
   HelpCircle, Lightbulb, TrendingDown, Users,
   PlayCircle, CheckSquare, Inbox, ClipboardList, UserPlus,
-  FileCheck, BadgeDollarSign,
+  FileCheck, BadgeDollarSign, Sparkles as SparklesIcon,
 } from "lucide-react";
 
 // ─────────────────────────────────────────────
@@ -196,16 +196,6 @@ const BinanceLogo = ({ size = 44 }: { size?: number }) => (
   </div>
 );
 
-const PayPalSVGLogo = ({ size = 44 }: { size?: number }) => (
-  <div style={{ width: size, height: size, minWidth: size, background: "#003087", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(0,48,135,0.35)" }}>
-    <svg viewBox="0 0 24 28" width={size * 0.45} height={size * 0.45 * 1.166} fill="none">
-      <path d="M20.5 4.5C21.5 6.2 21.7 8.3 21.1 10.3C19.7 15.1 15.4 16.5 11.3 16.5H9.5L8 24H3.5L6.5 4H14.5C17.2 4 19.2 4.1 20.5 4.5Z" fill="#009CDE"/>
-      <path d="M22 2.3C22.9 4 23.1 6.1 22.5 8.1C21.1 13 16.8 14.3 12.7 14.3H10.9L9.4 22H4.9L7.9 2H15.9C18.6 2 20.7 2.1 22 2.3Z" fill="#012169"/>
-      <path d="M9 20H7.5L8 17H9.5C12.5 17 15.8 16 17.5 13C19.3 9.8 19 6.2 16.8 4C19.5 4.5 21.3 6.5 21.3 10C21.3 15.5 17 20 11 20H9Z" fill="#003087"/>
-    </svg>
-  </div>
-);
-
 const MpesaLogoSVG = ({ size = 44 }: { size?: number }) => (
   <div style={{ width: size, height: size, minWidth: size, background: "linear-gradient(135deg, #22C55E, #15803D)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(34,197,94,0.35)" }}>
     <svg viewBox="0 0 44 44" width={size} height={size}>
@@ -225,6 +215,22 @@ const PaystackLogo = ({ size = 44 }: { size?: number }) => (
 );
 
 // ─────────────────────────────────────────────
+// Card Brand Icons
+// ─────────────────────────────────────────────
+const VisaIcon = () => (
+  <div className="h-7 px-3 rounded-md bg-[#1A1F71] flex items-center justify-center">
+    <span className="text-white font-black text-[12px] italic tracking-tight">VISA</span>
+  </div>
+);
+
+const MastercardIcon = () => (
+  <div className="h-7 px-2 rounded-md bg-white border border-gray-200 flex items-center gap-0.5">
+    <div className="w-4 h-4 rounded-full bg-[#EB001B] opacity-90" />
+    <div className="w-4 h-4 rounded-full bg-[#F79E1B] opacity-90 -ml-1.5" />
+  </div>
+);
+
+// ─────────────────────────────────────────────
 // HU Explainer
 // ─────────────────────────────────────────────
 const HUExplainer = ({ onTopUp }: { onTopUp: () => void }) => (
@@ -239,12 +245,12 @@ const HUExplainer = ({ onTopUp }: { onTopUp: () => void }) => (
         <h4 className="text-[13px] font-black text-gray-900">How Handshake Units (HU) Work</h4>
       </div>
       <p className="text-[11px] text-gray-600 leading-relaxed mb-4">
-        HU are your platform access tokens. <strong>Once you purchase any package, every matching gig is instantly unlocked — no applications, no waiting, no rejections.</strong> Just buy HU and start working globally.
+        HU are your platform access tokens. <strong>Once you purchase any package, every matching freelance gig is instantly unlocked — no applications, no waiting, no rejections.</strong> Corporate roles follow a standard HR hiring process.
       </p>
       <div className="grid grid-cols-3 gap-2 mb-4">
         {[
           { step: "1", icon: <Zap size={13} />, label: "Buy HU", sub: "Pick any package", color: "#3B82F6" },
-          { step: "2", icon: <CheckCircle2 size={13} />, label: "Instant Access", sub: "All gigs unlock now", color: "#8B5CF6" },
+          { step: "2", icon: <CheckCircle2 size={13} />, label: "Instant Access", sub: "Freelance gigs unlock", color: "#8B5CF6" },
           { step: "3", icon: <DollarSign size={13} />, label: "Work & Earn", sub: "Withdraw your pay", color: "#10B981" },
         ].map((s) => (
           <div key={s.step} className="bg-white rounded-xl p-3 border border-white/80 text-center shadow-sm">
@@ -259,13 +265,13 @@ const HUExplainer = ({ onTopUp }: { onTopUp: () => void }) => (
       <div className="mb-3 p-3 bg-white rounded-xl border border-indigo-100 flex items-start gap-2">
         <CheckCircle2 size={13} className="text-indigo-500 mt-0.5 shrink-0" />
         <p className="text-[10px] text-indigo-700 font-semibold leading-relaxed">
-          <strong>Zero applications.</strong> Unlike traditional freelance platforms, every gig on Nexus is pre-approved. Your HU purchase is your credential — clients have already said yes.
+          <strong>Zero applications for freelance gigs.</strong> Unlike traditional platforms, every freelance gig on Nexus is pre-approved — clients have already said yes. Corporate roles require a formal HR review.
         </p>
       </div>
       <button onClick={onTopUp}
         className="w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all hover:opacity-90"
         style={{ background: "linear-gradient(135deg, #4F46E5, #0066FF)" }}>
-        Unlock All Gigs — Buy HU Now →
+        Unlock All Freelance Gigs — Buy HU Now →
       </button>
     </div>
   </motion.div>
@@ -289,37 +295,39 @@ const CorporateHiringCard = () => (
         </div>
       </div>
 
-      <p className="text-[10px] text-gray-600 font-medium leading-relaxed mb-4">
-        Corporate roles go through a structured hiring pipeline — unlike freelance gigs which start immediately after buying HU.
-        Purchase HU to <strong className="text-gray-800">unlock and apply</strong>, then follow the steps below.
-      </p>
+      <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-2">
+        <AlertCircle size={13} className="text-amber-500 mt-0.5 shrink-0" />
+        <p className="text-[10px] text-amber-800 font-semibold leading-relaxed">
+          <strong>Corporate roles are different from freelance gigs.</strong> Freelance gigs start immediately after buying HU. Corporate roles require a formal HR application, CV review, and interview process — just like any professional job.
+        </p>
+      </div>
 
       <div className="space-y-2 mb-4">
         {[
           {
             step: 1, icon: <Zap size={12} />, color: "#3B82F6", bg: "#EFF6FF",
             title: "Buy HU & Apply",
-            desc: "Purchase any Pro Uplink package or higher to unlock corporate roles. Submit your application directly from the gig card with one tap."
+            desc: "Purchase any Pro Uplink package or higher to unlock and apply for corporate roles with one tap."
           },
           {
             step: 2, icon: <ClipboardList size={12} />, color: "#8B5CF6", bg: "#F5F3FF",
             title: "Submit CV & Credentials",
-            desc: "Upload your resume, portfolio, and any relevant certifications. Make sure your profile is complete — HR will review it thoroughly."
+            desc: "Upload your resume, portfolio, and certifications. Ensure your Nexus profile is complete — HR reviews everything."
           },
           {
             step: 3, icon: <Users size={12} />, color: "#06B6D4", bg: "#ECFEFF",
             title: "HR Review (2–5 Business Days)",
-            desc: "The company's HR team reviews your profile against role requirements. Top candidates are shortlisted and contacted directly."
+            desc: "The company's HR team evaluates your application against role requirements. Top candidates are shortlisted and contacted."
           },
           {
             step: 4, icon: <Video size={12} />, color: "#F59E0B", bg: "#FFFBEB",
             title: "Video Interview",
-            desc: "Shortlisted candidates are invited to a structured video interview with the hiring team. Be prepared to discuss your experience and technical skills."
+            desc: "Shortlisted candidates attend a structured video interview with the hiring team. Prepare to discuss experience and skills."
           },
           {
             step: 5, icon: <BadgeDollarSign size={12} />, color: "#10B981", bg: "#ECFDF5",
             title: "Offer & Onboarding",
-            desc: "Successful candidates receive a formal offer letter and begin paid onboarding. Monthly salary is paid directly to your Nexus wallet."
+            desc: "Successful candidates receive a formal offer letter. Monthly salary is paid directly to your Nexus wallet after onboarding."
           },
         ].map((item) => (
           <div key={item.step} className="flex items-start gap-3 bg-white rounded-xl p-3 border border-gray-100 shadow-sm">
@@ -338,10 +346,10 @@ const CorporateHiringCard = () => (
         ))}
       </div>
 
-      <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-100 rounded-xl">
-        <AlertCircle size={13} className="text-amber-500 mt-0.5 shrink-0" />
-        <p className="text-[9px] text-amber-700 font-semibold leading-relaxed">
-          Corporate roles require a minimum of <strong>50 HU</strong> (Pro Uplink+). Senior roles labelled "Premium Role" require 100 HU. Your HU balance is a quality signal that companies take seriously.
+      <div className="flex items-start gap-2 p-3 bg-purple-50 border border-purple-100 rounded-xl">
+        <Info size={13} className="text-purple-500 mt-0.5 shrink-0" />
+        <p className="text-[9px] text-purple-700 font-semibold leading-relaxed">
+          Corporate roles require a minimum of <strong>50 HU</strong> (Pro Uplink+). Senior roles labelled "Premium Role" require 100 HU. Your HU balance signals commitment — companies take this seriously.
         </p>
       </div>
     </div>
@@ -410,6 +418,53 @@ const ToggleRow = ({ label, sub, value, onChange, icon, color = "#3B82F6" }: {
       }
     </button>
   </div>
+);
+
+// ─────────────────────────────────────────────
+// Instant Access Banner (shown after purchase)
+// ─────────────────────────────────────────────
+const InstantAccessBanner = ({ huBalance, onBrowse }: { huBalance: number; onBrowse: () => void }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.96 }}
+    animate={{ opacity: 1, scale: 1 }}
+    className="rounded-2xl overflow-hidden border border-green-200 shadow-md"
+    style={{ background: "linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 60%, #A7F3D0 100%)" }}>
+    <div className="p-5">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="w-10 h-10 rounded-xl bg-green-600 flex items-center justify-center shrink-0 shadow-sm">
+          <CheckCircle size={19} className="text-white" />
+        </div>
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-widest text-green-600 mb-0.5">Access Unlocked</p>
+          <h4 className="text-[15px] font-black text-gray-900 leading-none">All Freelance Gigs Are Ready</h4>
+        </div>
+        <div className="ml-auto text-right shrink-0">
+          <p className="text-[22px] font-black text-green-700 leading-none">{huBalance} HU</p>
+          <p className="text-[9px] text-green-600 font-bold">Active Balance</p>
+        </div>
+      </div>
+      <p className="text-[10px] text-green-800 font-semibold leading-relaxed mb-3">
+        Your HU purchase is confirmed. Every freelance gig matching your package is <strong>available right now</strong> — tap any gig and begin working immediately. No approvals, no waiting.
+      </p>
+      <div className="grid grid-cols-3 gap-2">
+        {[
+          { label: "Applications Needed", value: "Zero", icon: <CheckCircle size={12} />, color: "#059669" },
+          { label: "Waiting Period", value: "None", icon: <Zap size={12} />, color: "#059669" },
+          { label: "Gigs Available", value: "24+", icon: <Briefcase size={12} />, color: "#059669" },
+        ].map((s, i) => (
+          <div key={i} className="bg-white/70 rounded-xl p-2.5 text-center border border-green-100">
+            <div className="flex justify-center mb-1" style={{ color: s.color }}>{s.icon}</div>
+            <p className="text-[11px] font-black text-gray-900">{s.value}</p>
+            <p className="text-[8px] font-bold text-gray-500 mt-0.5 leading-tight">{s.label}</p>
+          </div>
+        ))}
+      </div>
+      <button onClick={onBrowse}
+        className="mt-3 w-full py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white bg-green-600 hover:bg-green-700 transition-all flex items-center justify-center gap-2 shadow-sm">
+        <PlayCircle size={13} /> Browse & Start Gigs Now
+      </button>
+    </div>
+  </motion.div>
 );
 
 // ─────────────────────────────────────────────
@@ -486,16 +541,17 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   const [profileAvailability, setProfileAvailability] = useState("Available Now");
   const [showApiKey, setShowApiKey] = useState(false);
   const [showCurrencyMenu, setShowCurrencyMenu] = useState(false);
+  const [justPurchased, setJustPurchased] = useState(false);
 
   const uplinkPackages = [
     {
       id: 1, name: "Starter", price: 3, hu: 150,
-      desc: "Try out the platform and access basic gigs.",
+      desc: "Try out the platform and access basic gigs instantly.",
       hot: false, highlight: false,
       access: "Basic gigs up to $120 budget",
       roi: "Potential $1,200 earnings",
       color: "#10B981",
-      perks: ["Access to 24 basic gigs", "Direct client contact", "Instant activation"],
+      perks: ["Access to 24 basic gigs", "Instant activation", "Direct client contact"],
     },
     {
       id: 2, name: "Basic", price: 6, hu: 400,
@@ -517,9 +573,9 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
     },
     {
       id: 4, name: "Pro Uplink", price: 20, hu: 1200,
-      desc: "Maximum access including corporate roles.",
+      desc: "Maximum access including corporate role applications.",
       hot: false, highlight: false,
-      access: "All gigs + corporate roles",
+      access: "All gigs + corporate role applications",
       roi: "Potential $50,000+ earnings",
       color: "#EF4444",
       perks: ["All gig tiers unlocked", "Corporate role access", "Highest priority queue"],
@@ -809,8 +865,8 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   ];
 
   const messages = [
-    { sender: "Nexus HQ", body: "Welcome to Nexus! Purchase Handshake Units (HU) to instantly unlock all gigs on the platform. Once you have HU, every freelance gig is immediately available — no waiting, no applications needed.", time: "Just now", unread: true, avatar: "🏢" },
-    { sender: "Security Bot", body: "Your connection is encrypted and secure. You have 5 HU left. Purchase at least 150 HU (Starter pack) to unlock all basic gigs and start working immediately with zero application process.", time: "14m ago", unread: true, avatar: "🤖" },
+    { sender: "Nexus HQ", body: "Welcome to Nexus! Purchase Handshake Units (HU) to instantly unlock all freelance gigs on the platform. Once you have HU, every freelance gig is immediately available — no waiting, no applications needed. Corporate roles require a standard HR hiring process.", time: "Just now", unread: true, avatar: "🏢" },
+    { sender: "Security Bot", body: "Your connection is encrypted and secure. You have 5 HU left. Purchase at least 150 HU (Starter pack) to unlock all basic freelance gigs and start working immediately with zero application process.", time: "14m ago", unread: true, avatar: "🤖" },
     { sender: "Exchange Relay", body: "Currency rates updated. Switch between USD, EUR, GBP and more in your wallet settings. Withdrawals are available in your local currency after completing jobs.", time: "1h ago", unread: false, avatar: "📡" },
   ];
 
@@ -835,7 +891,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   };
 
   const handlePay = async (method: "MPESA" | "PAYPAL" | "CARD" | "BINANCE") => {
-    if (!agreed) return addToast("Please agree to the terms first.", "info");
+    if (method !== "BINANCE" && !agreed) return addToast("Please agree to the terms first.", "info");
     if (!selectedPack) return addToast("Please select a package first.", "error");
     setIsPaying(true);
     try {
@@ -855,9 +911,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
         });
         if (res.ok) { addToast("Check your phone — M-Pesa prompt sent!", "success"); setShowModal(false); }
         else addToast("M-Pesa connection failed. Try again.", "error");
-      } else if (method === "PAYPAL") {
-        addToast("Redirecting to PayPal...", "info");
-        setTimeout(() => { addToast("PayPal checkout ready!", "success"); setShowModal(false); }, 1500);
       } else if (method === "CARD") {
         const paystackPublicKey =
           process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "pk_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
@@ -875,14 +928,16 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
         const handler = PaystackPop.setup({
           key: paystackPublicKey,
           email,
-          amount: amountInKes * 100,
-          currency: "KES",
+          amount: amountInKes * 100,           // amount in kobo/pesewas/cents — KES kobos
+          currency: "KES",                      // charge in KES
+          channels: ["card"],                   // CARD ONLY — no mobile money, bank, USSD, QR
           ref,
           label: `${selectedPack.name} Pack — ${selectedPack.hu} HU`,
           metadata: {
             custom_fields: [
               { display_name: "Package", variable_name: "package", value: selectedPack.name },
               { display_name: "HU Amount", variable_name: "hu_amount", value: String(selectedPack.hu) },
+              { display_name: "USD Value", variable_name: "usd_value", value: `$${selectedPack.price}` },
             ],
           },
           onClose: () => {
@@ -892,7 +947,8 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
           callback: (response: { reference: string }) => {
             setIsPaying(false);
             setHuBalance((prev) => prev + selectedPack.hu);
-            addToast(`Payment confirmed! ${selectedPack.hu} HU credited. Ref: ${response.reference}`, "success");
+            setJustPurchased(true);
+            addToast(`Payment confirmed! ${selectedPack.hu} HU credited — all gigs unlocked! Ref: ${response.reference}`, "success");
             setShowModal(false);
           },
         });
@@ -919,12 +975,12 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   };
 
   const faqItems = [
-    { q: "What are Handshake Units (HU)?", a: "HU are your platform access credits. Once you purchase HU, all corresponding gigs become available immediately — no applications, no waiting. Buy a package and begin work right away." },
-    { q: "Do I need to apply to each freelance gig?", a: "Absolutely not! That's what makes Nexus different from every other freelance platform. Once you buy HU, ALL freelance gigs are instantly unlocked and ready for you to start immediately — no applications, no screening, no rejections. Clients have pre-approved all listed workers. Corporate roles are the ONLY exception, which require a formal application and HR review process." },
-    { q: "Which payment methods are supported?", a: "We support: Card via Paystack (Visa/Mastercard — available worldwide), Binance Pay (USDT crypto — worldwide, instant), M-Pesa (East Africa: Kenya, Tanzania, Uganda, Rwanda — instant STK Push), and PayPal (selected regions: EU, UK, US, Canada, Australia only — currently limited)." },
-    { q: "How fast is payment and HU credit?", a: "Card (Paystack) and Binance Pay are near-instant (within minutes). M-Pesa is instant via STK Push. PayPal is within 1 hour. HU balances are credited automatically once payment is confirmed on-chain or by the processor." },
+    { q: "What are Handshake Units (HU)?", a: "HU are your platform access credits. Once you purchase HU, all corresponding freelance gigs become available immediately — no applications, no waiting. Buy a package and begin work right away. Note: corporate roles still require a formal HR application process." },
+    { q: "Do I need to apply to each freelance gig?", a: "Absolutely not for freelance gigs! That's what makes Nexus different. Once you buy HU, ALL freelance gigs matching your tier are instantly unlocked and ready to start immediately — no applications, no screening, no rejections. Clients have pre-approved all listed workers. Corporate roles are the ONLY exception: they require a formal application, CV submission, HR review, and video interview — exactly like a professional job." },
+    { q: "How are freelance gigs different from corporate roles?", a: "Freelance gigs: buy HU → start immediately, zero applications, project-based pay into your wallet. Corporate roles: buy HU to apply → submit CV → HR review (2–5 days) → video interview → formal offer letter → monthly salary. Corporate roles are real full-time remote positions at Fortune 500 companies going through standard employment processes." },
+    { q: "Which payment methods are supported?", a: "We support: Card via Paystack (Visa/Mastercard worldwide — charges in KES, priced in USD), Binance Pay (USDT crypto — worldwide, instant), and M-Pesa (East Africa: Kenya, Tanzania, Uganda, Rwanda — instant STK Push)." },
+    { q: "How fast is payment and HU credit?", a: "Card (Paystack) is near-instant (within minutes). Binance Pay is instant once confirmed on-chain. M-Pesa is instant via STK Push. HU balances are credited automatically once payment is confirmed — your gigs unlock the moment it clears." },
     { q: "Can I withdraw my earnings?", a: "Yes! Once your balance reaches $50, you can withdraw via Binance Pay, M-Pesa, or PayPal. Verified accounts get priority processing and higher daily/monthly limits. Withdrawals are processed within 24 hours." },
-    { q: "How do corporate gigs work?", a: "Corporate roles go through a full hiring pipeline: you apply (requires HU) → submit your CV and credentials → company HR reviews your profile (2–5 business days) → shortlisted candidates attend a video interview → successful candidates receive an offer and begin paid onboarding. Monthly salaries are paid directly to your Nexus wallet." },
     { q: "Is my data and money safe?", a: "Yes. All data is protected using TLS 1.3 encryption in transit and AES-256 at rest. We comply with GDPR. Payments are handled by certified processors (Paystack, Binance, Safaricom). No financial data is stored on our servers, and no data is ever sold to third parties." },
   ];
 
@@ -1010,6 +1066,11 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 </div>
               </div>
 
+              {/* Instant Access Banner — shown after purchase */}
+              {justPurchased && hasHU && (
+                <InstantAccessBanner huBalance={huBalance} onBrowse={() => setActiveTab("tasks")} />
+              )}
+
               {/* Main CTA Cards */}
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <div className="md:col-span-3 rounded-2xl p-6 text-white shadow-md"
@@ -1019,12 +1080,12 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                       <PlayCircle size={18} className="text-white" />
                     </div>
                     <div>
-                      <h4 className="text-[11px] font-black uppercase tracking-wide">One Purchase. Instant Access. Zero Applications.</h4>
-                      <p className="text-[9px] text-blue-200 mt-0.5">Buy HU → all freelance gigs unlock immediately · No waiting required</p>
+                      <h4 className="text-[11px] font-black uppercase tracking-wide">One Purchase. Instant Freelance Access. Zero Applications.</h4>
+                      <p className="text-[9px] text-blue-200 mt-0.5">Buy HU → all freelance gigs unlock immediately · Corporate roles require HR process</p>
                     </div>
                   </div>
                   <p className="text-[12px] text-blue-100 leading-relaxed mb-5">
-                    Buy any HU package and <strong className="text-white">all matching gigs activate the moment your payment clears.</strong> Browse 46 global opportunities from top companies — start working instantly, no applications.
+                    Buy any HU package and <strong className="text-white">all matching freelance gigs activate the moment your payment clears.</strong> Browse 24+ freelance opportunities from top companies — start working instantly. Corporate roles follow a professional HR hiring pipeline.
                   </p>
                   <div className="flex gap-2">
                     <RippleButton onClick={openRefill}
@@ -1038,7 +1099,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                   </div>
                 </div>
                 <div className="md:col-span-2 grid grid-cols-2 gap-3">
-                  <StatCard label="Gigs Available" value="46" icon={<Briefcase size={15} />} color="#10B981" sub="Ready to start" />
+                  <StatCard label="Freelance Gigs" value="24+" icon={<Briefcase size={15} />} color="#10B981" sub="Instant start" />
                   <StatCard label="Uptime" value="99.9%" icon={<Wifi size={15} />} color="#3B82F6" />
                   <StatCard label="Your HU" value={huBalance} icon={<Zap size={15} />} color="#8B5CF6" sub={hasHU ? "Active" : "Top up to start"} />
                   <StatCard label="Countries" value="195+" icon={<Globe size={15} />} color="#F59E0B" />
@@ -1053,7 +1114,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                     <Lock size={18} className="text-amber-600" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-[11px] font-black text-amber-800 uppercase tracking-wide">Gigs are locked — purchase HU to unlock instantly</p>
+                    <p className="text-[11px] font-black text-amber-800 uppercase tracking-wide">Freelance gigs are locked — purchase HU to unlock instantly</p>
                     <p className="text-[10px] text-amber-600 font-medium mt-0.5">Current balance: {huBalance} HU · Buy Starter ($3) to unlock 24 basic gigs right now</p>
                   </div>
                   <button onClick={openRefill} className="shrink-0 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white bg-amber-500 hover:bg-amber-600 transition-all">
@@ -1092,6 +1153,46 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 ))}
               </div>
 
+              {/* Two types of work — clear distinction */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="rounded-2xl border border-green-100 p-5" style={{ background: "linear-gradient(135deg, #ECFDF5 0%, #F0FDF4 100%)" }}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-9 h-9 rounded-xl bg-green-600 flex items-center justify-center shrink-0">
+                      <PlayCircle size={16} className="text-white" />
+                    </div>
+                    <div>
+                      <h4 className="text-[12px] font-black text-green-900">Freelance Gigs</h4>
+                      <p className="text-[9px] text-green-600 font-bold uppercase tracking-wide">Instant · No Applications</p>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-green-800 font-medium leading-relaxed mb-3">
+                    Buy HU once → every matching gig unlocks immediately. Pick a gig and start working in minutes. No screening, no waiting.
+                  </p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Badge color="#059669"><CheckCircle size={9} /> Start Immediately</Badge>
+                    <Badge color="#059669"><Zap size={9} /> Project-Based Pay</Badge>
+                  </div>
+                </div>
+                <div className="rounded-2xl border border-purple-100 p-5" style={{ background: "linear-gradient(135deg, #FAF5FF 0%, #F5F3FF 100%)" }}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-9 h-9 rounded-xl bg-purple-600 flex items-center justify-center shrink-0">
+                      <Building2 size={16} className="text-white" />
+                    </div>
+                    <div>
+                      <h4 className="text-[12px] font-black text-purple-900">Corporate Roles</h4>
+                      <p className="text-[9px] text-purple-600 font-bold uppercase tracking-wide">HR Process · Monthly Salary</p>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-purple-800 font-medium leading-relaxed mb-3">
+                    Fortune 500 full-time remote roles. Apply with HU → CV review → video interview → formal offer. Standard professional hiring pipeline.
+                  </p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Badge color="#7C3AED"><Clock size={9} /> 2–5 Day Review</Badge>
+                    <Badge color="#7C3AED"><DollarSign size={9} /> Monthly Salary</Badge>
+                  </div>
+                </div>
+              </div>
+
               {/* Activity */}
               <Card className="p-5">
                 <div className="flex items-center justify-between mb-4">
@@ -1106,7 +1207,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                     <Sparkles size={18} className="text-blue-500" />
                   </div>
                   <p className="text-[12px] font-black text-gray-700">No activity yet</p>
-                  <p className="text-[10px] text-gray-400 font-medium mt-1">Purchase HU to unlock gigs. Once you start working, live updates appear here.</p>
+                  <p className="text-[10px] text-gray-400 font-medium mt-1">Purchase HU to unlock freelance gigs. Once you start working, live updates appear here.</p>
                   <button onClick={openRefill}
                     className="mt-4 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-blue-700 bg-blue-50 border border-blue-100 hover:bg-blue-100 transition-all">
                     Unlock Gigs Now
@@ -1173,6 +1274,23 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 </div>
               )}
 
+              {hasHU && gigMode === "marketplace" && (
+                <div className="p-4 rounded-2xl border border-green-200 flex items-center gap-4 shadow-sm"
+                  style={{ background: "linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)" }}>
+                  <div className="w-10 h-10 rounded-xl bg-green-600 flex items-center justify-center shrink-0">
+                    <CheckCircle size={18} className="text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-[12px] font-black text-green-900">All freelance gigs are ready — tap any gig to start now</p>
+                    <p className="text-[10px] text-green-700 font-medium mt-0.5">Your HU balance ({huBalance} HU) is active. No applications needed — clients have pre-approved all workers.</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-[18px] font-black text-green-700">{huBalance}</p>
+                    <p className="text-[9px] font-bold text-green-500">HU Active</p>
+                  </div>
+                </div>
+              )}
+
               <div className="flex gap-1 p-1 rounded-xl border border-gray-200 bg-white w-fit">
                 {(["marketplace", "corporate"] as const).map((m) => (
                   <button key={m} onClick={() => setGigMode(m)}
@@ -1191,8 +1309,8 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                       <CheckCircle2 size={16} className="text-white" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-[11px] font-black text-green-900">All freelance gigs are instantly available after buying HU</p>
-                      <p className="text-[10px] text-green-700 font-medium mt-0.5">No applications. No waiting. No rejections. Buy HU once → pick any gig → start working immediately.</p>
+                      <p className="text-[11px] font-black text-green-900">Freelance gigs are instantly available after buying HU — no applications ever needed</p>
+                      <p className="text-[10px] text-green-700 font-medium mt-0.5">Buy HU once → pick any matching gig → start working immediately. Clients have pre-approved all platform workers.</p>
                     </div>
                   </div>
 
@@ -1240,11 +1358,16 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                       const isExpanded = expandedGig === g.id;
                       return (
                         <motion.div key={g.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                          className="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-gray-200 transition-all group overflow-hidden">
+                          className="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-gray-200 transition-all group overflow-hidden relative">
+                          {hasHU && (
+                            <div className="absolute top-3 right-3 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-black bg-green-500 text-white shadow-sm">
+                              <CheckCircle size={8} /> Ready
+                            </div>
+                          )}
                           <div className="p-5">
                             <div className="flex items-start justify-between mb-3">
                               <MarketplaceAvatar initials={g.avatar} type={g.type} seed={g.client} size={44} />
-                              <div className="flex gap-1 flex-wrap justify-end">
+                              <div className="flex gap-1 flex-wrap justify-end pr-14">
                                 <Badge color={tc}>{g.type}</Badge>
                                 <Badge color={lc}>{g.level}</Badge>
                               </div>
@@ -1268,7 +1391,11 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                                   </div>
                                   <div className="mb-3 p-3 bg-green-50 rounded-xl border border-green-100">
                                     <p className="text-[9px] font-bold text-green-600 uppercase mb-1">How to Start</p>
-                                    <p className="text-[10px] font-semibold text-green-800">Purchase HU → tap "Start Gig" → begin working immediately. No application or approval needed.</p>
+                                    <p className="text-[10px] font-semibold text-green-800">
+                                      {hasHU
+                                        ? "✓ Your HU is active — tap 'Start Gig' below and begin working right now. No approval needed."
+                                        : "Purchase HU → tap 'Unlock' → gig activates instantly with zero waiting."}
+                                    </p>
                                   </div>
                                 </motion.div>
                               )}
@@ -1326,6 +1453,22 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                     ))}
                   </div>
 
+                  {/* Corporate vs Freelance distinction */}
+                  <div className="p-4 rounded-2xl border border-amber-200"
+                    style={{ background: "linear-gradient(135deg, #FFFBEB 0%, #FFF7ED 100%)" }}>
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-amber-500 flex items-center justify-center shrink-0 mt-0.5">
+                        <Info size={14} className="text-white" />
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-black text-amber-900 mb-1">Corporate roles ≠ Freelance gigs</p>
+                        <p className="text-[10px] text-amber-800 font-medium leading-relaxed">
+                          Unlike freelance gigs (which start immediately after buying HU), corporate roles go through a full professional hiring pipeline: CV submission → HR review → video interview → offer letter. This is how real companies hire full-time remote staff.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Corporate Hiring Process Card */}
                   <CorporateHiringCard />
 
@@ -1336,6 +1479,13 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                       return (
                         <div key={c.id} className="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-gray-200 transition-all overflow-hidden">
                           <div className="p-6">
+                            {/* Corporate badge strip */}
+                            <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-xl border border-purple-100"
+                              style={{ background: "linear-gradient(135deg, #FAF5FF, #F5F3FF)" }}>
+                              <Building2 size={11} className="text-purple-500 shrink-0" />
+                              <p className="text-[9px] font-black text-purple-700 uppercase tracking-widest">Full-Time Corporate Role · HR Hiring Process</p>
+                            </div>
+
                             <div className="flex items-center gap-4 mb-4">
                               <CompanyLogo name={c.company} domain={c.domain} size={52} />
                               <div className="min-w-0 flex-1">
@@ -1369,8 +1519,12 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                                     <p className="text-[10px] font-semibold text-gray-700">{c.type}</p>
                                   </div>
                                   <div className="mb-3 p-3 bg-purple-50 rounded-xl border border-purple-100">
-                                    <p className="text-[9px] font-bold text-purple-600 uppercase mb-1">Application Process</p>
+                                    <p className="text-[9px] font-bold text-purple-600 uppercase mb-1">Hiring Pipeline</p>
                                     <p className="text-[10px] font-semibold text-purple-800">Apply → Submit CV → HR Review (2–5 days) → Video Interview → Offer & Onboarding</p>
+                                  </div>
+                                  <div className="mb-3 p-3 bg-amber-50 rounded-xl border border-amber-100">
+                                    <p className="text-[9px] font-bold text-amber-600 uppercase mb-1">Important Note</p>
+                                    <p className="text-[10px] font-semibold text-amber-800">This is a corporate role — it does NOT start immediately like freelance gigs. It follows a formal HR process just like any professional job application.</p>
                                   </div>
                                 </motion.div>
                               )}
@@ -1385,14 +1539,14 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                               style={{ backgroundColor: `${costColor}0f`, border: `1px solid ${costColor}25` }}>
                               <Zap size={11} style={{ color: costColor }} />
                               <span className="text-[9px] font-black uppercase" style={{ color: costColor }}>Requires {c.huRequired} HU to Apply</span>
-                              {c.huRequired >= 100 && <span className="ml-auto text-[8px] font-bold text-red-400">Premium Role</span>}
+                              {c.huRequired >= 100 && <span className="ml-auto text-[8px] font-bold text-red-400">Senior Role</span>}
                             </div>
 
                             {hasHU
                               ? <RippleButton onClick={() => handleApplyCorporate(c.title)}
                                   className="w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2"
                                   style={{ background: "linear-gradient(135deg, #7C3AED, #4F46E5)" }}>
-                                  <ClipboardList size={13} /> Apply Now <ArrowUpRight size={12} />
+                                  <ClipboardList size={13} /> Submit Application <ArrowUpRight size={12} />
                                 </RippleButton>
                               : <button onClick={openRefill}
                                   className="w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 border border-purple-200 bg-purple-50 text-purple-600 hover:bg-purple-100 transition-all">
@@ -1436,7 +1590,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                         <span className="text-[44px] font-black text-gray-900 leading-none">{huBalance}</span>
                         <span className="text-[20px] font-black text-blue-600 mb-1">HU</span>
                       </div>
-                      <p className="text-[10px] font-medium text-gray-500">{hasHU ? "All gigs unlocked and ready to start" : "Purchase HU to unlock all gigs instantly"}</p>
+                      <p className="text-[10px] font-medium text-gray-500">{hasHU ? "All matching freelance gigs unlocked and ready to start" : "Purchase HU to unlock all freelance gigs instantly"}</p>
                       <div className="flex gap-2 mt-5">
                         <button onClick={openRefill} className="flex-1 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white bg-blue-600 hover:bg-blue-700 transition-all">
                           + Top Up
@@ -1500,7 +1654,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                     <p className="text-[9px] text-gray-400 font-medium mt-2 text-center">Based on average gig value per HU spent</p>
                   </Card>
 
-                  {/* Withdrawal Methods — Bank Wire removed */}
+                  {/* Withdrawal Methods */}
                   <Card className="p-5">
                     <div className="flex items-center gap-2 mb-4">
                       <Globe size={15} className="text-blue-500" />
@@ -1510,7 +1664,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                       {[
                         { name: "Binance Pay (USDT/Crypto)", sub: "Worldwide · Instant settlement · Best option globally", logo: <BinanceLogo size={40} />, status: "Global", color: "#F0B90B" },
                         { name: "M-Pesa", sub: "Kenya, Tanzania, Uganda, Rwanda · Instant STK Push", logo: <MpesaLogoSVG size={40} />, status: "East Africa", color: "#16A34A" },
-                        { name: "PayPal", sub: "EU, UK, US, Canada, Australia · Selected regions only", logo: <PayPalSVGLogo size={40} />, status: "Select Regions", color: "#003087" },
                       ].map((m, i) => (
                         <div key={i} className="flex items-center gap-4 p-3.5 bg-gray-50 rounded-xl border border-gray-100">
                           {m.logo}
@@ -1612,7 +1765,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
               </div>
               <PremiumLockedSection
                 title="No Gigs Started Yet"
-                description="Purchase HU and start your first gig to unlock this section. You'll see active work, milestones, client ratings, and earnings here."
+                description="Purchase HU and start your first freelance gig to unlock this section. Active work, milestones, client ratings, and earnings all appear here."
                 icon={<FileText size={28} />}
                 cta="Browse & Unlock Gigs"
                 onCta={() => setActiveTab("tasks")}
@@ -2212,25 +2365,25 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 <div className="space-y-4">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="text-[20px] font-black text-gray-900 leading-none">Purchase Handshake Units (HU)</h3>
-                      <p className="text-[11px] text-gray-400 font-medium mt-1">One purchase unlocks matching freelance opportunities immediately.</p>
+                      <h3 className="text-[20px] font-black text-gray-900 leading-none">Purchase Handshake Units</h3>
+                      <p className="text-[11px] text-gray-400 font-medium mt-1">One purchase unlocks all matching freelance gigs immediately.</p>
                     </div>
                     <button onClick={() => setShowModal(false)} className="p-2 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all">
                       <X size={16} />
                     </button>
                   </div>
 
-                  <div className="p-3 rounded-xl border border-slate-200 bg-slate-50 flex items-center gap-3">
-                    <PlayCircle size={14} className="text-slate-600 shrink-0" />
-                    <p className="text-[10px] font-semibold text-slate-700">
-                      <strong>Instant platform access.</strong> Purchase a package below and unlock the right freelance gigs without extra approvals.
+                  <div className="p-3 rounded-xl border border-green-200 bg-green-50 flex items-center gap-3">
+                    <CheckCircle2 size={14} className="text-green-600 shrink-0" />
+                    <p className="text-[10px] font-semibold text-green-800">
+                      <strong>Instant access for freelance gigs.</strong> Purchase and every matching gig unlocks immediately — no applications needed. Corporate roles still require HR review.
                     </p>
                   </div>
 
                   <div className="space-y-3">
                     {uplinkPackages.map((pack) => (
                       <div key={pack.id} onClick={() => { setSelectedPack(pack); setModalStep("choice"); setAgreed(false); }}
-                        className={`relative p-4 rounded-2xl border border-slate-200 bg-slate-50 cursor-pointer transition-all hover:shadow-lg hover:shadow-slate-200/30 ${pack.highlight ? "border-slate-300 bg-slate-100" : "bg-white"}`}>
+                        className={`relative p-4 rounded-2xl border cursor-pointer transition-all hover:shadow-lg hover:shadow-slate-200/30 ${pack.highlight ? "border-slate-300 bg-slate-100" : "bg-white border-slate-200"}`}>
                         {pack.hot && (
                           <div className="absolute -top-2.5 right-4 px-3 py-0.5 rounded-full text-[9px] font-black text-slate-900 bg-slate-200/90 border border-slate-200">
                             RECOMMENDED
@@ -2269,7 +2422,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
 
                   <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl border border-gray-100">
                     <ShieldCheck size={13} className="text-slate-500 shrink-0" />
-                    <p className="text-[9px] text-slate-500 font-medium">PCI-DSS enabled checkout · Instant credit on success · Encrypted payment flow</p>
+                    <p className="text-[9px] text-slate-500 font-medium">PCI-DSS enabled checkout · Instant HU credit on payment · Encrypted payment flow</p>
                   </div>
                 </div>
               )}
@@ -2289,25 +2442,29 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                     </div>
                   </div>
 
-                  <div className="p-3 rounded-xl border border-slate-200 bg-slate-50 flex items-center gap-3">
-                    <ShieldCheck size={13} className="text-slate-600 shrink-0" />
-                    <p className="text-[10px] font-medium text-slate-700">
-                      Secure checkout · {selectedPack.hu} HU credited instantly after successful payment · access unlocked immediately
+                  <div className="p-3 rounded-xl border border-green-200 bg-green-50 flex items-center gap-3">
+                    <CheckCircle2 size={13} className="text-green-600 shrink-0" />
+                    <p className="text-[10px] font-medium text-green-800">
+                      {selectedPack.hu} HU credited instantly after payment. All matching freelance gigs unlock immediately.
                     </p>
                   </div>
 
                   <div className="space-y-2.5">
-                    {/* Card / Paystack — Primary recommended */}
+                    {/* Card — PRIMARY RECOMMENDED */}
                     <RippleButton onClick={() => setModalStep("card")}
-                      className="w-full p-4 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-all flex items-center gap-4">
+                      className="w-full p-4 rounded-2xl border-2 border-cyan-400 bg-cyan-50 hover:bg-cyan-100 transition-all flex items-center gap-4 shadow-sm">
                       <PaystackLogo size={44} />
                       <div className="flex-1 text-left">
                         <div className="flex items-center gap-2 mb-0.5">
-                          <p className="text-[13px] font-black text-gray-900">Card (Paystack)</p>
-                          <Badge color="#00C3F7">Recommended</Badge>
+                          <p className="text-[13px] font-black text-gray-900">Pay by Card</p>
+                          <Badge color="#00C3F7">Best Choice</Badge>
                         </div>
-                        <p className="text-[10px] font-medium text-gray-500">Visa / Mastercard · ${selectedPack.price}.00 USD</p>
-                        <p className="text-[9px] font-bold text-cyan-600 mt-0.5">Worldwide · Near-instant · Buyer protection</p>
+                        <p className="text-[10px] font-medium text-gray-600">Visa / Mastercard · ${selectedPack.price}.00 USD</p>
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <VisaIcon />
+                          <MastercardIcon />
+                          <span className="text-[9px] font-bold text-cyan-600 ml-1">Worldwide · Instant · Secure</span>
+                        </div>
                       </div>
                       <ChevronRight size={16} className="text-gray-400 shrink-0" />
                     </RippleButton>
@@ -2317,9 +2474,9 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                       className="w-full p-4 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-all flex items-center gap-4">
                       <BinanceLogo size={44} />
                       <div className="flex-1 text-left">
-                        <p className="text-[13px] font-black text-gray-900">Binance Pay</p>
+                        <p className="text-[13px] font-black text-gray-900">Binance Pay (Crypto)</p>
                         <p className="text-[10px] font-medium text-gray-500 mt-0.5">USDT (TRC20 / ERC20) · ${selectedPack.price}.00</p>
-                        <p className="text-[9px] font-bold text-yellow-600 mt-0.5">Worldwide · Instant settlement</p>
+                        <p className="text-[9px] font-bold text-yellow-600 mt-0.5">Worldwide · Instant on-chain settlement</p>
                       </div>
                       <ChevronRight size={16} className="text-gray-400 shrink-0" />
                     </RippleButton>
@@ -2338,25 +2495,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                       </div>
                       <ChevronRight size={16} className="text-gray-400 shrink-0" />
                     </RippleButton>
-
-                    {/* PayPal — greyed out, limited regions */}
-                    <div>
-                      <div className="w-full p-4 rounded-2xl border border-gray-200 bg-gray-50 flex items-center gap-4 opacity-55 cursor-not-allowed select-none">
-                        <PayPalSVGLogo size={44} />
-                        <div className="flex-1 text-left">
-                          <div className="flex items-center gap-2">
-                            <p className="text-[13px] font-black text-gray-600">PayPal</p>
-                            <Badge color="#6B7280">Limited Regions</Badge>
-                          </div>
-                          <p className="text-[10px] font-medium text-gray-400 mt-0.5">${selectedPack.price}.00 USD</p>
-                          <p className="text-[9px] font-bold text-gray-400 mt-0.5">EU, UK, US, Canada, Australia only</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1.5 mt-1.5 px-1">
-                        <AlertCircle size={10} className="text-amber-500 shrink-0" />
-                        <p className="text-[9px] text-amber-600 font-semibold">Not available in your region — use Card (Paystack) or Binance instead</p>
-                      </div>
-                    </div>
                   </div>
 
                   <div className="flex items-start gap-2">
@@ -2376,55 +2514,106 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                       <ChevronLeft size={15} />
                     </button>
                     <div>
-                      <h4 className="text-[13px] font-black text-gray-900">Pay by Card (Paystack)</h4>
-                      <p className="text-[10px] text-gray-400 font-medium mt-0.5">Secure worldwide card checkout</p>
+                      <h4 className="text-[13px] font-black text-gray-900">Secure Card Payment</h4>
+                      <p className="text-[10px] text-gray-400 font-medium mt-0.5">Visa & Mastercard accepted worldwide</p>
                     </div>
                   </div>
 
-                  <div className="flex flex-col items-center py-5 gap-3">
-                    <PaystackLogo size={80} />
-                    <p className="text-[11px] text-slate-500 font-semibold">Industry-standard card checkout powered by Paystack</p>
-                  </div>
-
-                  <div className="p-4 bg-linear-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-2xl text-center">
-                    <p className="text-[26px] font-black text-gray-900">${selectedPack.price}.00 <span className="text-[14px] font-bold text-gray-400">USD</span></p>
-                    <p className="text-[11px] text-cyan-600 font-bold mt-1">KES {(selectedPack.price * 130).toLocaleString()} <span className="text-gray-400 font-medium">(charged currency)</span></p>
-                    <p className="text-[10px] text-cyan-700 font-semibold mt-0.5">{selectedPack.hu} Handshake Units · {selectedPack.name} Pack</p>
-                    <div className="flex items-center justify-center gap-1.5 mt-2">
-                      <CheckCircle2 size={11} className="text-green-500" />
-                      <p className="text-[9px] text-green-600 font-bold">All freelance gigs unlock instantly after payment</p>
-                    </div>
-                  </div>
-
-                  <div className="p-3.5 rounded-2xl border border-gray-100 space-y-2.5" style={{ background: "#FAFBFF" }}>
-                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">What happens next</p>
-                    {[
-                      { icon: <ExternalLink size={11} />, text: "Paystack's secure payment window opens in your browser" },
-                      { icon: <CreditCard size={11} />, text: "Enter your Visa or Mastercard details on Paystack's PCI-DSS certified page" },
-                      { icon: <CheckCircle2 size={11} />, text: "Payment confirmed — your HU balance is credited instantly" },
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-2.5">
-                        <div className="w-6 h-6 rounded-lg bg-cyan-100 flex items-center justify-center shrink-0 text-cyan-600">
-                          {item.icon}
-                        </div>
-                        <p className="text-[10px] text-gray-600 font-medium">{item.text}</p>
+                  {/* Order summary */}
+                  <div className="p-5 rounded-2xl border border-gray-100 shadow-sm"
+                    style={{ background: "linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%)" }}>
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">You're paying</p>
+                        <p className="text-[32px] font-black text-gray-900 leading-none">${selectedPack.price}<span className="text-[16px] text-gray-400 font-bold"> USD</span></p>
+                        <p className="text-[10px] text-blue-600 font-bold mt-1">
+                          Charged as KES {(selectedPack.price * 130).toLocaleString()} on your card statement
+                        </p>
                       </div>
-                    ))}
+                      <div className="text-right">
+                        <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ backgroundColor: `${selectedPack.color}15`, color: selectedPack.color }}>
+                          <Zap size={26} />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="bg-white p-2.5 rounded-xl border border-gray-100">
+                        <p className="text-[8px] text-gray-400 font-bold uppercase mb-0.5">Package</p>
+                        <p className="text-[11px] font-black text-gray-900">{selectedPack.name}</p>
+                      </div>
+                      <div className="bg-white p-2.5 rounded-xl border border-gray-100">
+                        <p className="text-[8px] text-gray-400 font-bold uppercase mb-0.5">You receive</p>
+                        <p className="text-[11px] font-black" style={{ color: selectedPack.color }}>{selectedPack.hu} HU</p>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                    <ShieldCheck size={14} className="text-cyan-500 shrink-0" />
-                    <p className="text-[10px] font-medium text-gray-500">256-bit SSL · PCI-DSS certified · Visa & Mastercard · No card data stored on our servers</p>
+                  {/* Access unlock preview */}
+                  <div className="p-3.5 rounded-2xl border border-green-100"
+                    style={{ background: "linear-gradient(135deg, #ECFDF5, #F0FDF4)" }}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <CheckCircle2 size={13} className="text-green-600 shrink-0" />
+                      <p className="text-[10px] font-black text-green-900">After payment clears:</p>
+                    </div>
+                    <div className="space-y-1.5">
+                      {[
+                        `${selectedPack.hu} HU credited to your account instantly`,
+                        `${selectedPack.access} — all unlocked with no applications`,
+                        "Start working on any matching gig immediately",
+                      ].map((item, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                          <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center shrink-0">
+                            <Check size={8} className="text-white" />
+                          </div>
+                          <p className="text-[9px] font-semibold text-green-800">{item}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
-                  <RippleButton disabled={isPaying} onClick={() => handlePay("CARD")}
-                    className="w-full py-4 rounded-xl text-[11px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2"
-                    style={{ background: "linear-gradient(135deg, #00C3F7, #011B33)" }}>
+                  {/* Card brands + security */}
+                  <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Accepted Cards</p>
+                      <div className="flex items-center gap-2">
+                        <VisaIcon />
+                        <MastercardIcon />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck size={13} className="text-cyan-500 shrink-0" />
+                      <p className="text-[9px] font-medium text-gray-500">256-bit TLS encryption · PCI-DSS Level 1 certified · Powered by Paystack · No card data stored on our servers</p>
+                    </div>
+                  </div>
+
+                  {/* Note about currency */}
+                  <div className="p-3 bg-blue-50 border border-blue-100 rounded-xl flex items-start gap-2">
+                    <Info size={12} className="text-blue-500 mt-0.5 shrink-0" />
+                    <p className="text-[9px] text-blue-700 font-semibold leading-relaxed">
+                      Prices are shown in USD. Your card will be charged <strong>KES {(selectedPack.price * 130).toLocaleString()}</strong> (equivalent to ${selectedPack.price} USD). Your bank may show the KES amount on your statement.
+                    </p>
+                  </div>
+
+                  {/* Terms checkbox if not already agreed */}
+                  {!agreed && (
+                    <div className="flex items-start gap-2">
+                      <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)} id="terms-card" className="mt-0.5 accent-blue-600 shrink-0" />
+                      <label htmlFor="terms-card" className="text-[9px] text-gray-400 font-medium leading-relaxed cursor-pointer">
+                        I agree to the Nexus Terms of Service and understand HU credits are non-refundable once gig access is granted.
+                      </label>
+                    </div>
+                  )}
+
+                  <RippleButton disabled={isPaying || !agreed} onClick={() => handlePay("CARD")}
+                    className="w-full py-4 rounded-xl text-[11px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2 shadow-md"
+                    style={{ background: agreed ? "linear-gradient(135deg, #00C3F7, #011B33)" : undefined }}>
                     {isPaying
-                      ? <><RefreshCw size={14} className="animate-spin" /> Opening Paystack…</>
-                      : <><CreditCard size={14} /> Pay ${selectedPack.price}.00 via Paystack</>}
+                      ? <><RefreshCw size={14} className="animate-spin" /> Opening Secure Checkout…</>
+                      : <><CreditCard size={14} /> Pay ${selectedPack.price}.00 by Card</>}
                   </RippleButton>
-                  <p className="text-center text-[9px] text-slate-500 font-medium">Securely processed by Paystack · Worldwide card acceptance · No card data is stored on our servers</p>
+                  <p className="text-center text-[9px] text-slate-400 font-medium">
+                    Secured by Paystack · Card details entered on Paystack's encrypted page · We never see or store your card number
+                  </p>
                 </div>
               )}
 
@@ -2435,7 +2624,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                     <button onClick={() => setModalStep("choice")} className="p-2 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all">
                       <ChevronLeft size={15} />
                     </button>
-                    <h4 className="text-[13px] font-black text-gray-900">Pay with Binance</h4>
+                    <h4 className="text-[13px] font-black text-gray-900">Pay with Binance (Crypto)</h4>
                   </div>
 
                   <div className="flex gap-2">
@@ -2485,7 +2674,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
 
                   <RippleButton onClick={() => handlePay("BINANCE")}
                     className="w-full py-4 rounded-xl text-[10px] font-black uppercase tracking-widest text-white bg-yellow-500 hover:bg-yellow-600 transition-all">
-                    I Have Paid — Confirm
+                    I Have Sent Payment — Confirm
                   </RippleButton>
                 </div>
               )}
@@ -2504,7 +2693,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                       <CheckCircle size={15} className="text-green-500 shrink-0" />
                       <p className="text-[11px] font-black text-green-800">Total: KES {selectedPack.price * 130}</p>
                     </div>
-                    <p className="text-[10px] text-green-600 font-medium pl-6">You get {selectedPack.hu} HU instantly. All freelance gigs unlock immediately after confirmation.</p>
+                    <p className="text-[10px] text-green-600 font-medium pl-6">You get {selectedPack.hu} HU instantly. All matching freelance gigs unlock immediately after confirmation.</p>
                   </div>
                   <div>
                     <p className="text-[10px] font-bold text-gray-600 mb-2">Your Safaricom Number</p>
@@ -2512,13 +2701,23 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                       className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-[18px] font-black text-gray-900 outline-none focus:border-green-400 text-center tracking-widest transition-all placeholder:text-gray-300 focus:bg-white" />
                     <p className="text-[10px] text-gray-400 font-medium mt-2 text-center">Format: 254XXXXXXXXX · 12 digits total</p>
                   </div>
+
+                  {!agreed && (
+                    <div className="flex items-start gap-2">
+                      <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)} id="terms-mpesa" className="mt-0.5 accent-green-600 shrink-0" />
+                      <label htmlFor="terms-mpesa" className="text-[9px] text-gray-400 font-medium leading-relaxed cursor-pointer">
+                        I agree to the Nexus Terms of Service and understand HU credits are non-refundable once gig access is granted.
+                      </label>
+                    </div>
+                  )}
+
                   <RippleButton disabled={isPaying} onClick={() => handlePay("MPESA")}
                     className="w-full py-4 rounded-xl text-[11px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 transition-all">
                     {isPaying
-                      ? <><RefreshCw size={14} className="animate-spin" /> Sending prompt…</>
+                      ? <><RefreshCw size={14} className="animate-spin" /> Sending M-Pesa prompt…</>
                       : `Pay KES ${selectedPack.price * 130} — Send to Phone`}
                   </RippleButton>
-                  <p className="text-center text-[9px] text-gray-400 font-medium">Available in Kenya, Tanzania, Uganda, Rwanda · Instant STK Push</p>
+                  <p className="text-center text-[9px] text-gray-400 font-medium">Available in Kenya, Tanzania, Uganda, Rwanda · Instant STK Push to your phone</p>
                 </div>
               )}
 
