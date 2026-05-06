@@ -870,11 +870,13 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
           return;
         }
         const ref = `HU-${selectedPack.id}-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+        const KES_RATE = 130;
+        const amountInKes = selectedPack.price * KES_RATE;
         const handler = PaystackPop.setup({
           key: paystackPublicKey,
           email,
-          amount: selectedPack.price * 100,
-          currency: "USD",
+          amount: amountInKes * 100,
+          currency: "KES",
           ref,
           label: `${selectedPack.name} Pack — ${selectedPack.hu} HU`,
           metadata: {
@@ -2387,7 +2389,8 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
 
                   <div className="p-4 bg-linear-to-br from-cyan-50 to-blue-50 border border-cyan-200 rounded-2xl text-center">
                     <p className="text-[26px] font-black text-gray-900">${selectedPack.price}.00 <span className="text-[14px] font-bold text-gray-400">USD</span></p>
-                    <p className="text-[10px] text-cyan-700 font-semibold mt-1">{selectedPack.hu} Handshake Units · {selectedPack.name} Pack</p>
+                    <p className="text-[11px] text-cyan-600 font-bold mt-1">KES {(selectedPack.price * 130).toLocaleString()} <span className="text-gray-400 font-medium">(charged currency)</span></p>
+                    <p className="text-[10px] text-cyan-700 font-semibold mt-0.5">{selectedPack.hu} Handshake Units · {selectedPack.name} Pack</p>
                     <div className="flex items-center justify-center gap-1.5 mt-2">
                       <CheckCircle2 size={11} className="text-green-500" />
                       <p className="text-[9px] text-green-600 font-bold">All freelance gigs unlock instantly after payment</p>
