@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useUser, SignOutButton } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -28,7 +28,10 @@ import {
   BarChart2, Languages, Moon, Sun, ChevronLeft,
   HelpCircle, Lightbulb, TrendingDown, Users,
   PlayCircle, CheckSquare, Inbox, ClipboardList, UserPlus,
-  FileCheck, BadgeDollarSign, Zap as ZapIcon,
+  FileCheck, BadgeDollarSign,
+  Paperclip, Mic, MoreVertical, PhoneCall, VideoIcon,
+  AtSign, Hash as HashIcon, Smile, Image as ImageIcon,
+  ChevronDown as ChevronDownIcon, Minimize2,
 } from "lucide-react";
 
 // ─────────────────────────────────────────────
@@ -47,6 +50,11 @@ interface ChatTarget {
   type: string;
   kind: "freelance" | "corporate";
   context: string;
+  company?: string;
+  domain?: string;
+  dept?: string;
+  salary?: number;
+  budget?: number;
 }
 
 interface ChatBubble {
@@ -374,6 +382,106 @@ const InstantAccessBanner = ({ huBalance, onBrowse }: { huBalance: number; onBro
 );
 
 // ─────────────────────────────────────────────
+// PREMIUM CALL POPUP (used for call/video/send paywall)
+// ─────────────────────────────────────────────
+const CallPaywallPopup = ({ open, feature, sub, onClose, onUnlock, kind }: {
+  open: boolean; feature: string; sub: string; onClose: () => void; onUnlock: () => void; kind: "freelance" | "corporate";
+}) => (
+  <AnimatePresence>
+    {open && (
+      <motion.div
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="absolute inset-0 z-20 flex items-center justify-center p-6"
+        style={{ background: "rgba(5,8,20,0.75)", backdropFilter: "blur(12px)" }}
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.88, y: 20, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.88, y: 20, opacity: 0 }}
+          transition={{ type: "spring", damping: 24, stiffness: 340 }}
+          onClick={e => e.stopPropagation()}
+          className="w-full max-w-xs rounded-3xl overflow-hidden shadow-2xl border border-white/10"
+          style={{ background: kind === "corporate"
+            ? "linear-gradient(160deg, #1e1333 0%, #2d1f5e 50%, #1a2550 100%)"
+            : "linear-gradient(160deg, #050f2e 0%, #0a1a4a 50%, #0c2060 100%)" }}
+        >
+          {/* Glow */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
+            <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full opacity-20"
+              style={{ background: kind === "corporate" ? "radial-gradient(circle, #a855f7, transparent)" : "radial-gradient(circle, #3b82f6, transparent)" }} />
+            <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full opacity-15"
+              style={{ background: kind === "corporate" ? "radial-gradient(circle, #7c3aed, transparent)" : "radial-gradient(circle, #0055ff, transparent)" }} />
+          </div>
+
+          <div className="relative p-6 text-center">
+            <button onClick={onClose}
+              className="absolute top-4 right-4 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/60 transition-all">
+              <X size={12} />
+            </button>
+
+            {/* Icon */}
+            <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-4 shadow-lg"
+              style={{ background: kind === "corporate"
+                ? "linear-gradient(135deg, rgba(124,58,237,0.4), rgba(79,70,229,0.4))"
+                : "linear-gradient(135deg, rgba(0,85,255,0.4), rgba(14,165,233,0.4))",
+                border: "1px solid rgba(255,255,255,0.15)" }}>
+              <Lock size={26} className="text-white" />
+            </div>
+
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 mb-3">
+              <Crown size={9} className="text-yellow-400" />
+              <span className="text-[8.5px] font-black text-white/80 uppercase tracking-widest">Premium Feature</span>
+            </div>
+
+            <h3 className="text-[16px] font-black text-white leading-tight mb-2">{feature}</h3>
+            <p className="text-[10px] text-white/60 font-medium leading-relaxed mb-6">{sub}</p>
+
+            {/* Features */}
+            <div className="grid grid-cols-3 gap-2 mb-6">
+              {(kind === "corporate"
+                ? [{ icon: <MessageSquare size={11} />, label: "Direct HR Chat" }, { icon: <VideoIcon size={11} />, label: "Interview calls" }, { icon: <FileCheck size={11} />, label: "CV Submission" }]
+                : [{ icon: <Send size={11} />, label: "Message client" }, { icon: <Phone size={11} />, label: "Voice call" }, { icon: <VideoIcon size={11} />, label: "Video call" }]
+              ).map((p, i) => (
+                <div key={i} className="p-2.5 rounded-xl text-center" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                  <div className="w-7 h-7 mx-auto rounded-lg flex items-center justify-center mb-1.5 text-white/70"
+                    style={{ background: "rgba(255,255,255,0.1)" }}>{p.icon}</div>
+                  <p className="text-[7.5px] font-bold text-white/60 leading-tight">{p.label}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Pricing hint */}
+            <div className="p-3 rounded-2xl mb-4" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}>
+              <div className="flex items-center justify-between">
+                <div className="text-left">
+                  <p className="text-[8px] text-white/50 font-bold uppercase tracking-widest">Starts from</p>
+                  <p className="text-[22px] font-black text-white leading-none">$3<span className="text-[11px] text-white/50 font-medium"> / one-time</span></p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[8px] text-white/50 font-bold uppercase tracking-widest">You get</p>
+                  <p className="text-[14px] font-black text-yellow-400 leading-none">150 HU</p>
+                  <p className="text-[8px] text-white/40 font-medium">instant credit</p>
+                </div>
+              </div>
+            </div>
+
+            <RippleButton onClick={onUnlock}
+              className="w-full py-3.5 rounded-2xl text-[10.5px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2 shadow-xl"
+              style={{ background: kind === "corporate"
+                ? "linear-gradient(135deg, #7C3AED, #4F46E5)"
+                : "linear-gradient(135deg, #0055FF, #0EA5E9)" }}>
+              <Zap size={12} fill="currentColor" /> Unlock Now — Buy HU
+            </RippleButton>
+            <button onClick={onClose} className="mt-3 text-[9px] font-semibold text-white/40 hover:text-white/60 transition-all">
+              Not right now
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+);
+
+// ─────────────────────────────────────────────
 // MAIN COMPONENT
 // ─────────────────────────────────────────────
 export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetadata: any }) => {
@@ -424,49 +532,12 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   const [expandedGig, setExpandedGig] = useState<string | null>(null);
   const [justPurchased, setJustPurchased] = useState(false);
 
-  // ── Chat / Paywall state ──
+  // ── Chat state ──
   const [chatTarget, setChatTarget] = useState<ChatTarget | null>(null);
   const [chatDraft, setChatDraft] = useState("");
   const [chatThread, setChatThread] = useState<ChatBubble[]>([]);
-  const [paywall, setPaywall] = useState<{ open: boolean; feature: string; sub: string } | null>(null);
-
-  const openChatForGig = (g: { id: string; title: string; client: string; avatar: string; type: string }) => {
-    const target: ChatTarget = {
-      id: `gig-${g.id}`,
-      name: g.client,
-      subtitle: g.title,
-      avatar: g.avatar,
-      type: g.type,
-      kind: "freelance",
-      context: g.title,
-    };
-    setChatTarget(target);
-    setChatThread([
-      { id: 1, from: "them", body: `Hi! I'm reviewing applicants for "${g.title}". Are you available to start within 24 hours?`, time: "Just now" },
-      { id: 2, from: "them", body: "Send me a quick intro and any portfolio links and we can lock the gig in.", time: "Just now" },
-    ]);
-  };
-
-  const openChatForCorporate = (c: { id: string; title: string; company: string; domain: string; dept: string }) => {
-    const target: ChatTarget = {
-      id: `corp-${c.id}`,
-      name: `${c.company} · Talent Team`,
-      subtitle: c.title,
-      avatar: c.company.slice(0, 2).toUpperCase(),
-      type: c.dept,
-      kind: "corporate",
-      context: `${c.title} @ ${c.company}`,
-    };
-    setChatTarget(target);
-    setChatThread([
-      { id: 1, from: "them", body: `Hello — this is the ${c.company} Talent Team regarding the ${c.title} role.`, time: "Just now" },
-      { id: 2, from: "them", body: "We've shortlisted your profile. Please share an updated CV and your earliest interview availability.", time: "Just now" },
-    ]);
-  };
-
-  const triggerPaywall = (feature: string, sub: string) => {
-    setPaywall({ open: true, feature, sub });
-  };
+  const [callPaywall, setCallPaywall] = useState<{ open: boolean; feature: string; sub: string } | null>(null);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   const [notifications, setNotifications] = useState({ missions: true, payments: true, messages: false, weekly: true, newGigs: true });
   const [twoFAEnabled, setTwoFAEnabled] = useState(false);
@@ -614,6 +685,45 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
     document.body.appendChild(script);
   }, []);
 
+  // Open freelance chat — empty thread
+  const openChatForGig = (g: { id: string; title: string; client: string; avatar: string; type: string; budget: number }) => {
+    setChatTarget({
+      id: `gig-${g.id}`,
+      name: g.client,
+      subtitle: g.title,
+      avatar: g.avatar,
+      type: g.type,
+      kind: "freelance",
+      context: g.title,
+      budget: g.budget,
+    });
+    setChatThread([]);
+    setChatDraft("");
+  };
+
+  // Open corporate chat — empty thread
+  const openChatForCorporate = (c: { id: string; title: string; company: string; domain: string; dept: string; salary: number; badge: string }) => {
+    setChatTarget({
+      id: `corp-${c.id}`,
+      name: `${c.company}`,
+      subtitle: c.title,
+      avatar: c.domain,
+      type: c.dept,
+      kind: "corporate",
+      context: `${c.title} @ ${c.company}`,
+      company: c.company,
+      domain: c.domain,
+      dept: c.dept,
+      salary: c.salary,
+    });
+    setChatThread([]);
+    setChatDraft("");
+  };
+
+  const triggerCallPaywall = (feature: string, sub: string) => {
+    setCallPaywall({ open: true, feature, sub });
+  };
+
   const navItems = [
     { id: "home", icon: <Home size={17} />, label: "Home" },
     { id: "tasks", icon: <Briefcase size={17} />, label: "Jobs" },
@@ -727,7 +837,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   // RENDER
   // ─────────────────────────────────────────────
   return (
-    <div className="min-h-screen font-sans overflow-x-hidden" style={{ background: "#F1F4FA", paddingBottom: "76px" }}>
+    <div className="min-h-screen font-sans overflow-x-hidden" style={{ background: "#F1F4FA", paddingBottom: chatTarget ? "0" : "76px" }}>
 
       {/* Toasts */}
       <div className="fixed top-3 right-3 z-999 flex flex-col gap-2 pointer-events-none">
@@ -744,1835 +854,1917 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
         </AnimatePresence>
       </div>
 
-      <div className="max-w-5xl mx-auto pt-4 px-3 relative z-10">
-        <AnimatePresence mode="wait">
-
-          {/* ═══════════════ HOME ═══════════════ */}
-          {activeTab === "home" && (
-            <motion.div key="home" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }} className="space-y-4">
-
-              {/* Hero */}
-              <div className="rounded-2xl border border-gray-100 shadow-sm p-5 flex justify-between items-center overflow-hidden relative bg-white">
-                <div className="absolute right-0 top-0 w-56 h-56 rounded-full opacity-[0.04]" style={{ background: "radial-gradient(circle, #0055FF, transparent)", transform: "translate(35%,-35%)" }} />
-                <div>
-                  <p className="text-[8.5px] font-black text-gray-400 uppercase tracking-[0.15em] mb-0.5">Welcome back</p>
-                  <h2 className="text-[22px] font-black text-gray-900 leading-none tracking-tight">{user?.firstName || "Operator"}</h2>
-                  <div className="flex items-center gap-1.5 mt-1.5">
-                    <PulseDot color="#10B981" size={5} />
-                    <span className="text-[9px] font-semibold text-gray-400">Connected · All systems running</span>
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-2">
-                  <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-100 px-3 py-2 rounded-xl shadow-sm">
-                    <Zap size={13} className="text-blue-600" fill="#3B82F6" />
-                    <span className="text-[15px] font-black text-gray-900">{huBalance}</span>
-                    <span className="text-[8px] font-black text-blue-600 uppercase tracking-widest">HU</span>
-                  </div>
-                  <div className="relative">
-                    <button onClick={() => setShowCurrencyMenu(m => !m)}
-                      className="text-[8.5px] font-bold bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-all flex items-center gap-1">
-                      {currency} <ChevronDown size={8} />
-                    </button>
-                    {showCurrencyMenu && (
-                      <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden w-40">
-                        {(["USD", "EUR", "GBP", "KES"] as const).map(c => (
-                          <button key={c} onClick={() => { setCurrency(c); setShowCurrencyMenu(false); }}
-                            className={`block w-full text-left px-3.5 py-2.5 text-[10px] font-bold hover:bg-blue-50 transition-all ${currency === c ? "text-blue-600 bg-blue-50" : "text-gray-700"}`}>
-                            {c} — {c === "USD" ? "US Dollar" : c === "EUR" ? "Euro" : c === "GBP" ? "British Pound" : "Kenyan Shilling"}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {justPurchased && hasHU && (
-                <InstantAccessBanner huBalance={huBalance} onBrowse={() => setActiveTab("tasks")} />
-              )}
-
-              {/* CTA + Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-                <div className="md:col-span-3 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden"
-                  style={{ background: "linear-gradient(135deg, #0041CC 0%, #0055FF 55%, #1D8EF0 100%)" }}>
-                  <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 80% 20%, #ffffff 0%, transparent 50%)" }} />
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <div className="w-5 h-5 rounded-lg bg-white/20 flex items-center justify-center">
-                        <Rocket size={11} className="text-white" />
-                      </div>
-                      <p className="text-[8px] font-black uppercase tracking-[0.15em] text-blue-200">One Purchase. Instant Freelance Access.</p>
-                    </div>
-                    <h3 className="text-[17px] font-black text-white leading-snug mb-2 tracking-tight">
-                      Buy HU → All Freelance Gigs<br />Unlock Immediately
-                    </h3>
-                    <p className="text-[10px] text-blue-100 leading-relaxed mb-4">
-                      24+ opportunities from top companies. Start working the moment your payment clears — <strong className="text-white">zero applications, zero waiting.</strong>
-                    </p>
-                    <div className="flex gap-2">
-                      <RippleButton onClick={openRefill}
-                        className="flex-1 py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-blue-700 bg-white hover:bg-blue-50 transition-all shadow-sm">
-                        Unlock Gigs — Buy HU
-                      </RippleButton>
-                      <button onClick={() => setActiveTab("tasks")}
-                        className="px-4 py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest border border-white/25 text-white/80 hover:text-white hover:bg-white/10 transition-all">
-                        Browse →
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <div className="md:col-span-2 grid grid-cols-2 gap-2">
-                  <StatCard label="Freelance Gigs" value="24+" icon={<Briefcase size={13} />} color="#10B981" sub="Instant start" />
-                  <StatCard label="Uptime" value="99.9%" icon={<Wifi size={13} />} color="#3B82F6" />
-                  <StatCard label="Your HU" value={huBalance} icon={<Zap size={13} />} color="#8B5CF6" sub={hasHU ? "Active" : "Top up"} />
-                  <StatCard label="Countries" value="195+" icon={<Globe size={13} />} color="#F59E0B" />
-                </div>
-              </div>
-
-              {/* Low HU Warning */}
-              {!hasHU && (
-                <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}
-                  className="p-3.5 rounded-xl border border-amber-200 bg-amber-50 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
-                    <Lock size={15} className="text-amber-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-[10.5px] font-black text-amber-800">Freelance gigs are locked — buy HU to unlock instantly</p>
-                    <p className="text-[9px] text-amber-600 font-medium mt-0.5">Balance: {huBalance} HU · Starter ($3) → unlocks 24 basic gigs right now</p>
-                  </div>
-                  <button onClick={openRefill} className="shrink-0 px-3.5 py-2 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-white bg-amber-500 hover:bg-amber-600 transition-all shadow-sm">
-                    Unlock
-                  </button>
-                </motion.div>
-              )}
-
-              {/* Quick Actions */}
-              <div className="grid grid-cols-4 gap-2">
-                {[
-                  { icon: <Zap size={16} />, label: "Buy HU", color: "#3B82F6", bg: "linear-gradient(135deg, #EFF6FF, #DBEAFE)", action: openRefill },
-                  { icon: <Briefcase size={16} />, label: "Browse Gigs", color: "#8B5CF6", bg: "linear-gradient(135deg, #F5F3FF, #EDE9FE)", action: () => setActiveTab("tasks") },
-                  { icon: <Wallet size={16} />, label: "My Wallet", color: "#10B981", bg: "linear-gradient(135deg, #ECFDF5, #D1FAE5)", action: () => setActiveTab("earnings") },
-                  { icon: <BarChart3 size={16} />, label: "My Stats", color: "#F59E0B", bg: "linear-gradient(135deg, #FFFBEB, #FEF3C7)", action: () => setActiveTab("analytics") },
-                ].map((item, i) => (
-                  <button key={i} onClick={item.action}
-                    className="p-3.5 rounded-xl border border-gray-100 bg-white hover:border-gray-200 hover:shadow-md transition-all text-center group">
-                    <div className="w-9 h-9 rounded-xl mx-auto mb-1.5 flex items-center justify-center transition-transform group-hover:scale-110"
-                      style={{ background: item.bg, color: item.color }}>
-                      {item.icon}
-                    </div>
-                    <p className="text-[8.5px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-gray-800 transition-all leading-none">{item.label}</p>
-                  </button>
-                ))}
-              </div>
-
-              {/* Freelance vs Corporate */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="rounded-xl border border-green-200 p-4" style={{ background: "linear-gradient(135deg, #ECFDF5, #F0FDF4)" }}>
-                  <div className="flex items-center gap-2.5 mb-2">
-                    <div className="w-8 h-8 rounded-xl bg-green-600 flex items-center justify-center shrink-0">
-                      <PlayCircle size={14} className="text-white" />
-                    </div>
-                    <div>
-                      <h4 className="text-[11px] font-black text-green-900">Freelance Gigs</h4>
-                      <p className="text-[8.5px] text-green-600 font-bold uppercase tracking-wide">Instant · Zero Applications</p>
-                    </div>
-                  </div>
-                  <p className="text-[9.5px] text-green-800 font-medium leading-relaxed mb-2">Buy HU once → every matching gig unlocks immediately. Pick a gig and start in minutes.</p>
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <Badge color="#059669"><CheckCircle size={7} /> Start Immediately</Badge>
-                    <Badge color="#059669"><Zap size={7} /> Project-Based Pay</Badge>
-                  </div>
-                </div>
-                <div className="rounded-xl border border-purple-200 p-4" style={{ background: "linear-gradient(135deg, #FAF5FF, #F5F3FF)" }}>
-                  <div className="flex items-center gap-2.5 mb-2">
-                    <div className="w-8 h-8 rounded-xl bg-purple-600 flex items-center justify-center shrink-0">
-                      <Building2 size={14} className="text-white" />
-                    </div>
-                    <div>
-                      <h4 className="text-[11px] font-black text-purple-900">Corporate Roles</h4>
-                      <p className="text-[8.5px] text-purple-600 font-bold uppercase tracking-wide">HR Process · Monthly Salary</p>
-                    </div>
-                  </div>
-                  <p className="text-[9.5px] text-purple-800 font-medium leading-relaxed mb-2">Fortune 500 full-time remote roles. Apply with HU → CV review → video interview → formal offer.</p>
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <Badge color="#7C3AED"><Clock size={7} /> 2–5 Day Review</Badge>
-                    <Badge color="#7C3AED"><DollarSign size={7} /> Monthly Salary</Badge>
-                  </div>
-                </div>
-              </div>
-
-              {/* Top Companies */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-[8.5px] font-black uppercase tracking-[0.12em] text-gray-400">Top Companies Hiring Now</p>
-                  <button onClick={() => { setGigMode("corporate"); setActiveTab("tasks"); }} className="text-[8.5px] font-bold text-blue-500 hover:text-blue-700 flex items-center gap-0.5">
-                    View all <ChevronRight size={9} />
-                  </button>
-                </div>
-                <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-                  {[
-                    { domain: "tesla.com", name: "Tesla" }, { domain: "amazon.com", name: "Amazon" },
-                    { domain: "stripe.com", name: "Stripe" }, { domain: "google.com", name: "Google" },
-                    { domain: "openai.com", name: "OpenAI" }, { domain: "coinbase.com", name: "Coinbase" },
-                    { domain: "shopify.com", name: "Shopify" }, { domain: "microsoft.com", name: "Microsoft" },
-                    { domain: "meta.com", name: "Meta" }, { domain: "discord.com", name: "Discord" },
-                  ].map((c, i) => (
-                    <button key={i} onClick={() => { setGigMode("corporate"); setActiveTab("tasks"); }}
-                      className="shrink-0 p-2.5 bg-white border border-gray-100 rounded-xl hover:border-blue-200 hover:shadow-md transition-all group">
-                      <CompanyLogo name={c.name} domain={c.domain} size={36} />
-                      <p className="text-[7.5px] font-bold text-gray-400 mt-1 text-center group-hover:text-gray-700">{c.name}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Global Stats */}
-              <div className="grid grid-cols-4 gap-2">
-                <StatCard label="Online" value="12,847" icon={<Users size={13} />} color="#10B981" sub="Workers" />
-                <StatCard label="Open Today" value="2,341" icon={<Briefcase size={13} />} color="#3B82F6" sub="Gigs" />
-                <StatCard label="Avg Value" value={fmt(847)} icon={<TrendingUp size={13} />} color="#8B5CF6" sub="Per gig" />
-                <StatCard label="Paid Out" value="$4.2M" icon={<DollarSign size={13} />} color="#F59E0B" sub="This month" />
-              </div>
-            </motion.div>
-          )}
-
-          {/* ═══════════════ JOBS ═══════════════ */}
-          {activeTab === "tasks" && (
-            <motion.div key="tasks" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }} className="space-y-3">
-              <div className="flex items-center justify-between">
-                <SectionHead label="Global Gig Board" sub={`${marketplaceGigs.length + corporateGigs.length} gigs ready worldwide`} />
-                <Badge color="#10B981"><PulseDot color="#10B981" size={5} /> Live</Badge>
-              </div>
-
-              {hasHU && gigMode === "marketplace" && (
-                <div className="px-3.5 py-2.5 rounded-xl border border-green-200 flex items-center gap-2.5" style={{ background: "linear-gradient(135deg, #ECFDF5, #D1FAE5)" }}>
-                  <CheckCircle size={13} className="text-green-600 shrink-0" />
-                  <div className="flex-1">
-                    <p className="text-[10px] font-black text-green-900">All freelance gigs unlocked — tap any to start now</p>
-                    <p className="text-[8.5px] text-green-700 font-medium mt-0.5">HU: {huBalance} · No applications · Clients pre-approved all workers</p>
-                  </div>
-                  <span className="text-[15px] font-black text-green-700">{huBalance}<span className="text-[8px] font-bold ml-0.5">HU</span></span>
-                </div>
-              )}
-
-              {/* Mode tabs */}
-              <div className="flex gap-1 p-1 rounded-xl border border-gray-200 bg-white w-fit shadow-sm">
-                {(["marketplace", "corporate"] as const).map(m => (
-                  <button key={m} onClick={() => setGigMode(m)}
-                    className={`px-5 py-2 rounded-lg text-[9.5px] font-black uppercase tracking-widest transition-all ${gigMode === m ? "bg-blue-600 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"}`}>
-                    {m === "marketplace" ? "Freelance Gigs" : "Corporate Roles"}
-                  </button>
-                ))}
-              </div>
-
-              {/* ── Marketplace ── */}
-              {gigMode === "marketplace" && (
-                <>
-                  <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border border-green-200" style={{ background: "linear-gradient(135deg, #ECFDF5, #D1FAE5)" }}>
-                    <CheckCircle2 size={12} className="text-green-600 shrink-0" />
-                    <p className="text-[9.5px] font-semibold text-green-800 leading-relaxed flex-1">
-                      <strong>Zero applications for freelance gigs.</strong> Buy HU → gigs unlock instantly. Clients have pre-approved all platform workers.
-                    </p>
-                    {!hasHU && (
-                      <button onClick={openRefill} className="shrink-0 px-2.5 py-1.5 rounded-lg text-[8.5px] font-black text-white bg-green-600 hover:bg-green-700 transition-all">Buy HU</button>
-                    )}
-                  </div>
-
-                  {/* Search + sort */}
-                  <div className="flex gap-2">
-                    <div className="flex-1 flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 shadow-sm">
-                      <Search size={12} className="text-gray-400 shrink-0" />
-                      <input value={gigSearch} onChange={e => setGigSearch(e.target.value)} placeholder="Search gigs or clients..."
-                        className="flex-1 text-[10.5px] outline-none text-gray-700 placeholder-gray-400 bg-transparent" />
-                      {gigSearch && <button onClick={() => setGigSearch("")}><X size={10} className="text-gray-400 hover:text-gray-600" /></button>}
-                    </div>
-                    <select value={gigSort} onChange={e => setGigSort(e.target.value as typeof gigSort)}
-                      className="bg-white border border-gray-200 rounded-xl px-3 py-2 text-[10.5px] font-semibold text-gray-600 outline-none cursor-pointer shadow-sm">
-                      <option value="newest">Newest</option>
-                      <option value="highest">Highest Pay</option>
-                      <option value="lowest">Lowest Pay</option>
-                    </select>
-                  </div>
-
-                  {/* Category pills */}
-                  <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-                    {gigCategories.map(cat => (
-                      <button key={cat} onClick={() => setGigCategory(cat)}
-                        className={`shrink-0 px-3.5 py-1.5 rounded-full text-[9px] font-bold border transition-all ${gigCategory === cat ? "bg-blue-600 text-white border-blue-600" : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"}`}>
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Level legend */}
-                  <div className="flex gap-2 flex-wrap items-center">
-                    {[["Basic", "#10B981"], ["Standard", "#3B82F6"], ["Advanced", "#8B5CF6"], ["Expert", "#EF4444"]].map(([l, c]) => (
-                      <div key={l} className="flex items-center gap-1 px-2 py-1 bg-white border border-gray-100 rounded-lg">
-                        <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: c }} />
-                        <span className="text-[8.5px] font-bold text-gray-500">{l}</span>
-                      </div>
-                    ))}
-                    <div className="flex items-center gap-1 px-2 py-1 bg-blue-50 border border-blue-100 rounded-lg ml-auto">
-                      <PlayCircle size={8} className="text-blue-600" />
-                      <span className="text-[8.5px] font-bold text-blue-600">{hasHU ? "All Unlocked" : "Buy HU to Unlock"}</span>
-                    </div>
-                  </div>
-
-                  {/* Gig Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {filteredMarket.map(g => {
-                      const lc = levelColors[g.level] || "#3B82F6";
-                      const tc = typeColors[g.type] || "#3B82F6";
-                      const isExpanded = expandedGig === g.id;
-                      return (
-                        <motion.div key={g.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                          className="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-lg hover:border-gray-200 transition-all overflow-hidden relative group"
-                          style={{ borderTop: `3px solid ${tc}` }}>
-                          {hasHU && (
-                            <div className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[7.5px] font-black bg-green-500 text-white shadow-sm">
-                              <CheckCircle size={7} /> Ready
-                            </div>
-                          )}
-                          <div className="p-4">
-                            <div className="flex items-start justify-between mb-2.5">
-                              <MarketplaceAvatar initials={g.avatar} type={g.type} seed={g.client} size={38} />
-                              <div className="flex gap-1 flex-wrap justify-end pr-12">
-                                <Badge color={tc}>{g.type}</Badge>
-                                <Badge color={lc}>{g.level}</Badge>
-                              </div>
-                            </div>
-                            <h4 className="text-[11.5px] font-black text-gray-900 mb-0.5 leading-snug">{g.title}</h4>
-                            <p className="text-[9px] text-gray-400 font-medium mb-1.5">{g.client} · {g.duration}</p>
-                            <p className="text-[9.5px] text-gray-500 leading-relaxed mb-2.5 line-clamp-2">{g.desc}</p>
-                            <div className="flex gap-1 flex-wrap mb-2.5">
-                              {g.skills.map((s, si) => (
-                                <span key={si} className="px-1.5 py-0.5 rounded text-[7.5px] font-bold bg-gray-100 text-gray-500">{s}</span>
-                              ))}
-                            </div>
-
-                            <AnimatePresence>
-                              {isExpanded && (
-                                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                                  <div className="mb-2 p-2.5 bg-gray-50 rounded-xl border border-gray-100">
-                                    <p className="text-[8.5px] font-bold text-gray-400 uppercase mb-0.5">Deliverables</p>
-                                    <p className="text-[9.5px] font-semibold text-gray-700">{g.deliverables}</p>
-                                  </div>
-                                  <div className="mb-2 p-2.5 bg-green-50 rounded-xl border border-green-100">
-                                    <p className="text-[8.5px] font-bold text-green-600 uppercase mb-0.5">How to Start</p>
-                                    <p className="text-[9.5px] font-semibold text-green-800">
-                                      {hasHU ? "✓ HU active — tap 'Start Gig' and begin right now. No approval needed." : "Purchase HU → gig activates instantly."}
-                                    </p>
-                                  </div>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-
-                            <button onClick={() => setExpandedGig(isExpanded ? null : g.id)}
-                              className="text-[8.5px] font-bold text-blue-500 hover:text-blue-700 transition-all mb-2.5 flex items-center gap-0.5">
-                              {isExpanded ? <><ChevronUp size={8} /> Less</> : <><ChevronDown size={8} /> More details</>}
-                            </button>
-
-                            <div className="flex items-center justify-between pt-2.5 border-t border-gray-50">
-                              <div>
-                                <p className="text-[15px] font-black text-gray-900 leading-none">{fmt(g.budget)}</p>
-                                <p className="text-[7.5px] text-gray-400 font-medium mt-0.5">Project budget</p>
-                              </div>
-                              <div className="flex items-center gap-1.5">
-                                <button onClick={() => openChatForGig(g)}
-                                  title="Chat with client"
-                                  className="w-9 h-9 rounded-xl border border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50 flex items-center justify-center text-gray-600 hover:text-blue-600 transition-all shadow-sm">
-                                  <MessageCircle size={13} />
-                                </button>
-                                {hasHU
-                                  ? <RippleButton onClick={() => handleStartGig(g.title)}
-                                      className="px-3.5 py-2 rounded-xl text-[8.5px] font-black uppercase tracking-widest text-white flex items-center gap-1 shadow-sm"
-                                      style={{ background: `linear-gradient(135deg, ${tc}, ${tc}bb)` }}>
-                                      <PlayCircle size={10} /> Start Gig
-                                    </RippleButton>
-                                  : <button onClick={openRefill}
-                                      className="px-3.5 py-2 rounded-xl text-[8.5px] font-black uppercase tracking-widest flex items-center gap-1 border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all">
-                                      <Lock size={9} /> Unlock
-                                    </button>
-                                }
-                              </div>
-                            </div>
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-
-                  {filteredMarket.length === 0 && (
-                    <div className="text-center py-12 text-gray-400">
-                      <Search size={28} className="mx-auto mb-2 opacity-40" />
-                      <p className="text-[12px] font-semibold text-gray-600">No gigs match your search</p>
-                      <button onClick={() => { setGigSearch(""); setGigCategory("All"); }}
-                        className="mt-2 px-4 py-2 rounded-xl text-[9.5px] font-bold text-blue-600 bg-blue-50 border border-blue-100 hover:bg-blue-100 transition-all">
-                        Clear Filters
-                      </button>
-                    </div>
-                  )}
-                </>
-              )}
-
-              {/* ── Corporate ── */}
-              {gigMode === "corporate" && (
-                <>
-                  <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-                    {corpDepts.map(d => (
-                      <button key={d} onClick={() => setCorpCategory(d)}
-                        className={`shrink-0 px-3.5 py-1.5 rounded-full text-[9px] font-bold border transition-all ${corpCategory === d ? "bg-blue-600 text-white border-blue-600" : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"}`}>
-                        {d}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="px-3.5 py-2.5 rounded-xl border border-amber-200" style={{ background: "linear-gradient(135deg, #FFFBEB, #FFF7ED)" }}>
-                    <div className="flex items-center gap-2">
-                      <Info size={11} className="text-amber-500 shrink-0" />
-                      <p className="text-[9.5px] text-amber-800 font-semibold leading-relaxed">
-                        <strong>Corporate roles require a formal HR process</strong> — unlike freelance gigs, they don't start immediately after buying HU.
-                      </p>
-                    </div>
-                  </div>
-
-                  <CorporateHiringCard />
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {filteredCorp.map(c => {
-                      const isExpanded = expandedGig === c.id;
-                      const costColor = c.huRequired >= 100 ? "#EF4444" : "#8B5CF6";
-                      return (
-                        <div key={c.id} className="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-lg hover:border-gray-200 transition-all overflow-hidden"
-                          style={{ borderTop: "3px solid #8B5CF6" }}>
-                          <div className="p-4">
-                            <div className="flex items-center gap-1.5 mb-2.5 px-2.5 py-1.5 rounded-xl border border-purple-100"
-                              style={{ background: "linear-gradient(135deg, #FAF5FF, #F5F3FF)" }}>
-                              <Building2 size={9} className="text-purple-500 shrink-0" />
-                              <p className="text-[8px] font-black text-purple-700 uppercase tracking-widest">Full-Time Corporate · HR Process</p>
-                            </div>
-                            <div className="flex items-center gap-3 mb-3">
-                              <CompanyLogo name={c.company} domain={c.domain} size={44} />
-                              <div className="min-w-0 flex-1">
-                                <p className="text-[8.5px] font-bold uppercase tracking-wide text-gray-400 mb-0.5">{c.company}</p>
-                                <h4 className="text-[11.5px] font-black text-gray-900 leading-snug">{c.title}</h4>
-                                <div className="flex gap-1 mt-1 flex-wrap">
-                                  <Badge color="#8B5CF6">{c.badge}</Badge>
-                                  <Badge color="#06B6D4">{c.dept}</Badge>
-                                </div>
-                              </div>
-                              <div className="text-right shrink-0">
-                                <p className="text-[15px] font-black text-gray-900 leading-none">{fmt(c.salary)}</p>
-                                <p className="text-[8px] text-gray-400 font-medium mt-0.5">/month</p>
-                              </div>
-                            </div>
-                            <p className="text-[9.5px] text-gray-500 leading-relaxed mb-2.5">{c.desc}</p>
-                            <div className="flex gap-1 flex-wrap mb-2.5">
-                              {c.skills.map((s, si) => (
-                                <span key={si} className="px-1.5 py-0.5 rounded text-[7.5px] font-bold bg-gray-100 text-gray-500">{s}</span>
-                              ))}
-                            </div>
-
-                            <AnimatePresence>
-                              {isExpanded && (
-                                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                                  <div className="mb-2 p-2.5 bg-purple-50 rounded-xl border border-purple-100">
-                                    <p className="text-[8.5px] font-bold text-purple-600 uppercase mb-0.5">Hiring Pipeline</p>
-                                    <p className="text-[9.5px] font-semibold text-purple-800">Apply → Submit CV → HR Review (2–5 days) → Video Interview → Offer</p>
-                                  </div>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-
-                            <button onClick={() => setExpandedGig(isExpanded ? null : c.id)}
-                              className="text-[8.5px] font-bold text-blue-500 hover:text-blue-700 transition-all mb-2.5 flex items-center gap-0.5">
-                              {isExpanded ? <><ChevronUp size={8} /> Less</> : <><ChevronDown size={8} /> More details</>}
-                            </button>
-
-                            <div className="flex items-center gap-1 mb-2.5 px-2.5 py-1.5 rounded-lg"
-                              style={{ backgroundColor: `${costColor}0c`, border: `1px solid ${costColor}22` }}>
-                              <Zap size={9} style={{ color: costColor }} />
-                              <span className="text-[8.5px] font-black uppercase" style={{ color: costColor }}>Requires {c.huRequired} HU to Apply</span>
-                              {c.huRequired >= 100 && <span className="ml-auto text-[7.5px] font-bold text-red-400">Senior Role</span>}
-                            </div>
-
-                            <div className="flex gap-1.5">
-                              <button onClick={() => openChatForCorporate(c)}
-                                title="Contact Talent Team"
-                                className="shrink-0 w-10 h-10 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 flex items-center justify-center text-purple-600 transition-all">
-                                <MessageCircle size={13} />
-                              </button>
-                              {hasHU
-                              ? <RippleButton onClick={() => handleApplyCorporate(c.title)}
-                                  className="flex-1 py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-1.5 shadow-sm"
-                                  style={{ background: "linear-gradient(135deg, #7C3AED, #4F46E5)" }}>
-                                  <ClipboardList size={11} /> Submit Application <ArrowUpRight size={10} />
-                                </RippleButton>
-                              : <button onClick={openRefill}
-                                  className="flex-1 py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 border border-purple-200 bg-purple-50 text-purple-600 hover:bg-purple-100 transition-all">
-                                  <Lock size={11} /> Purchase HU to Apply
-                                </button>
-                              }
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
-            </motion.div>
-          )}
-
-          {/* ═══════════════ WALLET ═══════════════ */}
-          {activeTab === "earnings" && (
-            <motion.div key="earnings" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }} className="space-y-4">
-              <SectionHead label="My Wallet" sub="Earnings, HU balance, and withdrawals" />
-
-              <div className="flex gap-1 p-1 rounded-xl border border-gray-200 bg-white w-fit overflow-x-auto no-scrollbar shadow-sm">
-                {(["overview", "history", "limits", "referral"] as const).map(t => (
-                  <button key={t} onClick={() => setActiveVaultTab(t)}
-                    className={`shrink-0 px-4 py-2 rounded-lg text-[9.5px] font-black uppercase tracking-widest transition-all ${activeVaultTab === t ? "bg-blue-600 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"}`}>
-                    {t}
-                  </button>
-                ))}
-              </div>
-
-              {activeVaultTab === "overview" && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {/* HU Balance */}
-                    <div className="p-5 rounded-2xl border border-blue-100 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)" }}>
-                      <div className="absolute right-0 top-0 w-28 h-28 rounded-full opacity-10" style={{ background: "radial-gradient(circle, #0055FF, transparent)", transform: "translate(30%,-30%)" }} />
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center shadow-sm"><Zap size={14} className="text-white" fill="white" /></div>
-                        <Badge color="#3B82F6"><PulseDot color="#3B82F6" size={5} /> Active</Badge>
-                      </div>
-                      <p className="text-[8.5px] font-bold uppercase tracking-[0.15em] text-blue-400 mb-0.5">Handshake Units (HU)</p>
-                      <div className="flex items-end gap-1.5 mb-1">
-                        <span className="text-[38px] font-black text-gray-900 leading-none">{huBalance}</span>
-                        <span className="text-[16px] font-black text-blue-600 mb-1">HU</span>
-                      </div>
-                      <p className="text-[9.5px] font-medium text-gray-500 mb-4">{hasHU ? "All matching freelance gigs unlocked" : "Purchase HU to unlock freelance gigs instantly"}</p>
-                      <div className="flex gap-2">
-                        <button onClick={openRefill} className="flex-1 px-3.5 py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-sm">+ Top Up</button>
-                        <button onClick={() => setActiveVaultTab("history")} className="px-3.5 py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest border border-blue-200 text-blue-600 hover:bg-blue-50 transition-all">History</button>
-                      </div>
-                    </div>
-
-                    {/* Cash Balance */}
-                    <div className="p-5 rounded-2xl border border-green-100 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)" }}>
-                      <div className="absolute right-0 top-0 w-28 h-28 rounded-full opacity-10" style={{ background: "radial-gradient(circle, #10B981, transparent)", transform: "translate(30%,-30%)" }} />
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="w-8 h-8 rounded-xl bg-green-600 flex items-center justify-center shadow-sm"><DollarSign size={14} className="text-white" /></div>
-                        <button onClick={() => setShowBalance(b => !b)} className="text-gray-400 hover:text-gray-600 transition-all p-1 rounded-lg hover:bg-white/50">
-                          {showBalance ? <Eye size={14} /> : <EyeOff size={14} />}
-                        </button>
-                      </div>
-                      <p className="text-[8.5px] font-bold uppercase tracking-[0.15em] text-green-400 mb-0.5">Earnings Balance</p>
-                      <div className="flex items-end gap-1.5 mb-1">
-                        <span className="text-[38px] font-black text-gray-900 leading-none">{showBalance ? fmt(cashBalance) : "••••"}</span>
-                      </div>
-                      <p className="text-[9.5px] font-medium text-gray-500 mb-4">Ready to withdraw · Min. $50.00</p>
-                      <RippleButton onClick={() => addToast("Minimum withdrawal is $50.00. Complete your first gig to earn.", "info")}
-                        className="w-full py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest border border-green-200 text-green-700 hover:bg-green-100 transition-all flex items-center justify-center gap-1.5 bg-white/50">
-                        Withdraw Money <ArrowUpRight size={11} />
-                      </RippleButton>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-4 gap-2">
-                    <StatCard label="Earned" value={fmt(0)} icon={<TrendingUp size={13} />} color="#10B981" sub="All time" />
-                    <StatCard label="Withdrawn" value={fmt(0)} icon={<Download size={13} />} color="#3B82F6" sub="All time" />
-                    <StatCard label="Pending" value={fmt(0)} icon={<Clock size={13} />} color="#F59E0B" sub="In review" />
-                    <StatCard label="HU" value={huBalance} icon={<Zap size={13} />} color="#8B5CF6" sub="Balance" />
-                  </div>
-
-                  {/* HU Calculator */}
-                  <Card className="p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-6 h-6 rounded-lg bg-blue-50 flex items-center justify-center"><Calculator size={12} className="text-blue-600" /></div>
-                      <span className="text-[11px] font-black text-gray-800">HU Value Calculator</span>
-                    </div>
-                    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-                      <div className="bg-gray-50 p-3 rounded-xl border border-gray-200">
-                        <p className="text-[8px] font-bold text-gray-400 uppercase mb-0.5">HU Amount</p>
-                        <input type="number" value={calcHU} onChange={e => setCalcHU(e.target.value)}
-                          className="bg-transparent w-full text-[16px] font-black outline-none text-gray-900" min="0" />
-                      </div>
-                      <RefreshCw size={12} className="text-gray-400" />
-                      <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 text-right">
-                        <p className="text-[8px] font-bold text-gray-400 uppercase mb-0.5">Est. Gig Value</p>
-                        <p className="text-[16px] font-black text-green-600 leading-none">
-                          {isNaN(calcUSD) || calcUSD <= 0 ? "—" : fmt(calcUSD)}
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
-
-                  {/* Withdrawal Methods */}
-                  <Card className="p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-6 h-6 rounded-lg bg-blue-50 flex items-center justify-center"><Globe size={12} className="text-blue-600" /></div>
-                      <span className="text-[11px] font-black text-gray-800">Withdrawal Methods</span>
-                    </div>
-                    <div className="space-y-2">
-                      {[
-                        { name: "Binance Pay (USDT)", sub: "Worldwide · Instant settlement", logo: <BinanceLogo size={38} />, status: "Global", color: "#F0B90B" },
-                        { name: "M-Pesa", sub: "Kenya, Tanzania, Uganda, Rwanda · Instant", logo: <MpesaLogoSVG size={38} />, status: "East Africa", color: "#16A34A" },
-                      ].map((m, i) => (
-                        <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100 hover:border-gray-200 transition-all">
-                          {m.logo}
-                          <div className="flex-1">
-                            <p className="text-[10.5px] font-black text-gray-900">{m.name}</p>
-                            <p className="text-[8.5px] text-gray-400 font-medium mt-0.5">{m.sub}</p>
-                          </div>
-                          <Badge color={m.color}>{m.status}</Badge>
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
-                </div>
-              )}
-
-              {activeVaultTab === "history" && (
-                <PremiumLockedSection
-                  title="Transaction History"
-                  description="Your full earnings record, withdrawal history, and HU purchase log appear here once you complete your first gig or top up."
-                  icon={<Clock size={24} />}
-                  cta="Unlock Gigs Now"
-                  onCta={() => setActiveTab("tasks")}
-                  features={["Full record", "CSV export", "HU log", "Withdrawals"]}
-                />
-              )}
-
-              {activeVaultTab === "limits" && (
-                <div className="space-y-3">
-                  <Card className="p-4">
-                    <h4 className="text-[10px] font-black uppercase tracking-wide text-gray-500 mb-3">Withdrawal Limits</h4>
-                    <div className="space-y-3">
-                      {[
-                        { label: "Daily Withdrawal", used: 0, limit: 500, unit: "USD" },
-                        { label: "Monthly Withdrawal", used: 0, limit: 5000, unit: "USD" },
-                        { label: "HU Used Today", used: 0, limit: 200, unit: "HU" },
-                      ].map((item, i) => (
-                        <div key={i}>
-                          <div className="flex justify-between mb-1">
-                            <span className="text-[9.5px] font-bold text-gray-600">{item.label}</span>
-                            <span className="text-[9.5px] font-black text-gray-900">{item.used} / {item.limit} {item.unit}</span>
-                          </div>
-                          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full rounded-full bg-blue-500" style={{ width: `${(item.used / item.limit) * 100}%` }} />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
-                  <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-3">
-                    <ChevronsUp size={14} className="text-amber-500 shrink-0" />
-                    <div className="flex-1">
-                      <p className="text-[10px] font-black text-amber-800">Verify your profile to increase limits 10×</p>
-                      <p className="text-[8.5px] text-amber-600 font-medium mt-0.5">Verified accounts get priority processing</p>
-                    </div>
-                    <button onClick={() => { setActiveTab("me"); setActiveProfileTab("security"); }}
-                      className="shrink-0 px-3 py-1.5 rounded-xl text-[8.5px] font-black text-amber-700 border border-amber-300 bg-amber-100 hover:bg-amber-200 transition-all">
-                      Verify
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {activeVaultTab === "referral" && (
-                <div className="p-6 rounded-2xl border border-purple-100 text-center" style={{ background: "linear-gradient(135deg, #F5F3FF 0%, #EEF2FF 100%)" }}>
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-purple-100 flex items-center justify-center">
-                    <Gift size={22} className="text-purple-600" />
-                  </div>
-                  <h4 className="text-[16px] font-black text-gray-900 mb-1.5">Refer Friends & Earn</h4>
-                  <p className="text-[10px] text-gray-500 font-medium mb-4">Get <strong className="text-purple-700">50 free HU</strong> for every friend who joins and tops up</p>
-                  <div className="bg-white p-3.5 rounded-xl border border-purple-100 flex items-center gap-3 text-left mb-4">
-                    <div className="flex-1">
-                      <p className="text-[8.5px] text-gray-400 font-medium mb-0.5">Your referral code</p>
-                      <p className="text-[15px] font-black text-blue-600 tracking-widest">NEXUS-{user?.firstName?.toUpperCase() || "USER"}07</p>
-                    </div>
-                    <button onClick={() => { navigator.clipboard.writeText("NEXUS-" + (user?.firstName?.toUpperCase() || "USER") + "07"); addToast("Referral code copied!", "success"); }}
-                      className="p-2 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-all">
-                      <Copy size={12} className="text-gray-500" />
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <StatCard label="Referred" value="0" icon={<Users size={12} />} color="#8B5CF6" />
-                    <StatCard label="HU Earned" value="0" icon={<Zap size={12} />} color="#3B82F6" />
-                    <StatCard label="$ Earned" value={fmt(0)} icon={<DollarSign size={12} />} color="#10B981" />
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          )}
-
-          {/* ═══════════════ WORK ═══════════════ */}
-          {activeTab === "contracts" && (
-            <motion.div key="contracts" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }} className="space-y-4">
-              <SectionHead label="My Work" sub="Active gigs, contracts, and completed jobs" />
-              <div className="grid grid-cols-4 gap-2 opacity-40 pointer-events-none select-none">
-                <StatCard label="Active Gigs" value="—" icon={<Briefcase size={13} />} color="#3B82F6" />
-                <StatCard label="Completed" value="—" icon={<CheckCircle2 size={13} />} color="#10B981" />
-                <StatCard label="Earned" value="—" icon={<DollarSign size={13} />} color="#F59E0B" />
-                <StatCard label="Rating" value="—" icon={<Star size={13} />} color="#8B5CF6" />
-              </div>
-
-              <PremiumLockedSection
-                title="No Gigs Started Yet"
-                description="Purchase HU and start your first freelance gig to unlock this section. Active work, milestones, client ratings, and earnings all appear here."
-                icon={<FileText size={24} />}
-                cta="Browse & Unlock Gigs"
-                onCta={() => setActiveTab("tasks")}
-                features={["Active gigs", "Client chat", "Milestones", "Earnings log", "Dispute help", "Ratings"]}
-              />
-
-              {/* Recent gig teasers */}
-              <div className="space-y-2">
-                <p className="text-[9px] font-black uppercase tracking-[0.12em] text-gray-400">Trending Gigs — Start Today</p>
-                {marketplaceGigs.slice(0, 3).map(g => (
-                  <div key={g.id} onClick={() => { setActiveTab("tasks"); setGigMode("marketplace"); }}
-                    className="flex items-center gap-3 p-3 bg-white border border-gray-100 rounded-xl cursor-pointer hover:border-blue-200 hover:shadow-md transition-all group">
-                    <MarketplaceAvatar initials={g.avatar} type={g.type} seed={g.client} size={34} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[10.5px] font-black text-gray-900 truncate">{g.title}</p>
-                      <p className="text-[8.5px] text-gray-400 font-medium">{g.client} · {g.duration}</p>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <p className="text-[12px] font-black text-gray-900">{fmt(g.budget)}</p>
-                      <Badge color={levelColors[g.level] || "#3B82F6"}>{g.level}</Badge>
-                    </div>
-                    <ChevronRight size={13} className="text-gray-300 group-hover:text-blue-400 transition-colors shrink-0" />
-                  </div>
-                ))}
-                <button onClick={() => setActiveTab("tasks")}
-                  className="w-full py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-blue-600 border border-blue-100 bg-blue-50 hover:bg-blue-100 transition-all">
-                  Browse All Gigs →
-                </button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* ═══════════════ CHATS ═══════════════ */}
-          {activeTab === "messages" && (
-            <motion.div key="messages" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }} className="space-y-3">
-              <div className="flex items-center justify-between">
-                <SectionHead label="Messages" sub="Platform notifications and system updates" />
-                <Badge color="#3B82F6">{messages.filter(m => m.unread).length} unread</Badge>
-              </div>
-
-              <div className="space-y-2">
-                {messages.map((m, i) => (
-                  <div key={i} onClick={() => setExpandedMsg(expandedMsg === i ? null : i)}
-                    className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${m.unread ? "bg-blue-50 border-blue-100 shadow-sm" : "bg-white border-gray-100"} hover:border-blue-200`}>
-                    <div className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-base shrink-0">{m.avatar}</div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2 mb-0.5">
-                          <div className="flex items-center gap-1.5">
-                            <p className="text-[10.5px] font-black text-gray-900">{m.sender}</p>
-                            {m.unread && <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
-                          </div>
-                          <span className="text-[8.5px] text-gray-400 font-medium shrink-0">{m.time}</span>
-                        </div>
-                        <p className={`text-[9.5px] text-gray-500 font-medium leading-relaxed ${expandedMsg === i ? "" : "line-clamp-2"}`}>{m.body}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Empty state for real chats */}
-              <div className="p-5 rounded-2xl border border-dashed border-gray-200 text-center">
-                <MessageSquare size={22} className="mx-auto mb-2 text-gray-300" />
-                <p className="text-[11px] font-black text-gray-700">Client messages appear here</p>
-                <p className="text-[9.5px] text-gray-400 font-medium mt-0.5 max-w-xs mx-auto leading-relaxed">
-                  Once you start a freelance gig, your direct client channel opens here automatically.
-                </p>
-                <button onClick={() => setActiveTab("tasks")}
-                  className="mt-3 px-4 py-2 rounded-xl text-[9.5px] font-bold text-blue-600 bg-blue-50 border border-blue-100 hover:bg-blue-100 transition-all">
-                  Browse Gigs →
-                </button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* ═══════════════ STATS ═══════════════ */}
-          {activeTab === "analytics" && (
-            <motion.div key="analytics" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }} className="space-y-4">
-              <SectionHead label="My Stats" sub="Performance overview and earnings analytics" />
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                <StatCard label="Success Rate" value="0%" icon={<CheckCircle2 size={13} />} color="#10B981" />
-                <StatCard label="Gigs Done" value="0" icon={<Briefcase size={13} />} color="#3B82F6" />
-                <StatCard label="Total Earned" value={fmt(0)} icon={<DollarSign size={13} />} color="#F59E0B" />
-                <StatCard label="Avg Rating" value="—" icon={<Star size={13} />} color="#8B5CF6" />
-              </div>
-
-              <PremiumLockedSection
-                title="Stats Unlock After First Gig"
-                description="Earnings charts, completion rate, client ratings, and skill analytics appear here after you complete your first gig on Nexus."
-                icon={<BarChart3 size={24} />}
-                cta="Start Your First Gig"
-                onCta={() => setActiveTab("tasks")}
-                features={["Earnings chart", "Win rate", "Client ratings", "Skill breakdown"]}
-              />
-
-              {/* Potential earnings preview */}
-              <Card className="p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-6 h-6 rounded-lg bg-green-50 flex items-center justify-center"><TrendingUp size={12} className="text-green-600" /></div>
-                  <span className="text-[10.5px] font-black text-gray-800">Your Earning Potential</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { pack: "Starter ($3)", potential: "$1,200", color: "#10B981" },
-                    { pack: "Basic ($6)", potential: "$4,800", color: "#3B82F6" },
-                    { pack: "Pro ($12)", potential: "$22,000", color: "#8B5CF6" },
-                    { pack: "Pro Uplink ($20)", potential: "$50,000+", color: "#EF4444" },
-                  ].map((item, i) => (
-                    <div key={i} className="p-3 rounded-xl border border-gray-100 bg-gray-50">
-                      <p className="text-[8px] font-bold text-gray-400 mb-0.5">{item.pack}</p>
-                      <p className="text-[14px] font-black leading-none" style={{ color: item.color }}>{item.potential}</p>
-                      <p className="text-[7.5px] text-gray-400 mt-0.5">potential earnings</p>
-                    </div>
-                  ))}
-                </div>
-                <button onClick={openRefill} className="mt-3 w-full py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-sm">
-                  Buy HU & Start Earning →
-                </button>
-              </Card>
-            </motion.div>
-          )}
-
-          {/* ═══════════════ HELP ═══════════════ */}
-          {activeTab === "support" && (
-            <motion.div key="support" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }} className="max-w-lg mx-auto space-y-4">
-              <SectionHead label="Help Center" sub="Worldwide support, 24/7" />
-
-              <div className="p-3.5 rounded-xl border border-green-200 bg-green-50 flex items-center gap-3">
-                <div className="w-7 h-7 rounded-xl bg-green-600 flex items-center justify-center shrink-0"><CheckCircle size={13} className="text-white" /></div>
-                <div className="flex-1">
-                  <p className="text-[10.5px] font-black text-green-800">All Systems Running Normally</p>
-                  <p className="text-[8.5px] text-green-600 font-medium">Platform · Payments · Gigs · Wallet — all operational</p>
-                </div>
-                <Badge color="#10B981"><PulseDot color="#10B981" size={5} /> 99.9%</Badge>
-              </div>
-
-              <Card className="p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-6 h-6 rounded-lg bg-indigo-50 flex items-center justify-center"><HelpCircle size={12} className="text-indigo-600" /></div>
-                  <span className="text-[10.5px] font-black text-gray-800">Frequently Asked Questions</span>
-                </div>
-                <div className="space-y-1.5">
-                  {faqItems.map((item, i) => (
-                    <div key={i} onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
-                      className="p-3.5 bg-indigo-50 border border-indigo-100 rounded-xl cursor-pointer hover:border-indigo-200 transition-all">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="text-[10.5px] font-bold text-indigo-900">{item.q}</p>
-                        <ChevronDown size={11} className={`text-indigo-400 shrink-0 transition-transform ${expandedFaq === i ? "rotate-180" : ""}`} />
-                      </div>
-                      <AnimatePresence>
-                        {expandedFaq === i && (
-                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-                            <p className="text-[10px] text-indigo-700 leading-relaxed mt-2.5 pt-2.5 border-t border-indigo-200">{item.a}</p>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  ))}
-                </div>
-                <button onClick={openRefill}
-                  className="mt-4 w-full py-3 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-white hover:opacity-90 shadow-sm"
-                  style={{ background: "linear-gradient(135deg, #4F46E5, #0055FF)" }}>
-                  Buy HU — Unlock Gigs Now →
-                </button>
-              </Card>
-
-              <Card className="p-4 space-y-2">
-                <p className="text-[9px] font-black uppercase tracking-[0.12em] text-gray-400 mb-2">Contact Support</p>
-                {[
-                  { label: "Email Us", value: "support@nexusgigs.me", icon: <Mail size={14} />, sub: "We reply within 2 hours", color: "#3B82F6", action: () => window.location.href = "mailto:support@nexusgigs.me" },
-                  { label: "Chat on WhatsApp", value: "Tap to open WhatsApp", icon: <MessageCircle size={14} />, sub: "Mon–Fri · Available globally", color: "#25D366", action: () => window.open("https://wa.me/254113637325", "_blank") },
-                  { label: "Live Chat", value: "Coming Soon", icon: <MessageSquare size={14} />, sub: "In-app · Under development", color: "#8B5CF6", action: undefined },
-                ].map((item, i) => (
-                  <div key={i} onClick={item.action}
-                    className={`p-3.5 bg-gray-50 rounded-xl border border-gray-100 flex items-center gap-3 ${item.action ? "cursor-pointer hover:border-blue-200 hover:bg-blue-50" : "opacity-50"} transition-all`}>
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: `${item.color}12`, color: item.color }}>{item.icon}</div>
-                    <div className="flex-1">
-                      <p className="text-[10.5px] font-black text-gray-900">{item.label}</p>
-                      <p className="text-[8.5px] text-gray-400 font-medium mt-0.5">{item.sub}</p>
-                    </div>
-                    {item.action && <ChevronRight size={12} className="text-gray-400 shrink-0" />}
-                  </div>
-                ))}
-              </Card>
-            </motion.div>
-          )}
-
-          {/* ═══════════════ ME / PROFILE ═══════════════ */}
-          {activeTab === "me" && (
-            <motion.div key="me" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }} className="space-y-4">
-              <SectionHead label="My Profile" sub="Account, security, and preferences" />
-
-              {/* Profile Header */}
-              <div className="rounded-2xl border border-gray-100 p-5 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%)" }}>
-                <div className="absolute right-0 top-0 w-40 h-40 rounded-full opacity-[0.05]" style={{ background: "radial-gradient(circle, #0055FF, transparent)", transform: "translate(30%,-30%)" }} />
-                <div className="flex items-start gap-4">
-                  <div className="relative shrink-0">
-                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-black shadow-lg"
-                      style={{ background: "linear-gradient(135deg, #0055FF, #8B5CF6)" }}>
-                      {(user?.firstName?.[0] || "U").toUpperCase()}
-                    </div>
-                    {isVerified && (
-                      <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 border-2 border-white flex items-center justify-center shadow-sm">
-                        <Check size={8} className="text-white" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                      <h3 className="text-[16px] font-black text-gray-900 leading-none">
-                        {`${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "Freelancer"}
-                      </h3>
-                      {isVerified
-                        ? <Badge color="#10B981"><BadgeCheck size={8} /> Verified</Badge>
-                        : <Badge color="#F59E0B"><AlertCircle size={8} /> Unverified</Badge>
-                      }
-                    </div>
-                    <p className="text-[9px] text-gray-400 font-medium mb-1.5">{user?.primaryEmailAddress?.emailAddress || "—"}</p>
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <Badge color="#3B82F6"><Globe size={7} /> {profileLocation}</Badge>
-                      <Badge color="#8B5CF6"><Zap size={7} /> {profileAvailability}</Badge>
-                    </div>
-
-                    {editingProfile ? (
-                      <div className="mt-3 space-y-2.5">
-                        {[
-                          { label: "Bio", el: <textarea value={profileBio} onChange={e => setProfileBio(e.target.value)} rows={2} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-[10.5px] text-gray-700 outline-none focus:border-blue-400 resize-none transition-all" /> },
-                          { label: "Location", el: <input value={profileLocation} onChange={e => setProfileLocation(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-[10.5px] text-gray-700 outline-none focus:border-blue-400 transition-all" /> },
-                          { label: "Hourly Rate", el: <input value={profileRate} onChange={e => setProfileRate(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-[10.5px] text-gray-700 outline-none focus:border-blue-400 transition-all" /> },
-                          { label: "Skills (comma separated)", el: <input value={profileSkills.join(", ")} onChange={e => setProfileSkills(e.target.value.split(",").map(s => s.trim()).filter(Boolean))} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-[10.5px] text-gray-700 outline-none focus:border-blue-400 transition-all" /> },
-                        ].map((row, i) => (
-                          <div key={i}>
-                            <label className="text-[8px] font-bold text-gray-400 uppercase tracking-wide mb-0.5 block">{row.label}</label>
-                            {row.el}
-                          </div>
-                        ))}
-                        <RippleButton onClick={() => { setEditingProfile(false); addToast("Profile updated!", "success"); }}
-                          className="w-full py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-white shadow-sm"
-                          style={{ background: "linear-gradient(135deg, #0055FF, #0041CC)" }}>
-                          Save Profile
-                        </RippleButton>
-                      </div>
-                    ) : (
-                      <div className="mt-2">
-                        <p className="text-[10px] text-gray-500 leading-relaxed">{profileBio}</p>
-                        <div className="flex gap-1 flex-wrap mt-2">
-                          {profileSkills.map((skill, i) => (
-                            <span key={i} className="px-2 py-0.5 rounded-full text-[8.5px] font-bold bg-blue-50 text-blue-600 border border-blue-100">{skill}</span>
-                          ))}
-                        </div>
-                        <button onClick={() => setEditingProfile(true)} className="mt-2 text-[9px] font-bold text-blue-500 hover:text-blue-700 flex items-center gap-1">
-                          <Edit3 size={9} /> Edit Profile
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Profile completion */}
-              {!isVerified && (
-                <div className="p-4 rounded-xl border border-amber-200" style={{ background: "linear-gradient(135deg, #FFFBEB, #FFF7ED)" }}>
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <UserCheck size={13} className="text-amber-600" />
-                      <span className="text-[10.5px] font-black text-amber-800">Profile Completion</span>
-                    </div>
-                    <span className="text-[12px] font-black text-amber-600">45%</span>
-                  </div>
-                  <div className="h-1.5 bg-amber-100 rounded-full overflow-hidden mb-2">
-                    <motion.div initial={{ width: 0 }} animate={{ width: "45%" }} transition={{ delay: 0.3, duration: 0.8 }}
-                      className="h-full rounded-full" style={{ background: "linear-gradient(90deg, #F59E0B, #EF4444)" }} />
-                  </div>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {[
-                      { label: "Email verified", done: true },
-                      { label: "Profile photo", done: false },
-                      { label: "ID verification", done: false },
-                      { label: "Phone number", done: false },
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-1.5">
-                        <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 ${item.done ? "bg-green-500" : "bg-gray-200"}`}>
-                          {item.done ? <Check size={7} className="text-white" /> : <X size={7} className="text-gray-400" />}
-                        </div>
-                        <span className={`text-[8.5px] font-semibold ${item.done ? "text-gray-700" : "text-gray-400"}`}>{item.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Stats */}
-              <div className="grid grid-cols-4 gap-2">
-                <StatCard label="HU Balance" value={huBalance} icon={<Zap size={12} />} color="#3B82F6" />
-                <StatCard label="Gigs Done" value="0" icon={<CheckSquare size={12} />} color="#10B981" />
-                <StatCard label="Earned" value={fmt(0)} icon={<DollarSign size={12} />} color="#F59E0B" />
-                <StatCard label="Rating" value="—" icon={<Star size={12} />} color="#8B5CF6" />
-              </div>
-
-              {/* Sub-tabs */}
-              <div className="flex gap-1 p-1 rounded-xl border border-gray-200 bg-white overflow-x-auto no-scrollbar shadow-sm">
-                {([
-                  { id: "profile" as ProfileTab, label: "Profile", icon: <User size={10} /> },
-                  { id: "security" as ProfileTab, label: "Security", icon: <Shield size={10} /> },
-                  { id: "notifications" as ProfileTab, label: "Alerts", icon: <Bell size={10} /> },
-                  { id: "achievements" as ProfileTab, label: "Badges", icon: <Trophy size={10} /> },
-                  { id: "settings" as ProfileTab, label: "Settings", icon: <Settings size={10} /> },
-                ]).map(t => (
-                  <button key={t.id} onClick={() => setActiveProfileTab(t.id)}
-                    className={`shrink-0 flex items-center gap-1 px-3.5 py-2 rounded-lg text-[9.5px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeProfileTab === t.id ? "bg-blue-600 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"}`}>
-                    {t.icon} {t.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Profile tab */}
-              {activeProfileTab === "profile" && (
-                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-                  <Card className="p-4">
-                    <p className="text-[8.5px] font-black uppercase tracking-[0.12em] text-gray-400 mb-3">Account Info</p>
-                    <div className="space-y-0.5">
-                      {[
-                        { label: "Display Name", value: `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "—", icon: <User size={12} />, color: "#3B82F6" },
-                        { label: "Email", value: user?.primaryEmailAddress?.emailAddress || "—", icon: <Mail size={12} />, color: "#10B981" },
-                        { label: "Account Type", value: "Freelancer · Global", icon: <Briefcase size={12} />, color: "#8B5CF6" },
-                        { label: "HU Balance", value: `${huBalance} HU`, icon: <Zap size={12} />, color: "#0055FF" },
-                        { label: "Cash Balance", value: fmt(cashBalance), icon: <DollarSign size={12} />, color: "#10B981" },
-                        { label: "Hourly Rate", value: profileRate, icon: <TrendingUp size={12} />, color: "#EF4444" },
-                        { label: "Location", value: profileLocation, icon: <MapPin size={12} />, color: "#06B6D4" },
-                      ].map((row, i) => (
-                        <div key={i} className="flex items-center gap-2.5 py-2.5 border-b border-gray-50 last:border-0">
-                          <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: `${row.color}12`, color: row.color }}>{row.icon}</div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[7.5px] font-bold text-gray-400 uppercase tracking-wide">{row.label}</p>
-                            <p className="text-[10.5px] font-black text-gray-900 mt-0.5 break-all">{row.value}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
-
-                  <Card className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <p className="text-[8.5px] font-black uppercase tracking-[0.12em] text-gray-400">My Skills</p>
-                      <button onClick={() => setEditingProfile(true)} className="text-[8.5px] font-bold text-blue-500 flex items-center gap-0.5"><Edit3 size={8} /> Edit</button>
-                    </div>
-                    <div className="flex gap-1.5 flex-wrap">
-                      {profileSkills.map((skill, i) => (
-                        <span key={i} className="px-2.5 py-1 rounded-xl text-[9.5px] font-bold bg-blue-50 text-blue-700 border border-blue-100">{skill}</span>
-                      ))}
-                    </div>
-                  </Card>
-                </motion.div>
-              )}
-
-              {/* Security tab */}
-              {activeProfileTab === "security" && (
-                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-                  <div className="p-4 rounded-2xl border border-blue-100" style={{ background: "linear-gradient(135deg, #EFF6FF, #DBEAFE)" }}>
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-xl bg-blue-600 flex items-center justify-center"><Shield size={13} className="text-white" /></div>
-                        <span className="text-[11px] font-black text-blue-900">Security Score</span>
-                      </div>
-                      <span className="text-[18px] font-black text-blue-600">40<span className="text-[11px] text-blue-400">/100</span></span>
-                    </div>
-                    <div className="h-1.5 bg-blue-100 rounded-full overflow-hidden mb-1">
-                      <motion.div initial={{ width: 0 }} animate={{ width: "40%" }} transition={{ delay: 0.2, duration: 0.8 }}
-                        className="h-full rounded-full" style={{ background: "linear-gradient(90deg, #3B82F6, #0055FF)" }} />
-                    </div>
-                    <p className="text-[8.5px] text-blue-500 font-medium">Enable 2FA to boost score to 80+</p>
-                  </div>
-
-                  <Card className="p-4">
-                    <p className="text-[8.5px] font-black uppercase tracking-[0.12em] text-gray-400 mb-2">Security Settings</p>
-                    <ToggleRow
-                      label="Two-Factor Authentication"
-                      sub={twoFAEnabled ? "Your account is protected" : "Strongly recommended"}
-                      value={twoFAEnabled}
-                      onChange={() => { setTwoFAEnabled(v => !v); addToast(twoFAEnabled ? "2FA disabled" : "2FA enabled!", twoFAEnabled ? "info" : "success"); }}
-                      icon={<Fingerprint size={12} />}
-                      color="#10B981"
-                    />
-                  </Card>
-
-                  <Card className="p-4">
-                    <p className="text-[8.5px] font-black uppercase tracking-[0.12em] text-gray-400 mb-3">Active Sessions</p>
-                    <div className="space-y-2">
-                      {sessions.map((s, i) => (
-                        <div key={i} className={`flex items-center gap-2.5 p-3 rounded-xl border transition-all ${revokedSession.includes(i) ? "opacity-40 bg-gray-50 border-gray-100" : s.current ? "bg-green-50 border-green-100" : "bg-gray-50 border-gray-100"}`}>
-                          <div className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center shrink-0">
-                            <Smartphone size={13} className="text-gray-500" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-1.5">
-                              <p className="text-[10px] font-black text-gray-900">{s.device}</p>
-                              {s.current && <Badge color="#10B981">Current</Badge>}
-                            </div>
-                            <p className="text-[8.5px] text-gray-400 font-medium">{s.location} · {s.last}</p>
-                          </div>
-                          {!s.current && !revokedSession.includes(i) && (
-                            <button onClick={() => { setRevokedSession(r => [...r, i]); addToast("Session revoked", "success"); }}
-                              className="px-2.5 py-1 rounded-lg border border-red-200 bg-red-50 text-[8.5px] font-bold text-red-600 hover:bg-red-100 transition-all">
-                              Revoke
-                            </button>
-                          )}
-                          {revokedSession.includes(i) && <span className="text-[8.5px] font-bold text-gray-400">Revoked</span>}
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
-
-                  <Card className="p-4">
-                    <p className="text-[8.5px] font-black uppercase tracking-[0.12em] text-gray-400 mb-1.5">API Access</p>
-                    <p className="text-[9.5px] text-gray-500 font-medium mb-3">Generate an API key to connect external tools to Nexus.</p>
-                    {generatedApiKey ? (
-                      <div className="space-y-2">
-                        <div className="flex gap-2">
-                          <div className="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-2.5 font-mono text-[9.5px] text-gray-600 truncate">
-                            {showApiKey ? generatedApiKey : "••••••••••••••••••••••••••••••••"}
-                          </div>
-                          <button onClick={() => setShowApiKey(v => !v)} className="p-2.5 bg-gray-100 border border-gray-200 rounded-xl hover:bg-gray-200 transition-all">
-                            {showApiKey ? <EyeOff size={12} className="text-gray-500" /> : <Eye size={12} className="text-gray-500" />}
-                          </button>
-                          <button onClick={() => { navigator.clipboard.writeText(generatedApiKey); setCopiedKey(true); addToast("API key copied!", "success"); setTimeout(() => setCopiedKey(false), 2000); }}
-                            className="p-2.5 bg-gray-100 border border-gray-200 rounded-xl hover:bg-gray-200 transition-all">
-                            {copiedKey ? <Check size={12} className="text-green-500" /> : <Copy size={12} className="text-gray-500" />}
-                          </button>
-                        </div>
-                        <button onClick={() => { setGeneratedApiKey(null); addToast("API key revoked", "info"); }} className="text-[9.5px] font-bold text-red-500 hover:text-red-700 transition-all">
-                          Revoke Key
-                        </button>
-                      </div>
-                    ) : (
-                      <RippleButton onClick={() => { const key = "nxs_" + Math.random().toString(36).substr(2, 32); setGeneratedApiKey(key); addToast("API key generated!", "success"); }}
-                        className="w-full py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest border border-blue-200 text-blue-600 hover:bg-blue-50 transition-all flex items-center justify-center gap-1.5">
-                        <Key size={11} /> Generate API Key
-                      </RippleButton>
-                    )}
-                  </Card>
-                </motion.div>
-              )}
-
-              {/* Notifications tab */}
-              {activeProfileTab === "notifications" && (
-                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-                  <Card className="p-4">
-                    <p className="text-[8.5px] font-black uppercase tracking-[0.12em] text-gray-400 mb-1">Notification Preferences</p>
-                    <ToggleRow label="New Gig Alerts" sub="When matching gigs are posted" value={notifications.newGigs} onChange={() => setNotifications(n => ({ ...n, newGigs: !n.newGigs }))} icon={<Briefcase size={12} />} color="#3B82F6" />
-                    <ToggleRow label="Payment Updates" sub="Confirmations, withdrawals, HU credits" value={notifications.payments} onChange={() => setNotifications(n => ({ ...n, payments: !n.payments }))} icon={<DollarSign size={12} />} color="#10B981" />
-                    <ToggleRow label="Mission Alerts" sub="Status changes on active gigs" value={notifications.missions} onChange={() => setNotifications(n => ({ ...n, missions: !n.missions }))} icon={<Target size={12} />} color="#8B5CF6" />
-                    <ToggleRow label="Message Alerts" sub="Client messages and announcements" value={notifications.messages} onChange={() => setNotifications(n => ({ ...n, messages: !n.messages }))} icon={<MessageSquare size={12} />} color="#F59E0B" />
-                    <ToggleRow label="Weekly Summary" sub="Performance digest every Monday" value={notifications.weekly} onChange={() => setNotifications(n => ({ ...n, weekly: !n.weekly }))} icon={<BarChart3 size={12} />} color="#06B6D4" />
-                  </Card>
-                </motion.div>
-              )}
-
-              {/* Achievements tab */}
-              {activeProfileTab === "achievements" && (
-                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-                  <div className="grid grid-cols-2 gap-2">
-                    {achievements.map(ach => (
-                      <div key={ach.id} className={`p-3.5 rounded-2xl border flex items-start gap-2.5 transition-all ${ach.earned ? "bg-white border-gray-100 shadow-sm" : "bg-gray-50 border-gray-100 opacity-50"}`}>
-                        <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                          style={{ backgroundColor: ach.earned ? `${ach.color}12` : "#F3F4F6", color: ach.earned ? ach.color : "#9CA3AF" }}>
-                          {ach.icon}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1 flex-wrap">
-                            <p className="text-[10.5px] font-black text-gray-900">{ach.title}</p>
-                            {ach.earned && <Check size={8} className="text-green-500" />}
-                          </div>
-                          <p className="text-[8.5px] text-gray-400 font-medium mt-0.5">{ach.desc}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="p-4 rounded-2xl border border-blue-100 bg-blue-50 text-center">
-                    <Trophy size={16} className="mx-auto text-blue-500 mb-1.5" />
-                    <p className="text-[10.5px] font-black text-gray-800">{achievements.filter(a => a.earned).length} of {achievements.length} badges earned</p>
-                    <p className="text-[8.5px] text-gray-400 font-medium mt-0.5">Purchase HU and start gigs to unlock more</p>
-                    <button onClick={openRefill} className="mt-2.5 px-4 py-1.5 rounded-xl text-[9.5px] font-bold text-blue-600 bg-white border border-blue-200 hover:bg-blue-50 transition-all">
-                      Unlock Gigs →
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Settings tab */}
-              {activeProfileTab === "settings" && (
-                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-                  <Card className="p-4">
-                    <p className="text-[8.5px] font-black uppercase tracking-[0.12em] text-gray-400 mb-3">App Settings</p>
-                    <div className="space-y-0.5">
-                      {[
-                        {
-                          icon: <Languages size={12} />, color: "#3B82F6", label: "Language", sub: "Display language",
-                          el: <select value={selectedLang} onChange={e => { setSelectedLang(e.target.value); addToast("Language updated", "success"); }} className="text-[9.5px] font-bold text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 outline-none cursor-pointer">
-                            <option>English</option><option>Français</option><option>Español</option><option>Deutsch</option><option>Swahili</option><option>Arabic</option>
-                          </select>
-                        },
-                        {
-                          icon: <DollarSign size={12} />, color: "#10B981", label: "Currency", sub: "Display currency",
-                          el: <select value={currency} onChange={e => setCurrency(e.target.value as typeof currency)} className="text-[9.5px] font-bold text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 outline-none cursor-pointer">
-                            <option value="USD">USD ($)</option><option value="EUR">EUR (€)</option><option value="GBP">GBP (£)</option><option value="KES">KES</option>
-                          </select>
-                        },
-                        {
-                          icon: <Globe size={12} />, color: "#8B5CF6", label: "Availability", sub: "Visible to clients",
-                          el: <select value={profileAvailability} onChange={e => { setProfileAvailability(e.target.value); addToast("Availability updated", "success"); }} className="text-[9.5px] font-bold text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 outline-none cursor-pointer">
-                            <option>Available Now</option><option>Part-time Only</option><option>Unavailable</option>
-                          </select>
-                        },
-                      ].map((row, i) => (
-                        <div key={i} className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${row.color}12`, color: row.color }}>{row.icon}</div>
-                            <div>
-                              <p className="text-[10.5px] font-bold text-gray-800">{row.label}</p>
-                              <p className="text-[8.5px] text-gray-400 font-medium">{row.sub}</p>
-                            </div>
-                          </div>
-                          {row.el}
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
-
-                  <Card className="p-4">
-                    <p className="text-[8.5px] font-black uppercase tracking-[0.12em] text-gray-400 mb-3">Account Actions</p>
-                    <div className="space-y-2">
-                      <button onClick={() => addToast("Data export requested — email sent within 24h", "info")}
-                        className="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-all flex items-center gap-2.5 text-left">
-                        <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center shrink-0"><Download size={12} className="text-blue-600" /></div>
-                        <div>
-                          <p className="text-[10.5px] font-bold text-gray-700">Export My Data</p>
-                          <p className="text-[8.5px] text-gray-400 font-medium">Download all account data (GDPR)</p>
-                        </div>
-                      </button>
-                      <button onClick={() => addToast("Account deletion requires identity verification", "error")}
-                        className="w-full p-3 rounded-xl border border-red-100 bg-red-50 hover:bg-red-100 transition-all flex items-center gap-2.5 text-left">
-                        <div className="w-7 h-7 rounded-lg bg-red-100 flex items-center justify-center shrink-0"><Trash2 size={12} className="text-red-500" /></div>
-                        <div>
-                          <p className="text-[10.5px] font-bold text-red-600">Delete Account</p>
-                          <p className="text-[8.5px] text-red-400 font-medium">Permanently remove your account</p>
-                        </div>
-                      </button>
-                    </div>
-                  </Card>
-
-                  <SignOutButton>
-                    <button className="w-full py-3.5 rounded-2xl border border-gray-200 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2.5 group shadow-sm">
-                      <LogOut size={14} className="text-gray-400 group-hover:text-red-500 transition-colors" />
-                      <span className="text-[10.5px] font-black text-gray-500 group-hover:text-red-500 transition-colors uppercase tracking-widest">Sign Out</span>
-                    </button>
-                  </SignOutButton>
-                </motion.div>
-              )}
-            </motion.div>
-          )}
-
-        </AnimatePresence>
-      </div>
-
-      {/* ═══════════════ BOTTOM NAV ═══════════════ */}
-      <div className="fixed bottom-0 left-0 right-0 z-100 border-t border-gray-100"
-        style={{ background: "rgba(255,255,255,0.97)", backdropFilter: "blur(16px)", boxShadow: "0 -4px 24px rgba(0,0,0,0.06)" }}>
-        <div className="max-w-5xl mx-auto flex items-center justify-around px-1 overflow-x-auto no-scrollbar" style={{ height: 64 }}>
-          {navItems.map(item => (
-            <button key={item.id} onClick={() => setActiveTab(item.id)}
-              className={`flex flex-col items-center justify-center gap-0.5 h-full flex-1 min-w-13 transition-all duration-200 relative ${activeTab === item.id ? "text-blue-600" : "text-gray-400 hover:text-gray-600"}`}>
-              {activeTab === item.id && (
-                <motion.span layoutId="nav-indicator"
-                  className="absolute top-0 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-b-full bg-blue-600" />
-              )}
-              <div className={`transition-all duration-200 ${activeTab === item.id ? "scale-110" : "scale-100"}`}>{item.icon}</div>
-              <span className={`text-[7.5px] font-bold uppercase tracking-widest leading-none ${activeTab === item.id ? "text-blue-600" : "text-gray-400"}`}>{item.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ═══════════════ REFILL MODAL ═══════════════ */}
-      <AnimatePresence>
-        {showModal && (
-          <div className="fixed inset-0 z-600 flex items-end sm:items-center justify-center p-3">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/55" style={{ backdropFilter: "blur(8px)" }}
-              onClick={() => !isPaying && setShowModal(false)} />
-
-            <motion.div initial={{ scale: 0.93, y: 24 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.93, y: 24 }}
-              transition={{ type: "spring", damping: 26, stiffness: 320 }}
-              className="relative w-full max-w-sm bg-white border border-gray-200 rounded-3xl p-5 shadow-2xl overflow-hidden max-h-[94vh] overflow-y-auto no-scrollbar">
-
-              {/* ── Packages ── */}
-              {modalStep === "packages" && (
-                <div className="space-y-3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-[18px] font-black text-gray-900 leading-none">Unlock Gigs Instantly</h3>
-                      <p className="text-[10px] text-gray-400 font-medium mt-0.5">One purchase → all matching freelance gigs unlock immediately.</p>
-                    </div>
-                    <button onClick={() => setShowModal(false)} className="p-1.5 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all"><X size={14} /></button>
-                  </div>
-
-                  <div className="p-3 rounded-xl border border-green-200 bg-green-50 flex items-center gap-2">
-                    <CheckCircle2 size={12} className="text-green-600 shrink-0" />
-                    <p className="text-[9.5px] font-semibold text-green-800 leading-relaxed">
-                      <strong>Payment confirmed = gigs unlocked.</strong> Start working in minutes — no applications, no screening, no waiting.
-                    </p>
-                  </div>
-
-                  {/* ROI teaser */}
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { label: "Avg ROI on $3", value: "400×", sub: "Starter pack" },
-                      { label: "Top earner", value: "$50K+", sub: "Pro Uplink users" },
-                    ].map((s, i) => (
-                      <div key={i} className="p-3 rounded-xl bg-blue-50 border border-blue-100 text-center">
-                        <p className="text-[18px] font-black text-blue-700 leading-none">{s.value}</p>
-                        <p className="text-[8px] font-bold text-blue-500 mt-0.5">{s.label}</p>
-                        <p className="text-[7.5px] text-gray-400 font-medium">{s.sub}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="space-y-2.5">
-                    {uplinkPackages.map(pack => (
-                      <div key={pack.id} onClick={() => { setSelectedPack(pack); setModalStep("choice"); setAgreed(false); }}
-                        className={`relative p-3.5 rounded-2xl border cursor-pointer transition-all hover:shadow-lg active:scale-[0.98] ${pack.highlight ? "border-slate-300 bg-slate-50 shadow-md ring-2 ring-purple-200" : "bg-white border-gray-200 hover:border-gray-300"}`}
-                        style={{ borderLeft: `4px solid ${pack.color}` }}>
-                        {pack.hot && (
-                          <div className="absolute -top-2.5 right-3 px-2.5 py-0.5 rounded-full text-[8px] font-black text-white shadow-sm"
-                            style={{ backgroundColor: pack.color }}>
-                            ⭐ MOST POPULAR
-                          </div>
-                        )}
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${pack.color}15`, color: pack.color }}>
-                              <Zap size={15} />
-                            </div>
-                            <div>
-                              <p className="text-[12px] font-black text-gray-900">{pack.name}</p>
-                              <p className="text-[8.5px] font-bold text-gray-400">{pack.hu.toLocaleString()} HU</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-[20px] font-black leading-none" style={{ color: pack.color }}>${pack.price}</p>
-                            <p className="text-[8px] text-gray-400 font-medium">one-time</p>
-                          </div>
-                        </div>
-                        <p className="text-[9.5px] text-gray-500 font-medium mb-2">{pack.desc}</p>
-                        <div className="flex flex-wrap gap-1">
-                          {pack.perks.map((perk, pi) => (
-                            <div key={pi} className="flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[7.5px] font-semibold bg-gray-100 text-gray-600">
-                              <Check size={6} /> {perk}
-                            </div>
-                          ))}
-                        </div>
-                        <div className="mt-2 pt-2 border-t border-gray-100 flex items-center justify-between">
-                          <p className="text-[8px] font-bold text-gray-400">{pack.access}</p>
-                          <p className="text-[8.5px] font-black" style={{ color: pack.color }}>{pack.roi}</p>
-                        </div>
-                        <div className="mt-2 flex items-center justify-center gap-1 text-gray-400">
-                          <span className="text-[8.5px] font-bold text-gray-500">Tap to select →</span>
-                          <ChevronRight size={11} className="text-gray-400" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center gap-2 p-2.5 bg-gray-50 rounded-xl border border-gray-100">
-                    <ShieldCheck size={11} className="text-gray-400 shrink-0" />
-                    <p className="text-[8.5px] text-gray-500 font-medium">PCI-DSS enabled · Instant HU credit · Encrypted payment</p>
-                  </div>
-                </div>
-              )}
-
-              {/* ── Choice ── */}
-              {modalStep === "choice" && selectedPack && (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2.5">
-                    <button onClick={() => setModalStep("packages")} className="p-1.5 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all"><ChevronLeft size={13} /></button>
-                    <div>
-                      <h4 className="text-[12px] font-black text-gray-900">Choose Payment Method</h4>
-                      <p className="text-[9.5px] text-gray-400 font-medium mt-0.5">
-                        {selectedPack.name} · {selectedPack.hu} HU · <span className="font-black" style={{ color: selectedPack.color }}>${selectedPack.price}.00</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* What you get */}
-                  <div className="p-3 rounded-xl border border-green-200 bg-green-50">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <Zap size={11} className="text-green-600 shrink-0" fill="#10B981" />
-                      <p className="text-[9.5px] font-black text-green-900">After payment — you get immediately:</p>
-                    </div>
-                    <div className="space-y-1">
-                      {[
-                        `${selectedPack.hu} HU credited instantly`,
-                        selectedPack.access + " — all unlocked",
-                        "Start any gig in under 60 seconds",
-                      ].map((item, i) => (
-                        <div key={i} className="flex items-center gap-1.5">
-                          <CheckCircle size={9} className="text-green-500 shrink-0" />
-                          <p className="text-[9px] font-semibold text-green-800">{item}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    {/* Card — Primary */}
-                    <RippleButton onClick={() => setModalStep("card")}
-                      className="w-full p-4 rounded-2xl border-2 border-cyan-300 bg-cyan-50 hover:bg-cyan-100 transition-all flex items-center gap-3 shadow-sm">
-                      <PaystackLogo size={40} />
-                      <div className="flex-1 text-left">
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <p className="text-[12px] font-black text-gray-900">Pay by Card</p>
-                          <Badge color="#00C3F7">Recommended</Badge>
-                        </div>
-                        <p className="text-[9px] font-medium text-gray-600">Visa / Mastercard · ${selectedPack.price}.00 · Worldwide</p>
-                        <div className="flex items-center gap-1.5 mt-1"><VisaIcon /><MastercardIcon /></div>
-                      </div>
-                      <ChevronRight size={14} className="text-gray-400 shrink-0" />
-                    </RippleButton>
-
-                    {/* Binance */}
-                    <RippleButton onClick={() => setModalStep("binance")}
-                      className="w-full p-4 rounded-2xl border border-gray-200 bg-gray-50 hover:bg-yellow-50 hover:border-yellow-200 transition-all flex items-center gap-3">
-                      <BinanceLogo size={40} />
-                      <div className="flex-1 text-left">
-                        <p className="text-[12px] font-black text-gray-900">Binance Pay</p>
-                        <p className="text-[9px] font-medium text-gray-500">USDT (TRC20 / ERC20) · ${selectedPack.price}.00 · Instant</p>
-                      </div>
-                      <ChevronRight size={14} className="text-gray-400 shrink-0" />
-                    </RippleButton>
-
-                    {/* M-Pesa */}
-                    <RippleButton onClick={() => setModalStep("mpesa")}
-                      className="w-full p-4 rounded-2xl border border-gray-200 bg-gray-50 hover:bg-green-50 hover:border-green-200 transition-all flex items-center gap-3">
-                      <MpesaLogoSVG size={40} />
-                      <div className="flex-1 text-left">
-                        <div className="flex items-center gap-2">
-                          <p className="text-[12px] font-black text-gray-900">M-Pesa</p>
-                          <Badge color="#16A34A">East Africa</Badge>
-                        </div>
-                        <p className="text-[9px] font-medium text-gray-500">STK Push · KES {selectedPack.price * 130} · Instant</p>
-                      </div>
-                      <ChevronRight size={14} className="text-gray-400 shrink-0" />
-                    </RippleButton>
-                  </div>
-
-                  <div className="flex items-start gap-2">
-                    <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)} id="terms-agree" className="mt-0.5 accent-blue-600 shrink-0" />
-                    <label htmlFor="terms-agree" className="text-[8.5px] text-gray-400 font-medium leading-relaxed cursor-pointer">
-                      I agree to the Nexus Terms of Service. HU credits are non-refundable once gig access is granted.
-                    </label>
-                  </div>
-                </div>
-              )}
-
-              {/* ── Card ── */}
-              {modalStep === "card" && selectedPack && (
-                <div className="space-y-3.5">
-                  <div className="flex items-center gap-2.5">
-                    <button onClick={() => setModalStep("choice")} className="p-1.5 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all"><ChevronLeft size={13} /></button>
-                    <div>
-                      <h4 className="text-[12px] font-black text-gray-900">Secure Card Payment</h4>
-                      <p className="text-[9px] text-gray-400 font-medium">Visa & Mastercard · Worldwide · Powered by Paystack</p>
-                    </div>
-                  </div>
-
-                  {/* Order summary */}
-                  <div className="p-4 rounded-2xl border border-gray-100 shadow-sm" style={{ background: "linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%)" }}>
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Total</p>
-                        <p className="text-[30px] font-black text-gray-900 leading-none">${selectedPack.price}<span className="text-[14px] text-gray-400 font-bold"> USD</span></p>
-                        <p className="text-[9px] text-blue-600 font-bold mt-0.5">≈ KES {(selectedPack.price * 130).toLocaleString()} on statement</p>
-                      </div>
-                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: `${selectedPack.color}12`, color: selectedPack.color }}>
-                        <Zap size={22} />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="bg-white p-2 rounded-xl border border-gray-100">
-                        <p className="text-[7.5px] text-gray-400 font-bold uppercase mb-0.5">Package</p>
-                        <p className="text-[10.5px] font-black text-gray-900">{selectedPack.name}</p>
-                      </div>
-                      <div className="bg-white p-2 rounded-xl border border-gray-100">
-                        <p className="text-[7.5px] text-gray-400 font-bold uppercase mb-0.5">You receive</p>
-                        <p className="text-[10.5px] font-black" style={{ color: selectedPack.color }}>{selectedPack.hu} HU</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* What unlocks */}
-                  <div className="p-3 rounded-xl border border-green-100" style={{ background: "linear-gradient(135deg, #ECFDF5, #F0FDF4)" }}>
-                    <div className="flex items-center gap-1.5 mb-1.5"><CheckCircle2 size={11} className="text-green-600" /><p className="text-[9.5px] font-black text-green-900">After payment clears:</p></div>
-                    {[`${selectedPack.hu} HU credited instantly`, `${selectedPack.access} — unlocked`, "Start any matching gig with zero wait"].map((item, i) => (
-                      <div key={i} className="flex items-center gap-1.5 mb-1">
-                        <div className="w-3.5 h-3.5 rounded-full bg-green-500 flex items-center justify-center shrink-0"><Check size={7} className="text-white" /></div>
-                        <p className="text-[8.5px] font-semibold text-green-800">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Accepted Cards</p>
-                      <div className="flex items-center gap-1.5"><VisaIcon /><MastercardIcon /></div>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <ShieldCheck size={11} className="text-cyan-500 shrink-0" />
-                      <p className="text-[8.5px] font-medium text-gray-500">256-bit TLS · PCI-DSS Level 1 · No card data stored</p>
-                    </div>
-                  </div>
-
-                  {!agreed && (
-                    <div className="flex items-start gap-2">
-                      <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)} id="terms-card" className="mt-0.5 accent-blue-600 shrink-0" />
-                      <label htmlFor="terms-card" className="text-[8.5px] text-gray-400 font-medium leading-relaxed cursor-pointer">
-                        I agree to the Nexus Terms of Service. HU credits are non-refundable once gig access is granted.
-                      </label>
-                    </div>
-                  )}
-
-                  <RippleButton disabled={isPaying || !agreed} onClick={() => handlePay("CARD")}
-                    className="w-full py-3.5 rounded-xl text-[10.5px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2 shadow-md"
-                    style={{ background: agreed ? "linear-gradient(135deg, #00C3F7, #011B33)" : undefined }}>
-                    {isPaying
-                      ? <><RefreshCw size={13} className="animate-spin" /> Opening Checkout…</>
-                      : <><CreditCard size={13} /> Pay ${selectedPack.price}.00 by Card</>}
-                  </RippleButton>
-                  <p className="text-center text-[8.5px] text-gray-400 font-medium">Secured by Paystack · We never store your card number</p>
-                </div>
-              )}
-
-              {/* ── Binance ── */}
-              {modalStep === "binance" && selectedPack && (
-                <div className="space-y-3.5">
-                  <div className="flex items-center gap-2.5">
-                    <button onClick={() => setModalStep("choice")} className="p-1.5 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all"><ChevronLeft size={13} /></button>
-                    <h4 className="text-[12px] font-black text-gray-900">Binance Pay (Crypto)</h4>
-                  </div>
-
-                  <div className="flex gap-2">
-                    {(["TRC20", "ERC20"] as const).map(net => (
-                      <button key={net} onClick={() => setSelectedCryptoNet(net)}
-                        className={`flex-1 py-2 rounded-xl text-[9.5px] font-black border transition-all ${selectedCryptoNet === net ? "bg-yellow-500 text-white border-yellow-500" : "border-gray-200 text-gray-500 hover:border-gray-300"}`}>
-                        {net}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="bg-gray-50 rounded-2xl p-3 flex justify-center border border-gray-200">
-                    <img src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${BINANCE_WALLETS[selectedCryptoNet]}`} alt="QR Code" className="w-32 h-32 block rounded-xl" />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-100">
-                      <p className="text-[8px] text-gray-400 font-medium mb-0.5">Amount</p>
-                      <p className="text-[14px] font-black text-gray-900">${selectedPack.price}.00 USDT</p>
-                    </div>
-                    <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-100">
-                      <p className="text-[8px] text-gray-400 font-medium mb-0.5">Network</p>
-                      <p className="text-[14px] font-black text-yellow-600">{selectedCryptoNet}</p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <p className="text-[9.5px] font-bold text-gray-500 mb-1.5">Wallet Address ({selectedCryptoNet})</p>
-                    <div className="flex gap-2">
-                      <div className="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-[9.5px] font-mono text-gray-600 truncate">{BINANCE_WALLETS[selectedCryptoNet]}</div>
-                      <button onClick={() => copyAddress(BINANCE_WALLETS[selectedCryptoNet])} className="p-2.5 bg-gray-100 border border-gray-200 rounded-xl hover:bg-gray-200 transition-all">
-                        {copied ? <Check size={12} className="text-green-500" /> : <Copy size={12} className="text-gray-500" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="p-2.5 bg-amber-50 border border-amber-100 rounded-xl">
-                    <p className="text-[9.5px] font-bold text-amber-800">⚠️ Send only USDT on {selectedCryptoNet} network</p>
-                    <p className="text-[8.5px] text-amber-600 font-medium mt-0.5">Wrong network = permanent loss of funds.</p>
-                  </div>
-
-                  <RippleButton onClick={() => handlePay("BINANCE")}
-                    className="w-full py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white shadow-sm"
-                    style={{ background: "linear-gradient(135deg, #F0B90B, #D4921F)" }}>
-                    I've Sent Payment — Confirm
-                  </RippleButton>
-                </div>
-              )}
-
-              {/* ── M-Pesa ── */}
-              {modalStep === "mpesa" && selectedPack && (
-                <div className="space-y-3.5">
-                  <div className="flex items-center gap-2.5">
-                    <button onClick={() => setModalStep("choice")} className="p-1.5 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all"><ChevronLeft size={13} /></button>
-                    <h4 className="text-[12px] font-black text-gray-900">Pay with M-Pesa</h4>
-                  </div>
-
-                  <div className="p-3.5 bg-green-50 border border-green-200 rounded-xl">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <CheckCircle size={13} className="text-green-500 shrink-0" />
-                      <p className="text-[12px] font-black text-green-800">Total: KES {(selectedPack.price * 130).toLocaleString()}</p>
-                    </div>
-                    <p className="text-[9px] text-green-600 font-medium pl-5">{selectedPack.hu} HU credited instantly after confirmation.</p>
-                  </div>
-
-                  <div>
-                    <p className="text-[9.5px] font-bold text-gray-600 mb-1.5">Your Safaricom Number</p>
-                    <input value={mpesaNum} onChange={e => setMpesaNum(e.target.value)} placeholder="254712345678"
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 text-[16px] font-black text-gray-900 outline-none focus:border-green-400 text-center tracking-widest transition-all placeholder:text-gray-300 focus:bg-white" />
-                    <p className="text-[9px] text-gray-400 font-medium mt-1.5 text-center">Format: 254XXXXXXXXX · 12 digits total</p>
-                  </div>
-
-                  {!agreed && (
-                    <div className="flex items-start gap-2">
-                      <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)} id="terms-mpesa" className="mt-0.5 accent-green-600 shrink-0" />
-                      <label htmlFor="terms-mpesa" className="text-[8.5px] text-gray-400 font-medium leading-relaxed cursor-pointer">
-                        I agree to the Nexus Terms of Service. HU credits are non-refundable once gig access is granted.
-                      </label>
-                    </div>
-                  )}
-
-                  <RippleButton disabled={isPaying} onClick={() => handlePay("MPESA")}
-                    className="w-full py-3.5 rounded-xl text-[10.5px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2 shadow-sm"
-                    style={{ background: "linear-gradient(135deg, #16A34A, #15803D)" }}>
-                    {isPaying
-                      ? <><RefreshCw size={13} className="animate-spin" /> Sending Prompt…</>
-                      : `Pay KES ${(selectedPack.price * 130).toLocaleString()}`}
-                  </RippleButton>
-                  <p className="text-center text-[8.5px] text-gray-400 font-medium">Kenya · Tanzania · Uganda · Rwanda · Instant STK Push</p>
-                </div>
-              )}
-
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* ═══════════════ CHAT OVERLAY (WhatsApp-style) ═══════════════ */}
+      {/* ─── CHAT OVERLAY ─── */}
       <AnimatePresence>
         {chatTarget && (
           <motion.div
-            key="chat-panel"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-stretch justify-center"
-            style={{ background: "rgba(8, 14, 30, 0.55)", backdropFilter: "blur(6px)" }}
+            key="chat-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="fixed inset-0 z-500 flex flex-col"
+            style={{
+              background: chatTarget.kind === "corporate"
+                ? "linear-gradient(160deg, #0d0618 0%, #160a2e 40%, #0a1230 100%)"
+                : "linear-gradient(160deg, #020a1e 0%, #061232 50%, #041a45 100%)"
+            }}
           >
-            <motion.div
-              initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 24, opacity: 0 }}
-              transition={{ duration: 0.22 }}
-              className="relative w-full max-w-md flex flex-col bg-white shadow-2xl md:my-4 md:rounded-3xl overflow-hidden border border-gray-100"
-              style={{ height: "100dvh", maxHeight: "min(100dvh, 780px)" }}
-            >
-              {/* Header */}
-              <div className="px-4 py-3 flex items-center gap-3 border-b border-gray-100"
+            {/* Ambient glow blobs */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full opacity-[0.08]"
                 style={{ background: chatTarget.kind === "corporate"
-                  ? "linear-gradient(135deg, #4F46E5, #7C3AED)"
-                  : "linear-gradient(135deg, #0055FF, #0EA5E9)" }}>
-                <button onClick={() => setChatTarget(null)}
-                  className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition-all">
-                  <ChevronLeft size={16} />
+                  ? "radial-gradient(circle, #a855f7, transparent)"
+                  : "radial-gradient(circle, #3b82f6, transparent)" }} />
+              <div className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full opacity-[0.06]"
+                style={{ background: chatTarget.kind === "corporate"
+                  ? "radial-gradient(circle, #7c3aed, transparent)"
+                  : "radial-gradient(circle, #0055ff, transparent)" }} />
+            </div>
+
+            {/* ── FREELANCE CHAT HEADER ── */}
+            {chatTarget.kind === "freelance" && (
+              <div className="relative z-10 px-4 pt-4 pb-3 flex items-center gap-3"
+                style={{ background: "rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.07)", backdropFilter: "blur(20px)" }}>
+                <button
+                  onClick={() => setChatTarget(null)}
+                  className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all shrink-0"
+                  style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}>
+                  <ChevronLeft size={16} className="text-white" />
                 </button>
-                {chatTarget.kind === "corporate" ? (
-                  <div className="w-10 h-10 rounded-full bg-white/15 border border-white/30 flex items-center justify-center text-white font-black text-[12px] shrink-0">
-                    {chatTarget.avatar}
-                  </div>
-                ) : (
-                  <MarketplaceAvatar initials={chatTarget.avatar} type={chatTarget.type} seed={chatTarget.name} size={40} />
-                )}
+
+                <MarketplaceAvatar initials={chatTarget.avatar} type={chatTarget.type} seed={chatTarget.name} size={42} />
+
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <p className="text-[12px] font-black text-white truncate">{chatTarget.name}</p>
-                    <BadgeCheck size={11} className="text-white/90 shrink-0" />
+                  <div className="flex items-center gap-2">
+                    <p className="text-[13px] font-black text-white truncate">{chatTarget.name}</p>
+                    <BadgeCheck size={13} className="text-blue-400 shrink-0" />
                   </div>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-2 mt-0.5">
                     <PulseDot color="#34D399" size={5} />
-                    <p className="text-[8.5px] font-semibold text-white/85 truncate">
-                      {chatTarget.kind === "corporate" ? "Talent Team · Online" : "Online · Verified Client"}
-                    </p>
+                    <p className="text-[9px] font-semibold text-white/50 truncate">{chatTarget.subtitle}</p>
                   </div>
                 </div>
-                <button onClick={() => triggerPaywall(
-                  chatTarget.kind === "corporate" ? "Voice call with recruiter" : "Voice call with client",
-                  "Live voice and video calls are part of the premium pipeline. Unlock with a HU pack.")}
-                  className="w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition-all">
-                  <Phone size={14} />
-                </button>
-                <button onClick={() => triggerPaywall(
-                  chatTarget.kind === "corporate" ? "Video interview" : "Video meeting",
-                  "HD video meetings unlock once you've activated platform access with a HU pack.")}
-                  className="w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition-all">
-                  <Video size={14} />
-                </button>
-              </div>
 
-              {/* Context strip */}
-              <div className="px-4 py-2 bg-gray-50 border-b border-gray-100 flex items-center gap-2">
-                {chatTarget.kind === "corporate"
-                  ? <Building2 size={11} className="text-purple-500 shrink-0" />
-                  : <Briefcase size={11} className="text-blue-500 shrink-0" />}
-                <p className="text-[9px] font-bold text-gray-500 truncate">
-                  RE: <span className="text-gray-800">{chatTarget.subtitle}</span>
-                </p>
-                <Lock size={9} className="text-amber-500 shrink-0 ml-auto" />
-                <p className="text-[8.5px] font-bold text-amber-600 shrink-0">End-to-end secured</p>
-              </div>
-
-              {/* Thread */}
-              <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2.5"
-                style={{ background: "linear-gradient(180deg, #F8FAFC, #EEF2FF)" }}>
-                <div className="flex justify-center">
-                  <span className="text-[8.5px] font-bold text-gray-500 bg-white border border-gray-200 px-2.5 py-1 rounded-full shadow-sm">Today</span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => triggerCallPaywall("Voice call with client", "Activate a HU pack to unlock direct voice calls with verified clients.")}
+                    className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all"
+                    style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}>
+                    <Phone size={14} className="text-white/70" />
+                  </button>
+                  <button
+                    onClick={() => triggerCallPaywall("Video call with client", "HD video meetings with clients are available once your HU pack is active.")}
+                    className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all"
+                    style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}>
+                    <VideoIcon size={14} className="text-white/70" />
+                  </button>
                 </div>
-                {chatThread.map(b => (
-                  <div key={b.id} className={`flex ${b.from === "me" ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[78%] px-3 py-2 text-[10.5px] leading-relaxed shadow-sm ${
-                      b.from === "me"
-                        ? "rounded-2xl rounded-br-md text-white"
-                        : "rounded-2xl rounded-bl-md bg-white text-gray-800 border border-gray-100"
-                    }`} style={b.from === "me" ? { background: chatTarget.kind === "corporate"
-                          ? "linear-gradient(135deg, #4F46E5, #7C3AED)"
-                          : "linear-gradient(135deg, #0055FF, #0EA5E9)" } : undefined}>
-                      <p className="font-medium">{b.body}</p>
-                      <p className={`text-[7.5px] mt-1 font-bold ${b.from === "me" ? "text-white/70" : "text-gray-400"}`}>{b.time}</p>
+              </div>
+            )}
+
+            {/* ── CORPORATE CHAT HEADER ── */}
+            {chatTarget.kind === "corporate" && (
+              <div className="relative z-10 flex flex-col"
+                style={{ background: "rgba(255,255,255,0.03)", borderBottom: "1px solid rgba(255,255,255,0.07)", backdropFilter: "blur(20px)" }}>
+
+                {/* Top bar */}
+                <div className="px-4 pt-4 pb-3 flex items-center gap-3">
+                  <button
+                    onClick={() => setChatTarget(null)}
+                    className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all shrink-0"
+                    style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}>
+                    <ChevronLeft size={16} className="text-white" />
+                  </button>
+
+                  {/* Company logo in circle */}
+                  <div className="w-11 h-11 rounded-2xl overflow-hidden shrink-0 flex items-center justify-center"
+                    style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)" }}>
+                    {chatTarget.domain ? (
+                      <img
+                        src={`https://logo.clearbit.com/${chatTarget.domain}`}
+                        alt={chatTarget.company || ""}
+                        className="w-8 h-8 object-contain"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                    ) : null}
+                    <Building2 size={18} className="text-purple-300" />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-[13px] font-black text-white">{chatTarget.company} Talent</p>
+                      <div className="w-4 h-4 rounded-full bg-purple-500/30 flex items-center justify-center">
+                        <BadgeCheck size={9} className="text-purple-300" />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <PulseDot color="#c084fc" size={5} />
+                      <p className="text-[9px] font-semibold text-white/50">Official HR Channel · Verified Employer</p>
                     </div>
                   </div>
-                ))}
 
-                {/* Locked-feature reminder */}
-                <div className="flex justify-center pt-2">
-                  <div className="bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 max-w-[80%] flex items-center gap-2">
-                    <Lock size={11} className="text-amber-500 shrink-0" />
-                    <p className="text-[9px] font-semibold text-amber-700 leading-snug">
-                      Sending messages, calls and file sharing unlock with a HU pack.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Composer */}
-              <div className="px-3 py-3 border-t border-gray-100 bg-white">
-                <div className="flex items-end gap-2">
-                  <button onClick={() => triggerPaywall("Attachments & file sharing", "Send portfolios, contracts and CVs once your HU pack is active.")}
-                    className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition-all shrink-0">
-                    <Plus size={16} />
-                  </button>
-                  <div className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl px-3 py-2 flex items-center gap-2">
-                    <input
-                      value={chatDraft}
-                      onChange={e => setChatDraft(e.target.value)}
-                      placeholder={chatTarget.kind === "corporate" ? "Reply to recruiter…" : "Type a message…"}
-                      className="flex-1 bg-transparent outline-none text-[11px] font-medium text-gray-800 placeholder:text-gray-400"
-                    />
-                    <button onClick={() => triggerPaywall("Voice notes", "Record and send voice notes once your HU pack is active.")}
-                      className="text-gray-400 hover:text-gray-600 transition-all">
-                      <HeadphonesIcon size={14} />
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => triggerCallPaywall("Schedule an interview", "Book your formal HR interview call once your HU pack is active and application is submitted.")}
+                      className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all"
+                      style={{ background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.25)" }}>
+                      <VideoIcon size={14} className="text-purple-300" />
                     </button>
                   </div>
-                  <button onClick={() => triggerPaywall(
-                    chatTarget.kind === "corporate" ? "Replying to recruiters" : "Sending messages",
-                    chatTarget.kind === "corporate"
-                      ? "Direct replies to corporate recruiters require an active HU pack. Unlock to continue your application."
-                      : "Direct messaging with clients unlocks instantly once you activate a HU pack.")}
-                    className="w-11 h-11 rounded-full flex items-center justify-center text-white shadow-md transition-all shrink-0"
-                    style={{ background: chatTarget.kind === "corporate"
-                      ? "linear-gradient(135deg, #4F46E5, #7C3AED)"
-                      : "linear-gradient(135deg, #0055FF, #0EA5E9)" }}>
-                    <Send size={15} />
-                  </button>
-                </div>
-                <p className="text-[8.5px] font-semibold text-gray-400 text-center mt-2">
-                  Encrypted · {chatTarget.kind === "corporate" ? "Corporate compliance enabled" : "Verified Nexus client"}
-                </p>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ═══════════════ PAYWALL POPUP ═══════════════ */}
-      <AnimatePresence>
-        {paywall?.open && (
-          <motion.div
-            key="paywall"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-60 flex items-center justify-center p-4"
-            style={{ background: "rgba(8, 14, 30, 0.7)", backdropFilter: "blur(8px)" }}
-            onClick={() => setPaywall(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.92, y: 16, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.92, y: 16, opacity: 0 }}
-              transition={{ duration: 0.22 }}
-              onClick={e => e.stopPropagation()}
-              className="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100"
-            >
-              <div className="p-5 text-center relative" style={{ background: "linear-gradient(135deg, #EEF2FF, #F5F3FF)" }}>
-                <button onClick={() => setPaywall(null)}
-                  className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/80 hover:bg-white border border-gray-100 flex items-center justify-center text-gray-500">
-                  <X size={12} />
-                </button>
-                <div className="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center text-white shadow-lg mb-3"
-                  style={{ background: "linear-gradient(135deg, #0055FF, #7C3AED)" }}>
-                  <Lock size={22} />
-                </div>
-                <Badge color="#7C3AED" className="mb-2"><Crown size={8} /> Premium Feature</Badge>
-                <h3 className="text-[15px] font-black text-gray-900 leading-tight">{paywall.feature} is locked</h3>
-                <p className="text-[10px] text-gray-500 font-medium mt-1.5 leading-relaxed">{paywall.sub}</p>
-              </div>
-
-              <div className="p-5 space-y-3">
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { icon: <Send size={11} />, label: "Send messages" },
-                    { icon: <Phone size={11} />, label: "Voice & video" },
-                    { icon: <Briefcase size={11} />, label: "Unlock gigs" },
-                  ].map((p, i) => (
-                    <div key={i} className="p-2 rounded-xl border border-gray-100 bg-gray-50 text-center">
-                      <div className="w-6 h-6 mx-auto rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-1">{p.icon}</div>
-                      <p className="text-[7.5px] font-bold text-gray-600 leading-tight">{p.label}</p>
-                    </div>
-                  ))}
                 </div>
 
-                <div className="p-3 rounded-xl border border-blue-100" style={{ background: "linear-gradient(135deg, #EFF6FF, #DBEAFE)" }}>
-                  <div className="flex items-center gap-2">
-                    <Sparkles size={12} className="text-blue-600" />
-                    <p className="text-[9.5px] font-black text-blue-900">From $3 — instant activation, zero applications</p>
+                {/* Corporate job context strip */}
+                <div className="mx-4 mb-3 p-3 rounded-2xl flex items-center gap-3"
+                  style={{ background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.2)" }}>
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                    style={{ background: "rgba(168,85,247,0.2)" }}>
+                    <Briefcase size={13} className="text-purple-300" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-black text-white truncate">{chatTarget.subtitle}</p>
+                    <p className="text-[8.5px] text-purple-300/70 font-medium">{chatTarget.dept} · {chatTarget.salary ? fmt(chatTarget.salary) + "/mo" : ""}</p>
+                  </div>
+                  <div className="shrink-0 px-2 py-1 rounded-lg" style={{ background: "rgba(168,85,247,0.2)" }}>
+                    <p className="text-[8px] font-black text-purple-300 uppercase tracking-widest">Active Listing</p>
                   </div>
                 </div>
+              </div>
+            )}
 
-                <RippleButton onClick={() => { setPaywall(null); setChatTarget(null); openRefill(); }}
-                  className="w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-white shadow-md flex items-center justify-center gap-2"
-                  style={{ background: "linear-gradient(135deg, #0055FF, #7C3AED)" }}>
-                  Continue <ArrowRight size={12} />
-                </RippleButton>
-                <button onClick={() => setPaywall(null)}
-                  className="w-full py-2 text-[9.5px] font-bold text-gray-500 hover:text-gray-800 transition-all">
-                  Maybe later
+            {/* ── MESSAGES AREA ── */}
+            <div className="flex-1 overflow-y-auto relative z-10" style={{ padding: "16px 16px 8px" }}>
+
+              {/* Empty state — no messages yet */}
+              {chatThread.length === 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="flex flex-col items-center justify-center h-full text-center py-12"
+                >
+                  {chatTarget.kind === "corporate" ? (
+                    <>
+                      <div className="w-20 h-20 rounded-3xl flex items-center justify-center mb-5 relative"
+                        style={{ background: "rgba(168,85,247,0.12)", border: "1px solid rgba(168,85,247,0.2)" }}>
+                        <Building2 size={34} className="text-purple-400/70" />
+                        <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-xl flex items-center justify-center"
+                          style={{ background: "rgba(168,85,247,0.25)", border: "1px solid rgba(168,85,247,0.3)" }}>
+                          <Lock size={13} className="text-purple-300" />
+                        </div>
+                      </div>
+                      <p className="text-[16px] font-black text-white mb-2">HR Portal Secured</p>
+                      <p className="text-[10px] text-white/40 font-medium leading-relaxed max-w-55">
+                        This is the official {chatTarget.company} Talent Team channel for the <strong className="text-white/60">{chatTarget.subtitle}</strong> role.
+                      </p>
+                      <div className="mt-5 p-4 rounded-2xl text-left w-full max-w-65"
+                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                        <p className="text-[9px] font-black text-white/60 uppercase tracking-widest mb-3">Application pipeline</p>
+                        {[
+                          { step: "01", label: "Activate HU Pack", done: false, color: "#a855f7" },
+                          { step: "02", label: "Submit your CV", done: false, color: "#8b5cf6" },
+                          { step: "03", label: "HR Reviews (2–5 days)", done: false, color: "#7c3aed" },
+                          { step: "04", label: "Video interview", done: false, color: "#6d28d9" },
+                          { step: "05", label: "Receive offer", done: false, color: "#5b21b6" },
+                        ].map((s, i) => (
+                          <div key={i} className="flex items-center gap-2.5 mb-2 last:mb-0">
+                            <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 text-[8px] font-black"
+                              style={{ background: `${s.color}20`, color: s.color, border: `1px solid ${s.color}30` }}>{s.step}</div>
+                            <p className="text-[9.5px] font-semibold text-white/50">{s.label}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-20 h-20 rounded-3xl flex items-center justify-center mb-5 relative"
+                        style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)" }}>
+                        <MessageCircle size={34} className="text-blue-400/70" />
+                        <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-xl flex items-center justify-center"
+                          style={{ background: "rgba(59,130,246,0.2)", border: "1px solid rgba(59,130,246,0.3)" }}>
+                          <Lock size={13} className="text-blue-300" />
+                        </div>
+                      </div>
+                      <p className="text-[16px] font-black text-white mb-2">Secure Client Channel</p>
+                      <p className="text-[10px] text-white/40 font-medium leading-relaxed max-w-55">
+                        This is your encrypted direct channel with <strong className="text-white/60">{chatTarget.name}</strong> for the <strong className="text-white/60">{chatTarget.subtitle}</strong> gig.
+                      </p>
+                      <div className="mt-5 p-4 rounded-2xl text-left w-full max-w-65"
+                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                        <p className="text-[9px] font-black text-white/60 uppercase tracking-widest mb-3">To start messaging</p>
+                        {[
+                          { icon: <Zap size={10} />, label: "Purchase a HU pack (from $3)", color: "#3b82f6" },
+                          { icon: <CheckCircle size={10} />, label: "HU credits instantly activated", color: "#10b981" },
+                          { icon: <Send size={10} />, label: "Full messaging unlocks immediately", color: "#8b5cf6" },
+                        ].map((s, i) => (
+                          <div key={i} className="flex items-center gap-2.5 mb-2 last:mb-0">
+                            <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
+                              style={{ background: `${s.color}20`, color: s.color }}>{s.icon}</div>
+                            <p className="text-[9.5px] font-semibold text-white/50">{s.label}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </motion.div>
+              )}
+
+              {/* Actual messages */}
+              {chatThread.map(b => (
+                <div key={b.id} className={`flex mb-3 ${b.from === "me" ? "justify-end" : "justify-start"}`}>
+                  <div className={`max-w-[76%] px-3.5 py-2.5 text-[10.5px] leading-relaxed shadow-lg ${
+                    b.from === "me"
+                      ? "rounded-2xl rounded-br-md text-white"
+                      : "rounded-2xl rounded-bl-md border"
+                  }`} style={b.from === "me"
+                    ? { background: chatTarget.kind === "corporate"
+                        ? "linear-gradient(135deg, #7c3aed, #4f46e5)"
+                        : "linear-gradient(135deg, #0055ff, #0ea5e9)" }
+                    : { background: "rgba(255,255,255,0.07)", borderColor: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.9)" }
+                  }>
+                    <p className="font-medium">{b.body}</p>
+                    <p className="text-[7.5px] mt-1 font-bold opacity-50">{b.time}</p>
+                  </div>
+                </div>
+              ))}
+              <div ref={chatEndRef} />
+            </div>
+
+            {/* ── COMPOSER ── */}
+            <div className="relative z-10 px-4 pb-6 pt-3"
+              style={{ background: "rgba(255,255,255,0.03)", borderTop: "1px solid rgba(255,255,255,0.07)", backdropFilter: "blur(20px)" }}>
+
+              {/* Lock notice */}
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl mb-3"
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                <Lock size={10} className="text-white/40 shrink-0" />
+                <p className="text-[9px] font-semibold text-white/40 leading-tight">
+                  {chatTarget.kind === "corporate"
+                    ? "Purchase HU and submit your application to start communicating with the HR team"
+                    : "Purchase a HU pack to unlock sending, attachments, and calls"}
+                </p>
+              </div>
+
+              <div className="flex items-end gap-2.5">
+                <button
+                  onClick={() => triggerCallPaywall("File & attachment sharing", "Send portfolios, CVs, and project files once your HU pack is active.")}
+                  className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 transition-all"
+                  style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                  <Paperclip size={15} className="text-white/50" />
+                </button>
+
+                <div className="flex-1 flex items-center gap-2 rounded-2xl px-4 py-3 transition-all"
+                  style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                  <input
+                    value={chatDraft}
+                    onChange={e => setChatDraft(e.target.value)}
+                    placeholder={chatTarget.kind === "corporate" ? "Message the Talent Team…" : "Type a message…"}
+                    className="flex-1 bg-transparent outline-none text-[11px] font-medium placeholder:font-medium"
+                    style={{ color: "rgba(255,255,255,0.6)", caretColor: chatTarget.kind === "corporate" ? "#a855f7" : "#3b82f6" }}
+                  />
+                  <button
+                    onClick={() => triggerCallPaywall("Voice messages", "Send voice notes once your HU pack is active.")}
+                    className="text-white/30 hover:text-white/50 transition-all">
+                    <Mic size={14} />
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => triggerCallPaywall(
+                    chatTarget.kind === "corporate" ? "Messaging the HR team" : "Sending messages",
+                    chatTarget.kind === "corporate"
+                      ? "Purchase a HU pack to open communication with the HR team and begin your application process."
+                      : "Purchase a HU pack to instantly unlock messaging with this verified client."
+                  )}
+                  className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 transition-all shadow-xl"
+                  style={{ background: chatTarget.kind === "corporate"
+                    ? "linear-gradient(135deg, #7c3aed, #4f46e5)"
+                    : "linear-gradient(135deg, #0055ff, #0ea5e9)" }}>
+                  <Send size={15} className="text-white" />
                 </button>
               </div>
-            </motion.div>
+
+              <p className="text-center text-[8px] font-semibold text-white/25 mt-3">
+                End-to-end encrypted · {chatTarget.kind === "corporate" ? "Official HR portal · Verified employer" : "Verified Nexus client"}
+              </p>
+            </div>
+
+            {/* Call paywall inside chat */}
+            {callPaywall && (
+              <CallPaywallPopup
+                open={callPaywall.open}
+                feature={callPaywall.feature}
+                sub={callPaywall.sub}
+                kind={chatTarget.kind}
+                onClose={() => setCallPaywall(null)}
+                onUnlock={() => { setCallPaywall(null); setChatTarget(null); openRefill(); }}
+              />
+            )}
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ─── MAIN CONTENT (only when not in chat) ─── */}
+      {!chatTarget && (
+        <>
+          <div className="max-w-5xl mx-auto pt-4 px-3 relative z-10">
+            <AnimatePresence mode="wait">
+
+              {/* ═══════════════ HOME ═══════════════ */}
+              {activeTab === "home" && (
+                <motion.div key="home" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }} className="space-y-4">
+
+                  {/* Hero */}
+                  <div className="rounded-2xl border border-gray-100 shadow-sm p-5 flex justify-between items-center overflow-hidden relative bg-white">
+                    <div className="absolute right-0 top-0 w-56 h-56 rounded-full opacity-[0.04]" style={{ background: "radial-gradient(circle, #0055FF, transparent)", transform: "translate(35%,-35%)" }} />
+                    <div>
+                      <p className="text-[8.5px] font-black text-gray-400 uppercase tracking-[0.15em] mb-0.5">Welcome back</p>
+                      <h2 className="text-[22px] font-black text-gray-900 leading-none tracking-tight">{user?.firstName || "Operator"}</h2>
+                      <div className="flex items-center gap-1.5 mt-1.5">
+                        <PulseDot color="#10B981" size={5} />
+                        <span className="text-[9px] font-semibold text-gray-400">Connected · All systems running</span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                      <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-100 px-3 py-2 rounded-xl shadow-sm">
+                        <Zap size={13} className="text-blue-600" fill="#3B82F6" />
+                        <span className="text-[15px] font-black text-gray-900">{huBalance}</span>
+                        <span className="text-[8px] font-black text-blue-600 uppercase tracking-widest">HU</span>
+                      </div>
+                      <div className="relative">
+                        <button onClick={() => setShowCurrencyMenu(m => !m)}
+                          className="text-[8.5px] font-bold bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-all flex items-center gap-1">
+                          {currency} <ChevronDown size={8} />
+                        </button>
+                        {showCurrencyMenu && (
+                          <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden w-40">
+                            {(["USD", "EUR", "GBP", "KES"] as const).map(c => (
+                              <button key={c} onClick={() => { setCurrency(c); setShowCurrencyMenu(false); }}
+                                className={`block w-full text-left px-3.5 py-2.5 text-[10px] font-bold hover:bg-blue-50 transition-all ${currency === c ? "text-blue-600 bg-blue-50" : "text-gray-700"}`}>
+                                {c} — {c === "USD" ? "US Dollar" : c === "EUR" ? "Euro" : c === "GBP" ? "British Pound" : "Kenyan Shilling"}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {justPurchased && hasHU && (
+                    <InstantAccessBanner huBalance={huBalance} onBrowse={() => setActiveTab("tasks")} />
+                  )}
+
+                  {/* CTA + Stats */}
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+                    <div className="md:col-span-3 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden"
+                      style={{ background: "linear-gradient(135deg, #0041CC 0%, #0055FF 55%, #1D8EF0 100%)" }}>
+                      <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 80% 20%, #ffffff 0%, transparent 50%)" }} />
+                      <div className="relative z-10">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <div className="w-5 h-5 rounded-lg bg-white/20 flex items-center justify-center">
+                            <Rocket size={11} className="text-white" />
+                          </div>
+                          <p className="text-[8px] font-black uppercase tracking-[0.15em] text-blue-200">One Purchase. Instant Freelance Access.</p>
+                        </div>
+                        <h3 className="text-[17px] font-black text-white leading-snug mb-2 tracking-tight">
+                          Buy HU → All Freelance Gigs<br />Unlock Immediately
+                        </h3>
+                        <p className="text-[10px] text-blue-100 leading-relaxed mb-4">
+                          24+ opportunities from top companies. Start working the moment your payment clears — <strong className="text-white">zero applications, zero waiting.</strong>
+                        </p>
+                        <div className="flex gap-2">
+                          <RippleButton onClick={openRefill}
+                            className="flex-1 py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-blue-700 bg-white hover:bg-blue-50 transition-all shadow-sm">
+                            Unlock Gigs — Buy HU
+                          </RippleButton>
+                          <button onClick={() => setActiveTab("tasks")}
+                            className="px-4 py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest border border-white/25 text-white/80 hover:text-white hover:bg-white/10 transition-all">
+                            Browse →
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="md:col-span-2 grid grid-cols-2 gap-2">
+                      <StatCard label="Freelance Gigs" value="24+" icon={<Briefcase size={13} />} color="#10B981" sub="Instant start" />
+                      <StatCard label="Uptime" value="99.9%" icon={<Wifi size={13} />} color="#3B82F6" />
+                      <StatCard label="Your HU" value={huBalance} icon={<Zap size={13} />} color="#8B5CF6" sub={hasHU ? "Active" : "Top up"} />
+                      <StatCard label="Countries" value="195+" icon={<Globe size={13} />} color="#F59E0B" />
+                    </div>
+                  </div>
+
+                  {/* Low HU Warning */}
+                  {!hasHU && (
+                    <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}
+                      className="p-3.5 rounded-xl border border-amber-200 bg-amber-50 flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+                        <Lock size={15} className="text-amber-600" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-[10.5px] font-black text-amber-800">Freelance gigs are locked — buy HU to unlock instantly</p>
+                        <p className="text-[9px] text-amber-600 font-medium mt-0.5">Balance: {huBalance} HU · Starter ($3) → unlocks 24 basic gigs right now</p>
+                      </div>
+                      <button onClick={openRefill} className="shrink-0 px-3.5 py-2 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-white bg-amber-500 hover:bg-amber-600 transition-all shadow-sm">
+                        Unlock
+                      </button>
+                    </motion.div>
+                  )}
+
+                  {/* Quick Actions */}
+                  <div className="grid grid-cols-4 gap-2">
+                    {[
+                      { icon: <Zap size={16} />, label: "Buy HU", color: "#3B82F6", bg: "linear-gradient(135deg, #EFF6FF, #DBEAFE)", action: openRefill },
+                      { icon: <Briefcase size={16} />, label: "Browse Gigs", color: "#8B5CF6", bg: "linear-gradient(135deg, #F5F3FF, #EDE9FE)", action: () => setActiveTab("tasks") },
+                      { icon: <Wallet size={16} />, label: "My Wallet", color: "#10B981", bg: "linear-gradient(135deg, #ECFDF5, #D1FAE5)", action: () => setActiveTab("earnings") },
+                      { icon: <BarChart3 size={16} />, label: "My Stats", color: "#F59E0B", bg: "linear-gradient(135deg, #FFFBEB, #FEF3C7)", action: () => setActiveTab("analytics") },
+                    ].map((item, i) => (
+                      <button key={i} onClick={item.action}
+                        className="p-3.5 rounded-xl border border-gray-100 bg-white hover:border-gray-200 hover:shadow-md transition-all text-center group">
+                        <div className="w-9 h-9 rounded-xl mx-auto mb-1.5 flex items-center justify-center transition-transform group-hover:scale-110"
+                          style={{ background: item.bg, color: item.color }}>
+                          {item.icon}
+                        </div>
+                        <p className="text-[8.5px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-gray-800 transition-all leading-none">{item.label}</p>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Freelance vs Corporate */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="rounded-xl border border-green-200 p-4" style={{ background: "linear-gradient(135deg, #ECFDF5, #F0FDF4)" }}>
+                      <div className="flex items-center gap-2.5 mb-2">
+                        <div className="w-8 h-8 rounded-xl bg-green-600 flex items-center justify-center shrink-0">
+                          <PlayCircle size={14} className="text-white" />
+                        </div>
+                        <div>
+                          <h4 className="text-[11px] font-black text-green-900">Freelance Gigs</h4>
+                          <p className="text-[8.5px] text-green-600 font-bold uppercase tracking-wide">Instant · Zero Applications</p>
+                        </div>
+                      </div>
+                      <p className="text-[9.5px] text-green-800 font-medium leading-relaxed mb-2">Buy HU once → every matching gig unlocks immediately. Pick a gig and start in minutes.</p>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <Badge color="#059669"><CheckCircle size={7} /> Start Immediately</Badge>
+                        <Badge color="#059669"><Zap size={7} /> Project-Based Pay</Badge>
+                      </div>
+                    </div>
+                    <div className="rounded-xl border border-purple-200 p-4" style={{ background: "linear-gradient(135deg, #FAF5FF, #F5F3FF)" }}>
+                      <div className="flex items-center gap-2.5 mb-2">
+                        <div className="w-8 h-8 rounded-xl bg-purple-600 flex items-center justify-center shrink-0">
+                          <Building2 size={14} className="text-white" />
+                        </div>
+                        <div>
+                          <h4 className="text-[11px] font-black text-purple-900">Corporate Roles</h4>
+                          <p className="text-[8.5px] text-purple-600 font-bold uppercase tracking-wide">HR Process · Monthly Salary</p>
+                        </div>
+                      </div>
+                      <p className="text-[9.5px] text-purple-800 font-medium leading-relaxed mb-2">Fortune 500 full-time remote roles. Apply with HU → CV review → video interview → formal offer.</p>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <Badge color="#7C3AED"><Clock size={7} /> 2–5 Day Review</Badge>
+                        <Badge color="#7C3AED"><DollarSign size={7} /> Monthly Salary</Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Top Companies */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-[8.5px] font-black uppercase tracking-[0.12em] text-gray-400">Top Companies Hiring Now</p>
+                      <button onClick={() => { setGigMode("corporate"); setActiveTab("tasks"); }} className="text-[8.5px] font-bold text-blue-500 hover:text-blue-700 flex items-center gap-0.5">
+                        View all <ChevronRight size={9} />
+                      </button>
+                    </div>
+                    <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                      {[
+                        { domain: "tesla.com", name: "Tesla" }, { domain: "amazon.com", name: "Amazon" },
+                        { domain: "stripe.com", name: "Stripe" }, { domain: "google.com", name: "Google" },
+                        { domain: "openai.com", name: "OpenAI" }, { domain: "coinbase.com", name: "Coinbase" },
+                        { domain: "shopify.com", name: "Shopify" }, { domain: "microsoft.com", name: "Microsoft" },
+                        { domain: "meta.com", name: "Meta" }, { domain: "discord.com", name: "Discord" },
+                      ].map((c, i) => (
+                        <button key={i} onClick={() => { setGigMode("corporate"); setActiveTab("tasks"); }}
+                          className="shrink-0 p-2.5 bg-white border border-gray-100 rounded-xl hover:border-blue-200 hover:shadow-md transition-all group">
+                          <CompanyLogo name={c.name} domain={c.domain} size={36} />
+                          <p className="text-[7.5px] font-bold text-gray-400 mt-1 text-center group-hover:text-gray-700">{c.name}</p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Global Stats */}
+                  <div className="grid grid-cols-4 gap-2">
+                    <StatCard label="Online" value="12,847" icon={<Users size={13} />} color="#10B981" sub="Workers" />
+                    <StatCard label="Open Today" value="2,341" icon={<Briefcase size={13} />} color="#3B82F6" sub="Gigs" />
+                    <StatCard label="Avg Value" value={fmt(847)} icon={<TrendingUp size={13} />} color="#8B5CF6" sub="Per gig" />
+                    <StatCard label="Paid Out" value="$4.2M" icon={<DollarSign size={13} />} color="#F59E0B" sub="This month" />
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ═══════════════ JOBS ═══════════════ */}
+              {activeTab === "tasks" && (
+                <motion.div key="tasks" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }} className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <SectionHead label="Global Gig Board" sub={`${marketplaceGigs.length + corporateGigs.length} gigs ready worldwide`} />
+                    <Badge color="#10B981"><PulseDot color="#10B981" size={5} /> Live</Badge>
+                  </div>
+
+                  {hasHU && gigMode === "marketplace" && (
+                    <div className="px-3.5 py-2.5 rounded-xl border border-green-200 flex items-center gap-2.5" style={{ background: "linear-gradient(135deg, #ECFDF5, #D1FAE5)" }}>
+                      <CheckCircle size={13} className="text-green-600 shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-[10px] font-black text-green-900">All freelance gigs unlocked — tap any to start now</p>
+                        <p className="text-[8.5px] text-green-700 font-medium mt-0.5">HU: {huBalance} · No applications · Clients pre-approved all workers</p>
+                      </div>
+                      <span className="text-[15px] font-black text-green-700">{huBalance}<span className="text-[8px] font-bold ml-0.5">HU</span></span>
+                    </div>
+                  )}
+
+                  {/* Mode tabs */}
+                  <div className="flex gap-1 p-1 rounded-xl border border-gray-200 bg-white w-fit shadow-sm">
+                    {(["marketplace", "corporate"] as const).map(m => (
+                      <button key={m} onClick={() => setGigMode(m)}
+                        className={`px-5 py-2 rounded-lg text-[9.5px] font-black uppercase tracking-widest transition-all ${gigMode === m ? "bg-blue-600 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"}`}>
+                        {m === "marketplace" ? "Freelance Gigs" : "Corporate Roles"}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* ── Marketplace ── */}
+                  {gigMode === "marketplace" && (
+                    <>
+                      <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border border-green-200" style={{ background: "linear-gradient(135deg, #ECFDF5, #D1FAE5)" }}>
+                        <CheckCircle2 size={12} className="text-green-600 shrink-0" />
+                        <p className="text-[9.5px] font-semibold text-green-800 leading-relaxed flex-1">
+                          <strong>Zero applications for freelance gigs.</strong> Buy HU → gigs unlock instantly.
+                        </p>
+                        {!hasHU && (
+                          <button onClick={openRefill} className="shrink-0 px-2.5 py-1.5 rounded-lg text-[8.5px] font-black text-white bg-green-600 hover:bg-green-700 transition-all">Buy HU</button>
+                        )}
+                      </div>
+
+                      <div className="flex gap-2">
+                        <div className="flex-1 flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 shadow-sm">
+                          <Search size={12} className="text-gray-400 shrink-0" />
+                          <input value={gigSearch} onChange={e => setGigSearch(e.target.value)} placeholder="Search gigs or clients..."
+                            className="flex-1 text-[10.5px] outline-none text-gray-700 placeholder-gray-400 bg-transparent" />
+                          {gigSearch && <button onClick={() => setGigSearch("")}><X size={10} className="text-gray-400 hover:text-gray-600" /></button>}
+                        </div>
+                        <select value={gigSort} onChange={e => setGigSort(e.target.value as typeof gigSort)}
+                          className="bg-white border border-gray-200 rounded-xl px-3 py-2 text-[10.5px] font-semibold text-gray-600 outline-none cursor-pointer shadow-sm">
+                          <option value="newest">Newest</option>
+                          <option value="highest">Highest Pay</option>
+                          <option value="lowest">Lowest Pay</option>
+                        </select>
+                      </div>
+
+                      <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+                        {gigCategories.map(cat => (
+                          <button key={cat} onClick={() => setGigCategory(cat)}
+                            className={`shrink-0 px-3.5 py-1.5 rounded-full text-[9px] font-bold border transition-all ${gigCategory === cat ? "bg-blue-600 text-white border-blue-600" : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"}`}>
+                            {cat}
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="flex gap-2 flex-wrap items-center">
+                        {[["Basic", "#10B981"], ["Standard", "#3B82F6"], ["Advanced", "#8B5CF6"], ["Expert", "#EF4444"]].map(([l, c]) => (
+                          <div key={l} className="flex items-center gap-1 px-2 py-1 bg-white border border-gray-100 rounded-lg">
+                            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: c }} />
+                            <span className="text-[8.5px] font-bold text-gray-500">{l}</span>
+                          </div>
+                        ))}
+                        <div className="flex items-center gap-1 px-2 py-1 bg-blue-50 border border-blue-100 rounded-lg ml-auto">
+                          <PlayCircle size={8} className="text-blue-600" />
+                          <span className="text-[8.5px] font-bold text-blue-600">{hasHU ? "All Unlocked" : "Buy HU to Unlock"}</span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {filteredMarket.map(g => {
+                          const lc = levelColors[g.level] || "#3B82F6";
+                          const tc = typeColors[g.type] || "#3B82F6";
+                          const isExpanded = expandedGig === g.id;
+                          return (
+                            <motion.div key={g.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                              className="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-lg hover:border-gray-200 transition-all overflow-hidden relative group"
+                              style={{ borderTop: `3px solid ${tc}` }}>
+                              {hasHU && (
+                                <div className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[7.5px] font-black bg-green-500 text-white shadow-sm">
+                                  <CheckCircle size={7} /> Ready
+                                </div>
+                              )}
+                              <div className="p-4">
+                                <div className="flex items-start justify-between mb-2.5">
+                                  <MarketplaceAvatar initials={g.avatar} type={g.type} seed={g.client} size={38} />
+                                  <div className="flex gap-1 flex-wrap justify-end pr-12">
+                                    <Badge color={tc}>{g.type}</Badge>
+                                    <Badge color={lc}>{g.level}</Badge>
+                                  </div>
+                                </div>
+                                <h4 className="text-[11.5px] font-black text-gray-900 mb-0.5 leading-snug">{g.title}</h4>
+                                <p className="text-[9px] text-gray-400 font-medium mb-1.5">{g.client} · {g.duration}</p>
+                                <p className="text-[9.5px] text-gray-500 leading-relaxed mb-2.5 line-clamp-2">{g.desc}</p>
+                                <div className="flex gap-1 flex-wrap mb-2.5">
+                                  {g.skills.map((s, si) => (
+                                    <span key={si} className="px-1.5 py-0.5 rounded text-[7.5px] font-bold bg-gray-100 text-gray-500">{s}</span>
+                                  ))}
+                                </div>
+
+                                <AnimatePresence>
+                                  {isExpanded && (
+                                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                                      <div className="mb-2 p-2.5 bg-gray-50 rounded-xl border border-gray-100">
+                                        <p className="text-[8.5px] font-bold text-gray-400 uppercase mb-0.5">Deliverables</p>
+                                        <p className="text-[9.5px] font-semibold text-gray-700">{g.deliverables}</p>
+                                      </div>
+                                      <div className="mb-2 p-2.5 bg-green-50 rounded-xl border border-green-100">
+                                        <p className="text-[8.5px] font-bold text-green-600 uppercase mb-0.5">How to Start</p>
+                                        <p className="text-[9.5px] font-semibold text-green-800">
+                                          {hasHU ? "✓ HU active — tap 'Start Gig' and begin right now. No approval needed." : "Purchase HU → gig activates instantly."}
+                                        </p>
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+
+                                <button onClick={() => setExpandedGig(isExpanded ? null : g.id)}
+                                  className="text-[8.5px] font-bold text-blue-500 hover:text-blue-700 transition-all mb-2.5 flex items-center gap-0.5">
+                                  {isExpanded ? <><ChevronUp size={8} /> Less</> : <><ChevronDown size={8} /> More details</>}
+                                </button>
+
+                                <div className="flex items-center justify-between pt-2.5 border-t border-gray-50">
+                                  <div>
+                                    <p className="text-[15px] font-black text-gray-900 leading-none">{fmt(g.budget)}</p>
+                                    <p className="text-[7.5px] text-gray-400 font-medium mt-0.5">Project budget</p>
+                                  </div>
+                                  <div className="flex items-center gap-1.5">
+                                    <button
+                                      onClick={() => openChatForGig(g)}
+                                      title="Chat with client"
+                                      className="w-9 h-9 rounded-xl border border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50 flex items-center justify-center text-gray-600 hover:text-blue-600 transition-all shadow-sm">
+                                      <MessageCircle size={13} />
+                                    </button>
+                                    {hasHU
+                                      ? <RippleButton onClick={() => handleStartGig(g.title)}
+                                          className="px-3.5 py-2 rounded-xl text-[8.5px] font-black uppercase tracking-widest text-white flex items-center gap-1 shadow-sm"
+                                          style={{ background: `linear-gradient(135deg, ${tc}, ${tc}bb)` }}>
+                                          <PlayCircle size={10} /> Start Gig
+                                        </RippleButton>
+                                      : <button onClick={openRefill}
+                                          className="px-3.5 py-2 rounded-xl text-[8.5px] font-black uppercase tracking-widest flex items-center gap-1 border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all">
+                                          <Lock size={9} /> Unlock
+                                        </button>
+                                    }
+                                  </div>
+                                </div>
+                              </div>
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+
+                      {filteredMarket.length === 0 && (
+                        <div className="text-center py-12 text-gray-400">
+                          <Search size={28} className="mx-auto mb-2 opacity-40" />
+                          <p className="text-[12px] font-semibold text-gray-600">No gigs match your search</p>
+                          <button onClick={() => { setGigSearch(""); setGigCategory("All"); }}
+                            className="mt-2 px-4 py-2 rounded-xl text-[9.5px] font-bold text-blue-600 bg-blue-50 border border-blue-100 hover:bg-blue-100 transition-all">
+                            Clear Filters
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {/* ── Corporate ── */}
+                  {gigMode === "corporate" && (
+                    <>
+                      <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+                        {corpDepts.map(d => (
+                          <button key={d} onClick={() => setCorpCategory(d)}
+                            className={`shrink-0 px-3.5 py-1.5 rounded-full text-[9px] font-bold border transition-all ${corpCategory === d ? "bg-blue-600 text-white border-blue-600" : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"}`}>
+                            {d}
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="px-3.5 py-2.5 rounded-xl border border-amber-200" style={{ background: "linear-gradient(135deg, #FFFBEB, #FFF7ED)" }}>
+                        <div className="flex items-center gap-2">
+                          <Info size={11} className="text-amber-500 shrink-0" />
+                          <p className="text-[9.5px] text-amber-800 font-semibold leading-relaxed">
+                            <strong>Corporate roles require a formal HR process</strong> — unlike freelance gigs, they don't start immediately after buying HU.
+                          </p>
+                        </div>
+                      </div>
+
+                      <CorporateHiringCard />
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {filteredCorp.map(c => {
+                          const isExpanded = expandedGig === c.id;
+                          const costColor = c.huRequired >= 100 ? "#EF4444" : "#8B5CF6";
+                          return (
+                            <div key={c.id} className="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-lg hover:border-gray-200 transition-all overflow-hidden"
+                              style={{ borderTop: "3px solid #8B5CF6" }}>
+                              <div className="p-4">
+                                <div className="flex items-center gap-1.5 mb-2.5 px-2.5 py-1.5 rounded-xl border border-purple-100"
+                                  style={{ background: "linear-gradient(135deg, #FAF5FF, #F5F3FF)" }}>
+                                  <Building2 size={9} className="text-purple-500 shrink-0" />
+                                  <p className="text-[8px] font-black text-purple-700 uppercase tracking-widest">Full-Time Corporate · HR Process</p>
+                                </div>
+                                <div className="flex items-center gap-3 mb-3">
+                                  <CompanyLogo name={c.company} domain={c.domain} size={44} />
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-[8.5px] font-bold uppercase tracking-wide text-gray-400 mb-0.5">{c.company}</p>
+                                    <h4 className="text-[11.5px] font-black text-gray-900 leading-snug">{c.title}</h4>
+                                    <div className="flex gap-1 mt-1 flex-wrap">
+                                      <Badge color="#8B5CF6">{c.badge}</Badge>
+                                      <Badge color="#06B6D4">{c.dept}</Badge>
+                                    </div>
+                                  </div>
+                                  <div className="text-right shrink-0">
+                                    <p className="text-[15px] font-black text-gray-900 leading-none">{fmt(c.salary)}</p>
+                                    <p className="text-[8px] text-gray-400 font-medium mt-0.5">/month</p>
+                                  </div>
+                                </div>
+                                <p className="text-[9.5px] text-gray-500 leading-relaxed mb-2.5">{c.desc}</p>
+                                <div className="flex gap-1 flex-wrap mb-2.5">
+                                  {c.skills.map((s, si) => (
+                                    <span key={si} className="px-1.5 py-0.5 rounded text-[7.5px] font-bold bg-gray-100 text-gray-500">{s}</span>
+                                  ))}
+                                </div>
+
+                                <AnimatePresence>
+                                  {isExpanded && (
+                                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                                      <div className="mb-2 p-2.5 bg-purple-50 rounded-xl border border-purple-100">
+                                        <p className="text-[8.5px] font-bold text-purple-600 uppercase mb-0.5">Hiring Pipeline</p>
+                                        <p className="text-[9.5px] font-semibold text-purple-800">Apply → Submit CV → HR Review (2–5 days) → Video Interview → Offer</p>
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+
+                                <button onClick={() => setExpandedGig(isExpanded ? null : c.id)}
+                                  className="text-[8.5px] font-bold text-blue-500 hover:text-blue-700 transition-all mb-2.5 flex items-center gap-0.5">
+                                  {isExpanded ? <><ChevronUp size={8} /> Less</> : <><ChevronDown size={8} /> More details</>}
+                                </button>
+
+                                <div className="flex items-center gap-1 mb-2.5 px-2.5 py-1.5 rounded-lg"
+                                  style={{ backgroundColor: `${costColor}0c`, border: `1px solid ${costColor}22` }}>
+                                  <Zap size={9} style={{ color: costColor }} />
+                                  <span className="text-[8.5px] font-black uppercase" style={{ color: costColor }}>Requires {c.huRequired} HU to Apply</span>
+                                  {c.huRequired >= 100 && <span className="ml-auto text-[7.5px] font-bold text-red-400">Senior Role</span>}
+                                </div>
+
+                                <div className="flex gap-1.5">
+                                  {/* Corporate Chat Button — opens dark HR portal */}
+                                  <button
+                                    onClick={() => openChatForCorporate(c)}
+                                    title="Open HR Portal"
+                                    className="shrink-0 flex items-center gap-1.5 px-3 h-10 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-600 transition-all text-[8.5px] font-black">
+                                    <Building2 size={12} />
+                                    HR Portal
+                                  </button>
+                                  {hasHU
+                                    ? <RippleButton onClick={() => handleApplyCorporate(c.title)}
+                                        className="flex-1 py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-1.5 shadow-sm"
+                                        style={{ background: "linear-gradient(135deg, #7C3AED, #4F46E5)" }}>
+                                        <ClipboardList size={11} /> Submit Application <ArrowUpRight size={10} />
+                                      </RippleButton>
+                                    : <button onClick={openRefill}
+                                        className="flex-1 py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 border border-purple-200 bg-purple-50 text-purple-600 hover:bg-purple-100 transition-all">
+                                        <Lock size={11} /> Purchase HU to Apply
+                                      </button>
+                                  }
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+                </motion.div>
+              )}
+
+              {/* ═══════════════ WALLET ═══════════════ */}
+              {activeTab === "earnings" && (
+                <motion.div key="earnings" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }} className="space-y-4">
+                  <SectionHead label="My Wallet" sub="Earnings, HU balance, and withdrawals" />
+
+                  <div className="flex gap-1 p-1 rounded-xl border border-gray-200 bg-white w-fit overflow-x-auto no-scrollbar shadow-sm">
+                    {(["overview", "history", "limits", "referral"] as const).map(t => (
+                      <button key={t} onClick={() => setActiveVaultTab(t)}
+                        className={`shrink-0 px-4 py-2 rounded-lg text-[9.5px] font-black uppercase tracking-widest transition-all ${activeVaultTab === t ? "bg-blue-600 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"}`}>
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+
+                  {activeVaultTab === "overview" && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="p-5 rounded-2xl border border-blue-100 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)" }}>
+                          <div className="absolute right-0 top-0 w-28 h-28 rounded-full opacity-10" style={{ background: "radial-gradient(circle, #0055FF, transparent)", transform: "translate(30%,-30%)" }} />
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center shadow-sm"><Zap size={14} className="text-white" fill="white" /></div>
+                            <Badge color="#3B82F6"><PulseDot color="#3B82F6" size={5} /> Active</Badge>
+                          </div>
+                          <p className="text-[8.5px] font-bold uppercase tracking-[0.15em] text-blue-400 mb-0.5">Handshake Units (HU)</p>
+                          <div className="flex items-end gap-1.5 mb-1">
+                            <span className="text-[38px] font-black text-gray-900 leading-none">{huBalance}</span>
+                            <span className="text-[16px] font-black text-blue-600 mb-1">HU</span>
+                          </div>
+                          <p className="text-[9.5px] font-medium text-gray-500 mb-4">{hasHU ? "All matching freelance gigs unlocked" : "Purchase HU to unlock freelance gigs instantly"}</p>
+                          <div className="flex gap-2">
+                            <button onClick={openRefill} className="flex-1 px-3.5 py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-sm">+ Top Up</button>
+                            <button onClick={() => setActiveVaultTab("history")} className="px-3.5 py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest border border-blue-200 text-blue-600 hover:bg-blue-50 transition-all">History</button>
+                          </div>
+                        </div>
+
+                        <div className="p-5 rounded-2xl border border-green-100 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)" }}>
+                          <div className="absolute right-0 top-0 w-28 h-28 rounded-full opacity-10" style={{ background: "radial-gradient(circle, #10B981, transparent)", transform: "translate(30%,-30%)" }} />
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="w-8 h-8 rounded-xl bg-green-600 flex items-center justify-center shadow-sm"><DollarSign size={14} className="text-white" /></div>
+                            <button onClick={() => setShowBalance(b => !b)} className="text-gray-400 hover:text-gray-600 transition-all p-1 rounded-lg hover:bg-white/50">
+                              {showBalance ? <Eye size={14} /> : <EyeOff size={14} />}
+                            </button>
+                          </div>
+                          <p className="text-[8.5px] font-bold uppercase tracking-[0.15em] text-green-400 mb-0.5">Earnings Balance</p>
+                          <div className="flex items-end gap-1.5 mb-1">
+                            <span className="text-[38px] font-black text-gray-900 leading-none">{showBalance ? fmt(cashBalance) : "••••"}</span>
+                          </div>
+                          <p className="text-[9.5px] font-medium text-gray-500 mb-4">Ready to withdraw · Min. $50.00</p>
+                          <RippleButton onClick={() => addToast("Minimum withdrawal is $50.00. Complete your first gig to earn.", "info")}
+                            className="w-full py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest border border-green-200 text-green-700 hover:bg-green-100 transition-all flex items-center justify-center gap-1.5 bg-white/50">
+                            Withdraw Money <ArrowUpRight size={11} />
+                          </RippleButton>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-4 gap-2">
+                        <StatCard label="Earned" value={fmt(0)} icon={<TrendingUp size={13} />} color="#10B981" sub="All time" />
+                        <StatCard label="Withdrawn" value={fmt(0)} icon={<Download size={13} />} color="#3B82F6" sub="All time" />
+                        <StatCard label="Pending" value={fmt(0)} icon={<Clock size={13} />} color="#F59E0B" sub="In review" />
+                        <StatCard label="HU" value={huBalance} icon={<Zap size={13} />} color="#8B5CF6" sub="Balance" />
+                      </div>
+
+                      <Card className="p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="w-6 h-6 rounded-lg bg-blue-50 flex items-center justify-center"><Calculator size={12} className="text-blue-600" /></div>
+                          <span className="text-[11px] font-black text-gray-800">HU Value Calculator</span>
+                        </div>
+                        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+                          <div className="bg-gray-50 p-3 rounded-xl border border-gray-200">
+                            <p className="text-[8px] font-bold text-gray-400 uppercase mb-0.5">HU Amount</p>
+                            <input type="number" value={calcHU} onChange={e => setCalcHU(e.target.value)}
+                              className="bg-transparent w-full text-[16px] font-black outline-none text-gray-900" min="0" />
+                          </div>
+                          <RefreshCw size={12} className="text-gray-400" />
+                          <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 text-right">
+                            <p className="text-[8px] font-bold text-gray-400 uppercase mb-0.5">Est. Gig Value</p>
+                            <p className="text-[16px] font-black text-green-600 leading-none">
+                              {isNaN(calcUSD) || calcUSD <= 0 ? "—" : fmt(calcUSD)}
+                            </p>
+                          </div>
+                        </div>
+                      </Card>
+
+                      <Card className="p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="w-6 h-6 rounded-lg bg-blue-50 flex items-center justify-center"><Globe size={12} className="text-blue-600" /></div>
+                          <span className="text-[11px] font-black text-gray-800">Withdrawal Methods</span>
+                        </div>
+                        <div className="space-y-2">
+                          {[
+                            { name: "Binance Pay (USDT)", sub: "Worldwide · Instant settlement", logo: <BinanceLogo size={38} />, status: "Global", color: "#F0B90B" },
+                            { name: "M-Pesa", sub: "Kenya, Tanzania, Uganda, Rwanda · Instant", logo: <MpesaLogoSVG size={38} />, status: "East Africa", color: "#16A34A" },
+                          ].map((m, i) => (
+                            <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100 hover:border-gray-200 transition-all">
+                              {m.logo}
+                              <div className="flex-1">
+                                <p className="text-[10.5px] font-black text-gray-900">{m.name}</p>
+                                <p className="text-[8.5px] text-gray-400 font-medium mt-0.5">{m.sub}</p>
+                              </div>
+                              <Badge color={m.color}>{m.status}</Badge>
+                            </div>
+                          ))}
+                        </div>
+                      </Card>
+                    </div>
+                  )}
+
+                  {activeVaultTab === "history" && (
+                    <PremiumLockedSection
+                      title="Transaction History"
+                      description="Your full earnings record, withdrawal history, and HU purchase log appear here once you complete your first gig or top up."
+                      icon={<Clock size={24} />}
+                      cta="Unlock Gigs Now"
+                      onCta={() => setActiveTab("tasks")}
+                      features={["Full record", "CSV export", "HU log", "Withdrawals"]}
+                    />
+                  )}
+
+                  {activeVaultTab === "limits" && (
+                    <div className="space-y-3">
+                      <Card className="p-4">
+                        <h4 className="text-[10px] font-black uppercase tracking-wide text-gray-500 mb-3">Withdrawal Limits</h4>
+                        <div className="space-y-3">
+                          {[
+                            { label: "Daily Withdrawal", used: 0, limit: 500, unit: "USD" },
+                            { label: "Monthly Withdrawal", used: 0, limit: 5000, unit: "USD" },
+                            { label: "HU Used Today", used: 0, limit: 200, unit: "HU" },
+                          ].map((item, i) => (
+                            <div key={i}>
+                              <div className="flex justify-between mb-1">
+                                <span className="text-[9.5px] font-bold text-gray-600">{item.label}</span>
+                                <span className="text-[9.5px] font-black text-gray-900">{item.used} / {item.limit} {item.unit}</span>
+                              </div>
+                              <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div className="h-full rounded-full bg-blue-500" style={{ width: `${(item.used / item.limit) * 100}%` }} />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </Card>
+                      <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-3">
+                        <ChevronsUp size={14} className="text-amber-500 shrink-0" />
+                        <div className="flex-1">
+                          <p className="text-[10px] font-black text-amber-800">Verify your profile to increase limits 10×</p>
+                          <p className="text-[8.5px] text-amber-600 font-medium mt-0.5">Verified accounts get priority processing</p>
+                        </div>
+                        <button onClick={() => { setActiveTab("me"); setActiveProfileTab("security"); }}
+                          className="shrink-0 px-3 py-1.5 rounded-xl text-[8.5px] font-black text-amber-700 border border-amber-300 bg-amber-100 hover:bg-amber-200 transition-all">
+                          Verify
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeVaultTab === "referral" && (
+                    <div className="p-6 rounded-2xl border border-purple-100 text-center" style={{ background: "linear-gradient(135deg, #F5F3FF 0%, #EEF2FF 100%)" }}>
+                      <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-purple-100 flex items-center justify-center">
+                        <Gift size={22} className="text-purple-600" />
+                      </div>
+                      <h4 className="text-[16px] font-black text-gray-900 mb-1.5">Refer Friends & Earn</h4>
+                      <p className="text-[10px] text-gray-500 font-medium mb-4">Get <strong className="text-purple-700">50 free HU</strong> for every friend who joins and tops up</p>
+                      <div className="bg-white p-3.5 rounded-xl border border-purple-100 flex items-center gap-3 text-left mb-4">
+                        <div className="flex-1">
+                          <p className="text-[8.5px] text-gray-400 font-medium mb-0.5">Your referral code</p>
+                          <p className="text-[15px] font-black text-blue-600 tracking-widest">NEXUS-{user?.firstName?.toUpperCase() || "USER"}07</p>
+                        </div>
+                        <button onClick={() => { navigator.clipboard.writeText("NEXUS-" + (user?.firstName?.toUpperCase() || "USER") + "07"); addToast("Referral code copied!", "success"); }}
+                          className="p-2 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-all">
+                          <Copy size={12} className="text-gray-500" />
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        <StatCard label="Referred" value="0" icon={<Users size={12} />} color="#8B5CF6" />
+                        <StatCard label="HU Earned" value="0" icon={<Zap size={12} />} color="#3B82F6" />
+                        <StatCard label="$ Earned" value={fmt(0)} icon={<DollarSign size={12} />} color="#10B981" />
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              {/* ═══════════════ WORK ═══════════════ */}
+              {activeTab === "contracts" && (
+                <motion.div key="contracts" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }} className="space-y-4">
+                  <SectionHead label="My Work" sub="Active gigs, contracts, and completed jobs" />
+                  <div className="grid grid-cols-4 gap-2 opacity-40 pointer-events-none select-none">
+                    <StatCard label="Active Gigs" value="—" icon={<Briefcase size={13} />} color="#3B82F6" />
+                    <StatCard label="Completed" value="—" icon={<CheckCircle2 size={13} />} color="#10B981" />
+                    <StatCard label="Earned" value="—" icon={<DollarSign size={13} />} color="#F59E0B" />
+                    <StatCard label="Rating" value="—" icon={<Star size={13} />} color="#8B5CF6" />
+                  </div>
+
+                  <PremiumLockedSection
+                    title="No Gigs Started Yet"
+                    description="Purchase HU and start your first freelance gig to unlock this section. Active work, milestones, client ratings, and earnings all appear here."
+                    icon={<FileText size={24} />}
+                    cta="Browse & Unlock Gigs"
+                    onCta={() => setActiveTab("tasks")}
+                    features={["Active gigs", "Client chat", "Milestones", "Earnings log", "Dispute help", "Ratings"]}
+                  />
+
+                  <div className="space-y-2">
+                    <p className="text-[9px] font-black uppercase tracking-[0.12em] text-gray-400">Trending Gigs — Start Today</p>
+                    {marketplaceGigs.slice(0, 3).map(g => (
+                      <div key={g.id} onClick={() => { setActiveTab("tasks"); setGigMode("marketplace"); }}
+                        className="flex items-center gap-3 p-3 bg-white border border-gray-100 rounded-xl cursor-pointer hover:border-blue-200 hover:shadow-md transition-all group">
+                        <MarketplaceAvatar initials={g.avatar} type={g.type} seed={g.client} size={34} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10.5px] font-black text-gray-900 truncate">{g.title}</p>
+                          <p className="text-[8.5px] text-gray-400 font-medium">{g.client} · {g.duration}</p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-[12px] font-black text-gray-900">{fmt(g.budget)}</p>
+                          <Badge color={levelColors[g.level] || "#3B82F6"}>{g.level}</Badge>
+                        </div>
+                        <ChevronRight size={13} className="text-gray-300 group-hover:text-blue-400 transition-colors shrink-0" />
+                      </div>
+                    ))}
+                    <button onClick={() => setActiveTab("tasks")}
+                      className="w-full py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-blue-600 border border-blue-100 bg-blue-50 hover:bg-blue-100 transition-all">
+                      Browse All Gigs →
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ═══════════════ CHATS ═══════════════ */}
+              {activeTab === "messages" && (
+                <motion.div key="messages" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }} className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <SectionHead label="Messages" sub="Platform notifications and system updates" />
+                    <Badge color="#3B82F6">{messages.filter(m => m.unread).length} unread</Badge>
+                  </div>
+
+                  <div className="space-y-2">
+                    {messages.map((m, i) => (
+                      <div key={i} onClick={() => setExpandedMsg(expandedMsg === i ? null : i)}
+                        className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${m.unread ? "bg-blue-50 border-blue-100 shadow-sm" : "bg-white border-gray-100"} hover:border-blue-200`}>
+                        <div className="flex items-start gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-base shrink-0">{m.avatar}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2 mb-0.5">
+                              <div className="flex items-center gap-1.5">
+                                <p className="text-[10.5px] font-black text-gray-900">{m.sender}</p>
+                                {m.unread && <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
+                              </div>
+                              <span className="text-[8.5px] text-gray-400 font-medium shrink-0">{m.time}</span>
+                            </div>
+                            <p className={`text-[9.5px] text-gray-500 font-medium leading-relaxed ${expandedMsg === i ? "" : "line-clamp-2"}`}>{m.body}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="p-5 rounded-2xl border border-dashed border-gray-200 text-center">
+                    <MessageSquare size={22} className="mx-auto mb-2 text-gray-300" />
+                    <p className="text-[11px] font-black text-gray-700">Client messages appear here</p>
+                    <p className="text-[9.5px] text-gray-400 font-medium mt-0.5 max-w-xs mx-auto leading-relaxed">
+                      Once you start a freelance gig, your direct client channel opens here automatically.
+                    </p>
+                    <button onClick={() => setActiveTab("tasks")}
+                      className="mt-3 px-4 py-2 rounded-xl text-[9.5px] font-bold text-blue-600 bg-blue-50 border border-blue-100 hover:bg-blue-100 transition-all">
+                      Browse Gigs →
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ═══════════════ STATS ═══════════════ */}
+              {activeTab === "analytics" && (
+                <motion.div key="analytics" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }} className="space-y-4">
+                  <SectionHead label="My Stats" sub="Performance overview and earnings analytics" />
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <StatCard label="Success Rate" value="0%" icon={<CheckCircle2 size={13} />} color="#10B981" />
+                    <StatCard label="Gigs Done" value="0" icon={<Briefcase size={13} />} color="#3B82F6" />
+                    <StatCard label="Total Earned" value={fmt(0)} icon={<DollarSign size={13} />} color="#F59E0B" />
+                    <StatCard label="Avg Rating" value="—" icon={<Star size={13} />} color="#8B5CF6" />
+                  </div>
+
+                  <PremiumLockedSection
+                    title="Stats Unlock After First Gig"
+                    description="Earnings charts, completion rate, client ratings, and skill analytics appear here after you complete your first gig on Nexus."
+                    icon={<BarChart3 size={24} />}
+                    cta="Start Your First Gig"
+                    onCta={() => setActiveTab("tasks")}
+                    features={["Earnings chart", "Win rate", "Client ratings", "Skill breakdown"]}
+                  />
+
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-6 h-6 rounded-lg bg-green-50 flex items-center justify-center"><TrendingUp size={12} className="text-green-600" /></div>
+                      <span className="text-[10.5px] font-black text-gray-800">Your Earning Potential</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { pack: "Starter ($3)", potential: "$1,200", color: "#10B981" },
+                        { pack: "Basic ($6)", potential: "$4,800", color: "#3B82F6" },
+                        { pack: "Pro ($12)", potential: "$22,000", color: "#8B5CF6" },
+                        { pack: "Pro Uplink ($20)", potential: "$50,000+", color: "#EF4444" },
+                      ].map((item, i) => (
+                        <div key={i} className="p-3 rounded-xl border border-gray-100 bg-gray-50">
+                          <p className="text-[8px] font-bold text-gray-400 mb-0.5">{item.pack}</p>
+                          <p className="text-[14px] font-black leading-none" style={{ color: item.color }}>{item.potential}</p>
+                          <p className="text-[7.5px] text-gray-400 mt-0.5">potential earnings</p>
+                        </div>
+                      ))}
+                    </div>
+                    <button onClick={openRefill} className="mt-3 w-full py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-sm">
+                      Buy HU & Start Earning →
+                    </button>
+                  </Card>
+                </motion.div>
+              )}
+
+              {/* ═══════════════ HELP ═══════════════ */}
+              {activeTab === "support" && (
+                <motion.div key="support" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }} className="max-w-lg mx-auto space-y-4">
+                  <SectionHead label="Help Center" sub="Worldwide support, 24/7" />
+
+                  <div className="p-3.5 rounded-xl border border-green-200 bg-green-50 flex items-center gap-3">
+                    <div className="w-7 h-7 rounded-xl bg-green-600 flex items-center justify-center shrink-0"><CheckCircle size={13} className="text-white" /></div>
+                    <div className="flex-1">
+                      <p className="text-[10.5px] font-black text-green-800">All Systems Running Normally</p>
+                      <p className="text-[8.5px] text-green-600 font-medium">Platform · Payments · Gigs · Wallet — all operational</p>
+                    </div>
+                    <Badge color="#10B981"><PulseDot color="#10B981" size={5} /> 99.9%</Badge>
+                  </div>
+
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-6 h-6 rounded-lg bg-indigo-50 flex items-center justify-center"><HelpCircle size={12} className="text-indigo-600" /></div>
+                      <span className="text-[10.5px] font-black text-gray-800">Frequently Asked Questions</span>
+                    </div>
+                    <div className="space-y-1.5">
+                      {faqItems.map((item, i) => (
+                        <div key={i} onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
+                          className="p-3.5 bg-indigo-50 border border-indigo-100 rounded-xl cursor-pointer hover:border-indigo-200 transition-all">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-[10.5px] font-bold text-indigo-900">{item.q}</p>
+                            <ChevronDown size={11} className={`text-indigo-400 shrink-0 transition-transform ${expandedFaq === i ? "rotate-180" : ""}`} />
+                          </div>
+                          <AnimatePresence>
+                            {expandedFaq === i && (
+                              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+                                <p className="text-[10px] text-indigo-700 leading-relaxed mt-2.5 pt-2.5 border-t border-indigo-200">{item.a}</p>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      ))}
+                    </div>
+                    <button onClick={openRefill}
+                      className="mt-4 w-full py-3 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-white hover:opacity-90 shadow-sm"
+                      style={{ background: "linear-gradient(135deg, #4F46E5, #0055FF)" }}>
+                      Buy HU — Unlock Gigs Now →
+                    </button>
+                  </Card>
+
+                  <Card className="p-4 space-y-2">
+                    <p className="text-[9px] font-black uppercase tracking-[0.12em] text-gray-400 mb-2">Contact Support</p>
+                    {[
+                      { label: "Email Us", value: "support@nexusgigs.me", icon: <Mail size={14} />, sub: "We reply within 2 hours", color: "#3B82F6", action: () => window.location.href = "mailto:support@nexusgigs.me" },
+                      { label: "Chat on WhatsApp", value: "Tap to open WhatsApp", icon: <MessageCircle size={14} />, sub: "Mon–Fri · Available globally", color: "#25D366", action: () => window.open("https://wa.me/254113637325", "_blank") },
+                      { label: "Live Chat", value: "Coming Soon", icon: <MessageSquare size={14} />, sub: "In-app · Under development", color: "#8B5CF6", action: undefined },
+                    ].map((item, i) => (
+                      <div key={i} onClick={item.action}
+                        className={`p-3.5 bg-gray-50 rounded-xl border border-gray-100 flex items-center gap-3 ${item.action ? "cursor-pointer hover:border-blue-200 hover:bg-blue-50" : "opacity-50"} transition-all`}>
+                        <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: `${item.color}12`, color: item.color }}>{item.icon}</div>
+                        <div className="flex-1">
+                          <p className="text-[10.5px] font-black text-gray-900">{item.label}</p>
+                          <p className="text-[8.5px] text-gray-400 font-medium mt-0.5">{item.sub}</p>
+                        </div>
+                        {item.action && <ChevronRight size={12} className="text-gray-400 shrink-0" />}
+                      </div>
+                    ))}
+                  </Card>
+                </motion.div>
+              )}
+
+              {/* ═══════════════ ME / PROFILE ═══════════════ */}
+              {activeTab === "me" && (
+                <motion.div key="me" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }} className="space-y-4">
+                  <SectionHead label="My Profile" sub="Account, security, and preferences" />
+
+                  <div className="rounded-2xl border border-gray-100 p-5 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%)" }}>
+                    <div className="absolute right-0 top-0 w-40 h-40 rounded-full opacity-[0.05]" style={{ background: "radial-gradient(circle, #0055FF, transparent)", transform: "translate(30%,-30%)" }} />
+                    <div className="flex items-start gap-4">
+                      <div className="relative shrink-0">
+                        <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-black shadow-lg"
+                          style={{ background: "linear-gradient(135deg, #0055FF, #8B5CF6)" }}>
+                          {(user?.firstName?.[0] || "U").toUpperCase()}
+                        </div>
+                        {isVerified && (
+                          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 border-2 border-white flex items-center justify-center shadow-sm">
+                            <Check size={8} className="text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                          <h3 className="text-[16px] font-black text-gray-900 leading-none">
+                            {`${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "Freelancer"}
+                          </h3>
+                          {isVerified
+                            ? <Badge color="#10B981"><BadgeCheck size={8} /> Verified</Badge>
+                            : <Badge color="#F59E0B"><AlertCircle size={8} /> Unverified</Badge>
+                          }
+                        </div>
+                        <p className="text-[9px] text-gray-400 font-medium mb-1.5">{user?.primaryEmailAddress?.emailAddress || "—"}</p>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <Badge color="#3B82F6"><Globe size={7} /> {profileLocation}</Badge>
+                          <Badge color="#8B5CF6"><Zap size={7} /> {profileAvailability}</Badge>
+                        </div>
+
+                        {editingProfile ? (
+                          <div className="mt-3 space-y-2.5">
+                            {[
+                              { label: "Bio", el: <textarea value={profileBio} onChange={e => setProfileBio(e.target.value)} rows={2} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-[10.5px] text-gray-700 outline-none focus:border-blue-400 resize-none transition-all" /> },
+                              { label: "Location", el: <input value={profileLocation} onChange={e => setProfileLocation(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-[10.5px] text-gray-700 outline-none focus:border-blue-400 transition-all" /> },
+                              { label: "Hourly Rate", el: <input value={profileRate} onChange={e => setProfileRate(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-[10.5px] text-gray-700 outline-none focus:border-blue-400 transition-all" /> },
+                              { label: "Skills (comma separated)", el: <input value={profileSkills.join(", ")} onChange={e => setProfileSkills(e.target.value.split(",").map(s => s.trim()).filter(Boolean))} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-[10.5px] text-gray-700 outline-none focus:border-blue-400 transition-all" /> },
+                            ].map((row, i) => (
+                              <div key={i}>
+                                <label className="text-[8px] font-bold text-gray-400 uppercase tracking-wide mb-0.5 block">{row.label}</label>
+                                {row.el}
+                              </div>
+                            ))}
+                            <RippleButton onClick={() => { setEditingProfile(false); addToast("Profile updated!", "success"); }}
+                              className="w-full py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-white shadow-sm"
+                              style={{ background: "linear-gradient(135deg, #0055FF, #0041CC)" }}>
+                              Save Profile
+                            </RippleButton>
+                          </div>
+                        ) : (
+                          <div className="mt-2">
+                            <p className="text-[10px] text-gray-500 leading-relaxed">{profileBio}</p>
+                            <div className="flex gap-1 flex-wrap mt-2">
+                              {profileSkills.map((skill, i) => (
+                                <span key={i} className="px-2 py-0.5 rounded-full text-[8.5px] font-bold bg-blue-50 text-blue-600 border border-blue-100">{skill}</span>
+                              ))}
+                            </div>
+                            <button onClick={() => setEditingProfile(true)} className="mt-2 text-[9px] font-bold text-blue-500 hover:text-blue-700 flex items-center gap-1">
+                              <Edit3 size={9} /> Edit Profile
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {!isVerified && (
+                    <div className="p-4 rounded-xl border border-amber-200" style={{ background: "linear-gradient(135deg, #FFFBEB, #FFF7ED)" }}>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <UserCheck size={13} className="text-amber-600" />
+                          <span className="text-[10.5px] font-black text-amber-800">Profile Completion</span>
+                        </div>
+                        <span className="text-[12px] font-black text-amber-600">45%</span>
+                      </div>
+                      <div className="h-1.5 bg-amber-100 rounded-full overflow-hidden mb-2">
+                        <motion.div initial={{ width: 0 }} animate={{ width: "45%" }} transition={{ delay: 0.3, duration: 0.8 }}
+                          className="h-full rounded-full" style={{ background: "linear-gradient(90deg, #F59E0B, #EF4444)" }} />
+                      </div>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {[
+                          { label: "Email verified", done: true },
+                          { label: "Profile photo", done: false },
+                          { label: "ID verification", done: false },
+                          { label: "Phone number", done: false },
+                        ].map((item, i) => (
+                          <div key={i} className="flex items-center gap-1.5">
+                            <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 ${item.done ? "bg-green-500" : "bg-gray-200"}`}>
+                              {item.done ? <Check size={7} className="text-white" /> : <X size={7} className="text-gray-400" />}
+                            </div>
+                            <span className={`text-[8.5px] font-semibold ${item.done ? "text-gray-700" : "text-gray-400"}`}>{item.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-4 gap-2">
+                    <StatCard label="HU Balance" value={huBalance} icon={<Zap size={12} />} color="#3B82F6" />
+                    <StatCard label="Gigs Done" value="0" icon={<CheckSquare size={12} />} color="#10B981" />
+                    <StatCard label="Earned" value={fmt(0)} icon={<DollarSign size={12} />} color="#F59E0B" />
+                    <StatCard label="Rating" value="—" icon={<Star size={12} />} color="#8B5CF6" />
+                  </div>
+
+                  <div className="flex gap-1 p-1 rounded-xl border border-gray-200 bg-white overflow-x-auto no-scrollbar shadow-sm">
+                    {([
+                      { id: "profile" as ProfileTab, label: "Profile", icon: <User size={10} /> },
+                      { id: "security" as ProfileTab, label: "Security", icon: <Shield size={10} /> },
+                      { id: "notifications" as ProfileTab, label: "Alerts", icon: <Bell size={10} /> },
+                      { id: "achievements" as ProfileTab, label: "Badges", icon: <Trophy size={10} /> },
+                      { id: "settings" as ProfileTab, label: "Settings", icon: <Settings size={10} /> },
+                    ]).map(t => (
+                      <button key={t.id} onClick={() => setActiveProfileTab(t.id)}
+                        className={`shrink-0 flex items-center gap-1 px-3.5 py-2 rounded-lg text-[9.5px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeProfileTab === t.id ? "bg-blue-600 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"}`}>
+                        {t.icon} {t.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {activeProfileTab === "profile" && (
+                    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
+                      <Card className="p-4">
+                        <p className="text-[8.5px] font-black uppercase tracking-[0.12em] text-gray-400 mb-3">Account Info</p>
+                        <div className="space-y-0.5">
+                          {[
+                            { label: "Display Name", value: `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "—", icon: <User size={12} />, color: "#3B82F6" },
+                            { label: "Email", value: user?.primaryEmailAddress?.emailAddress || "—", icon: <Mail size={12} />, color: "#10B981" },
+                            { label: "Account Type", value: "Freelancer · Global", icon: <Briefcase size={12} />, color: "#8B5CF6" },
+                            { label: "HU Balance", value: `${huBalance} HU`, icon: <Zap size={12} />, color: "#0055FF" },
+                            { label: "Cash Balance", value: fmt(cashBalance), icon: <DollarSign size={12} />, color: "#10B981" },
+                            { label: "Hourly Rate", value: profileRate, icon: <TrendingUp size={12} />, color: "#EF4444" },
+                            { label: "Location", value: profileLocation, icon: <MapPin size={12} />, color: "#06B6D4" },
+                          ].map((row, i) => (
+                            <div key={i} className="flex items-center gap-2.5 py-2.5 border-b border-gray-50 last:border-0">
+                              <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: `${row.color}12`, color: row.color }}>{row.icon}</div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[7.5px] font-bold text-gray-400 uppercase tracking-wide">{row.label}</p>
+                                <p className="text-[10.5px] font-black text-gray-900 mt-0.5 break-all">{row.value}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </Card>
+
+                      <Card className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <p className="text-[8.5px] font-black uppercase tracking-[0.12em] text-gray-400">My Skills</p>
+                          <button onClick={() => setEditingProfile(true)} className="text-[8.5px] font-bold text-blue-500 flex items-center gap-0.5"><Edit3 size={8} /> Edit</button>
+                        </div>
+                        <div className="flex gap-1.5 flex-wrap">
+                          {profileSkills.map((skill, i) => (
+                            <span key={i} className="px-2.5 py-1 rounded-xl text-[9.5px] font-bold bg-blue-50 text-blue-700 border border-blue-100">{skill}</span>
+                          ))}
+                        </div>
+                      </Card>
+                    </motion.div>
+                  )}
+
+                  {activeProfileTab === "security" && (
+                    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
+                      <div className="p-4 rounded-2xl border border-blue-100" style={{ background: "linear-gradient(135deg, #EFF6FF, #DBEAFE)" }}>
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-xl bg-blue-600 flex items-center justify-center"><Shield size={13} className="text-white" /></div>
+                            <span className="text-[11px] font-black text-blue-900">Security Score</span>
+                          </div>
+                          <span className="text-[18px] font-black text-blue-600">40<span className="text-[11px] text-blue-400">/100</span></span>
+                        </div>
+                        <div className="h-1.5 bg-blue-100 rounded-full overflow-hidden mb-1">
+                          <motion.div initial={{ width: 0 }} animate={{ width: "40%" }} transition={{ delay: 0.2, duration: 0.8 }}
+                            className="h-full rounded-full" style={{ background: "linear-gradient(90deg, #3B82F6, #0055FF)" }} />
+                        </div>
+                        <p className="text-[8.5px] text-blue-500 font-medium">Enable 2FA to boost score to 80+</p>
+                      </div>
+
+                      <Card className="p-4">
+                        <p className="text-[8.5px] font-black uppercase tracking-[0.12em] text-gray-400 mb-2">Security Settings</p>
+                        <ToggleRow
+                          label="Two-Factor Authentication"
+                          sub={twoFAEnabled ? "Your account is protected" : "Strongly recommended"}
+                          value={twoFAEnabled}
+                          onChange={() => { setTwoFAEnabled(v => !v); addToast(twoFAEnabled ? "2FA disabled" : "2FA enabled!", twoFAEnabled ? "info" : "success"); }}
+                          icon={<Fingerprint size={12} />}
+                          color="#10B981"
+                        />
+                      </Card>
+
+                      <Card className="p-4">
+                        <p className="text-[8.5px] font-black uppercase tracking-[0.12em] text-gray-400 mb-3">Active Sessions</p>
+                        <div className="space-y-2">
+                          {sessions.map((s, i) => (
+                            <div key={i} className={`flex items-center gap-2.5 p-3 rounded-xl border transition-all ${revokedSession.includes(i) ? "opacity-40 bg-gray-50 border-gray-100" : s.current ? "bg-green-50 border-green-100" : "bg-gray-50 border-gray-100"}`}>
+                              <div className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center shrink-0">
+                                <Smartphone size={13} className="text-gray-500" />
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-1.5">
+                                  <p className="text-[10px] font-black text-gray-900">{s.device}</p>
+                                  {s.current && <Badge color="#10B981">Current</Badge>}
+                                </div>
+                                <p className="text-[8.5px] text-gray-400 font-medium">{s.location} · {s.last}</p>
+                              </div>
+                              {!s.current && !revokedSession.includes(i) && (
+                                <button onClick={() => { setRevokedSession(r => [...r, i]); addToast("Session revoked", "success"); }}
+                                  className="px-2.5 py-1 rounded-lg border border-red-200 bg-red-50 text-[8.5px] font-bold text-red-600 hover:bg-red-100 transition-all">
+                                  Revoke
+                                </button>
+                              )}
+                              {revokedSession.includes(i) && <span className="text-[8.5px] font-bold text-gray-400">Revoked</span>}
+                            </div>
+                          ))}
+                        </div>
+                      </Card>
+
+                      <Card className="p-4">
+                        <p className="text-[8.5px] font-black uppercase tracking-[0.12em] text-gray-400 mb-1.5">API Access</p>
+                        <p className="text-[9.5px] text-gray-500 font-medium mb-3">Generate an API key to connect external tools to Nexus.</p>
+                        {generatedApiKey ? (
+                          <div className="space-y-2">
+                            <div className="flex gap-2">
+                              <div className="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-2.5 font-mono text-[9.5px] text-gray-600 truncate">
+                                {showApiKey ? generatedApiKey : "••••••••••••••••••••••••••••••••"}
+                              </div>
+                              <button onClick={() => setShowApiKey(v => !v)} className="p-2.5 bg-gray-100 border border-gray-200 rounded-xl hover:bg-gray-200 transition-all">
+                                {showApiKey ? <EyeOff size={12} className="text-gray-500" /> : <Eye size={12} className="text-gray-500" />}
+                              </button>
+                              <button onClick={() => { navigator.clipboard.writeText(generatedApiKey); setCopiedKey(true); addToast("API key copied!", "success"); setTimeout(() => setCopiedKey(false), 2000); }}
+                                className="p-2.5 bg-gray-100 border border-gray-200 rounded-xl hover:bg-gray-200 transition-all">
+                                {copiedKey ? <Check size={12} className="text-green-500" /> : <Copy size={12} className="text-gray-500" />}
+                              </button>
+                            </div>
+                            <button onClick={() => { setGeneratedApiKey(null); addToast("API key revoked", "info"); }} className="text-[9.5px] font-bold text-red-500 hover:text-red-700 transition-all">
+                              Revoke Key
+                            </button>
+                          </div>
+                        ) : (
+                          <RippleButton onClick={() => { const key = "nxs_" + Math.random().toString(36).substr(2, 32); setGeneratedApiKey(key); addToast("API key generated!", "success"); }}
+                            className="w-full py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest border border-blue-200 text-blue-600 hover:bg-blue-50 transition-all flex items-center justify-center gap-1.5">
+                            <Key size={11} /> Generate API Key
+                          </RippleButton>
+                        )}
+                      </Card>
+                    </motion.div>
+                  )}
+
+                  {activeProfileTab === "notifications" && (
+                    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+                      <Card className="p-4">
+                        <p className="text-[8.5px] font-black uppercase tracking-[0.12em] text-gray-400 mb-1">Notification Preferences</p>
+                        <ToggleRow label="New Gig Alerts" sub="When matching gigs are posted" value={notifications.newGigs} onChange={() => setNotifications(n => ({ ...n, newGigs: !n.newGigs }))} icon={<Briefcase size={12} />} color="#3B82F6" />
+                        <ToggleRow label="Payment Updates" sub="Confirmations, withdrawals, HU credits" value={notifications.payments} onChange={() => setNotifications(n => ({ ...n, payments: !n.payments }))} icon={<DollarSign size={12} />} color="#10B981" />
+                        <ToggleRow label="Mission Alerts" sub="Status changes on active gigs" value={notifications.missions} onChange={() => setNotifications(n => ({ ...n, missions: !n.missions }))} icon={<Target size={12} />} color="#8B5CF6" />
+                        <ToggleRow label="Message Alerts" sub="Client messages and announcements" value={notifications.messages} onChange={() => setNotifications(n => ({ ...n, messages: !n.messages }))} icon={<MessageSquare size={12} />} color="#F59E0B" />
+                        <ToggleRow label="Weekly Summary" sub="Performance digest every Monday" value={notifications.weekly} onChange={() => setNotifications(n => ({ ...n, weekly: !n.weekly }))} icon={<BarChart3 size={12} />} color="#06B6D4" />
+                      </Card>
+                    </motion.div>
+                  )}
+
+                  {activeProfileTab === "achievements" && (
+                    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
+                      <div className="grid grid-cols-2 gap-2">
+                        {achievements.map(ach => (
+                          <div key={ach.id} className={`p-3.5 rounded-2xl border flex items-start gap-2.5 transition-all ${ach.earned ? "bg-white border-gray-100 shadow-sm" : "bg-gray-50 border-gray-100 opacity-50"}`}>
+                            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                              style={{ backgroundColor: ach.earned ? `${ach.color}12` : "#F3F4F6", color: ach.earned ? ach.color : "#9CA3AF" }}>
+                              {ach.icon}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-1 flex-wrap">
+                                <p className="text-[10.5px] font-black text-gray-900">{ach.title}</p>
+                                {ach.earned && <Check size={8} className="text-green-500" />}
+                              </div>
+                              <p className="text-[8.5px] text-gray-400 font-medium mt-0.5">{ach.desc}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="p-4 rounded-2xl border border-blue-100 bg-blue-50 text-center">
+                        <Trophy size={16} className="mx-auto text-blue-500 mb-1.5" />
+                        <p className="text-[10.5px] font-black text-gray-800">{achievements.filter(a => a.earned).length} of {achievements.length} badges earned</p>
+                        <p className="text-[8.5px] text-gray-400 font-medium mt-0.5">Purchase HU and start gigs to unlock more</p>
+                        <button onClick={openRefill} className="mt-2.5 px-4 py-1.5 rounded-xl text-[9.5px] font-bold text-blue-600 bg-white border border-blue-200 hover:bg-blue-50 transition-all">
+                          Unlock Gigs →
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {activeProfileTab === "settings" && (
+                    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
+                      <Card className="p-4">
+                        <p className="text-[8.5px] font-black uppercase tracking-[0.12em] text-gray-400 mb-3">App Settings</p>
+                        <div className="space-y-0.5">
+                          {[
+                            {
+                              icon: <Languages size={12} />, color: "#3B82F6", label: "Language", sub: "Display language",
+                              el: <select value={selectedLang} onChange={e => { setSelectedLang(e.target.value); addToast("Language updated", "success"); }} className="text-[9.5px] font-bold text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 outline-none cursor-pointer">
+                                <option>English</option><option>Français</option><option>Español</option><option>Deutsch</option><option>Swahili</option><option>Arabic</option>
+                              </select>
+                            },
+                            {
+                              icon: <DollarSign size={12} />, color: "#10B981", label: "Currency", sub: "Display currency",
+                              el: <select value={currency} onChange={e => setCurrency(e.target.value as typeof currency)} className="text-[9.5px] font-bold text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 outline-none cursor-pointer">
+                                <option value="USD">USD ($)</option><option value="EUR">EUR (€)</option><option value="GBP">GBP (£)</option><option value="KES">KES</option>
+                              </select>
+                            },
+                            {
+                              icon: <Globe size={12} />, color: "#8B5CF6", label: "Availability", sub: "Visible to clients",
+                              el: <select value={profileAvailability} onChange={e => { setProfileAvailability(e.target.value); addToast("Availability updated", "success"); }} className="text-[9.5px] font-bold text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 outline-none cursor-pointer">
+                                <option>Available Now</option><option>Part-time Only</option><option>Unavailable</option>
+                              </select>
+                            },
+                          ].map((row, i) => (
+                            <div key={i} className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0">
+                              <div className="flex items-center gap-2.5">
+                                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${row.color}12`, color: row.color }}>{row.icon}</div>
+                                <div>
+                                  <p className="text-[10.5px] font-bold text-gray-800">{row.label}</p>
+                                  <p className="text-[8.5px] text-gray-400 font-medium">{row.sub}</p>
+                                </div>
+                              </div>
+                              {row.el}
+                            </div>
+                          ))}
+                        </div>
+                      </Card>
+
+                      <Card className="p-4">
+                        <p className="text-[8.5px] font-black uppercase tracking-[0.12em] text-gray-400 mb-3">Account Actions</p>
+                        <div className="space-y-2">
+                          <button onClick={() => addToast("Data export requested — email sent within 24h", "info")}
+                            className="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-all flex items-center gap-2.5 text-left">
+                            <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center shrink-0"><Download size={12} className="text-blue-600" /></div>
+                            <div>
+                              <p className="text-[10.5px] font-bold text-gray-700">Export My Data</p>
+                              <p className="text-[8.5px] text-gray-400 font-medium">Download all account data (GDPR)</p>
+                            </div>
+                          </button>
+                          <button onClick={() => addToast("Account deletion requires identity verification", "error")}
+                            className="w-full p-3 rounded-xl border border-red-100 bg-red-50 hover:bg-red-100 transition-all flex items-center gap-2.5 text-left">
+                            <div className="w-7 h-7 rounded-lg bg-red-100 flex items-center justify-center shrink-0"><Trash2 size={12} className="text-red-500" /></div>
+                            <div>
+                              <p className="text-[10.5px] font-bold text-red-600">Delete Account</p>
+                              <p className="text-[8.5px] text-red-400 font-medium">Permanently remove your account</p>
+                            </div>
+                          </button>
+                        </div>
+                      </Card>
+
+                      <SignOutButton>
+                        <button className="w-full py-3.5 rounded-2xl border border-gray-200 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2.5 group shadow-sm">
+                          <LogOut size={14} className="text-gray-400 group-hover:text-red-500 transition-colors" />
+                          <span className="text-[10.5px] font-black text-gray-500 group-hover:text-red-500 transition-colors uppercase tracking-widest">Sign Out</span>
+                        </button>
+                      </SignOutButton>
+                    </motion.div>
+                  )}
+                </motion.div>
+              )}
+
+            </AnimatePresence>
+          </div>
+
+          {/* ═══════════════ BOTTOM NAV ═══════════════ */}
+          <div className="fixed bottom-0 left-0 right-0 z-100 border-t border-gray-100"
+            style={{ background: "rgba(255,255,255,0.97)", backdropFilter: "blur(16px)", boxShadow: "0 -4px 24px rgba(0,0,0,0.06)" }}>
+            <div className="max-w-5xl mx-auto flex items-center justify-around px-1 overflow-x-auto no-scrollbar" style={{ height: 64 }}>
+              {navItems.map(item => (
+                <button key={item.id} onClick={() => setActiveTab(item.id)}
+                  className={`flex flex-col items-center justify-center gap-0.5 h-full flex-1 min-w-13 transition-all duration-200 relative ${activeTab === item.id ? "text-blue-600" : "text-gray-400 hover:text-gray-600"}`}>
+                  {activeTab === item.id && (
+                    <motion.span layoutId="nav-indicator"
+                      className="absolute top-0 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-b-full bg-blue-600" />
+                  )}
+                  <div className={`transition-all duration-200 ${activeTab === item.id ? "scale-110" : "scale-100"}`}>{item.icon}</div>
+                  <span className={`text-[7.5px] font-bold uppercase tracking-widest leading-none ${activeTab === item.id ? "text-blue-600" : "text-gray-400"}`}>{item.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* ═══════════════ REFILL MODAL ═══════════════ */}
+          <AnimatePresence>
+            {showModal && (
+              <div className="fixed inset-0 z-600 flex items-end sm:items-center justify-center p-3">
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  className="absolute inset-0 bg-black/55" style={{ backdropFilter: "blur(8px)" }}
+                  onClick={() => !isPaying && setShowModal(false)} />
+
+                <motion.div initial={{ scale: 0.93, y: 24 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.93, y: 24 }}
+                  transition={{ type: "spring", damping: 26, stiffness: 320 }}
+                  className="relative w-full max-w-sm bg-white border border-gray-200 rounded-3xl p-5 shadow-2xl overflow-hidden max-h-[94vh] overflow-y-auto no-scrollbar">
+
+                  {modalStep === "packages" && (
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-[18px] font-black text-gray-900 leading-none">Unlock Gigs Instantly</h3>
+                          <p className="text-[10px] text-gray-400 font-medium mt-0.5">One purchase → all matching freelance gigs unlock immediately.</p>
+                        </div>
+                        <button onClick={() => setShowModal(false)} className="p-1.5 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all"><X size={14} /></button>
+                      </div>
+
+                      <div className="p-3 rounded-xl border border-green-200 bg-green-50 flex items-center gap-2">
+                        <CheckCircle2 size={12} className="text-green-600 shrink-0" />
+                        <p className="text-[9.5px] font-semibold text-green-800 leading-relaxed">
+                          <strong>Payment confirmed = gigs unlocked.</strong> Start working in minutes — no applications, no waiting.
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { label: "Avg ROI on $3", value: "400×", sub: "Starter pack" },
+                          { label: "Top earner", value: "$50K+", sub: "Pro Uplink users" },
+                        ].map((s, i) => (
+                          <div key={i} className="p-3 rounded-xl bg-blue-50 border border-blue-100 text-center">
+                            <p className="text-[18px] font-black text-blue-700 leading-none">{s.value}</p>
+                            <p className="text-[8px] font-bold text-blue-500 mt-0.5">{s.label}</p>
+                            <p className="text-[7.5px] text-gray-400 font-medium">{s.sub}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="space-y-2.5">
+                        {uplinkPackages.map(pack => (
+                          <div key={pack.id} onClick={() => { setSelectedPack(pack); setModalStep("choice"); setAgreed(false); }}
+                            className={`relative p-3.5 rounded-2xl border cursor-pointer transition-all hover:shadow-lg active:scale-[0.98] ${pack.highlight ? "border-slate-300 bg-slate-50 shadow-md ring-2 ring-purple-200" : "bg-white border-gray-200 hover:border-gray-300"}`}
+                            style={{ borderLeft: `4px solid ${pack.color}` }}>
+                            {pack.hot && (
+                              <div className="absolute -top-2.5 right-3 px-2.5 py-0.5 rounded-full text-[8px] font-black text-white shadow-sm"
+                                style={{ backgroundColor: pack.color }}>
+                                ⭐ MOST POPULAR
+                              </div>
+                            )}
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${pack.color}15`, color: pack.color }}>
+                                  <Zap size={15} />
+                                </div>
+                                <div>
+                                  <p className="text-[12px] font-black text-gray-900">{pack.name}</p>
+                                  <p className="text-[8.5px] font-bold text-gray-400">{pack.hu.toLocaleString()} HU</p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-[20px] font-black leading-none" style={{ color: pack.color }}>${pack.price}</p>
+                                <p className="text-[8px] text-gray-400 font-medium">one-time</p>
+                              </div>
+                            </div>
+                            <p className="text-[9.5px] text-gray-500 font-medium mb-2">{pack.desc}</p>
+                            <div className="flex flex-wrap gap-1">
+                              {pack.perks.map((perk, pi) => (
+                                <div key={pi} className="flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[7.5px] font-semibold bg-gray-100 text-gray-600">
+                                  <Check size={6} /> {perk}
+                                </div>
+                              ))}
+                            </div>
+                            <div className="mt-2 pt-2 border-t border-gray-100 flex items-center justify-between">
+                              <p className="text-[8px] font-bold text-gray-400">{pack.access}</p>
+                              <p className="text-[8.5px] font-black" style={{ color: pack.color }}>{pack.roi}</p>
+                            </div>
+                            <div className="mt-2 flex items-center justify-center gap-1 text-gray-400">
+                              <span className="text-[8.5px] font-bold text-gray-500">Tap to select →</span>
+                              <ChevronRight size={11} className="text-gray-400" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="flex items-center gap-2 p-2.5 bg-gray-50 rounded-xl border border-gray-100">
+                        <ShieldCheck size={11} className="text-gray-400 shrink-0" />
+                        <p className="text-[8.5px] text-gray-500 font-medium">PCI-DSS enabled · Instant HU credit · Encrypted payment</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {modalStep === "choice" && selectedPack && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2.5">
+                        <button onClick={() => setModalStep("packages")} className="p-1.5 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all"><ChevronLeft size={13} /></button>
+                        <div>
+                          <h4 className="text-[12px] font-black text-gray-900">Choose Payment Method</h4>
+                          <p className="text-[9.5px] text-gray-400 font-medium mt-0.5">
+                            {selectedPack.name} · {selectedPack.hu} HU · <span className="font-black" style={{ color: selectedPack.color }}>${selectedPack.price}.00</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="p-3 rounded-xl border border-green-200 bg-green-50">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <Zap size={11} className="text-green-600 shrink-0" fill="#10B981" />
+                          <p className="text-[9.5px] font-black text-green-900">After payment — you get immediately:</p>
+                        </div>
+                        <div className="space-y-1">
+                          {[
+                            `${selectedPack.hu} HU credited instantly`,
+                            selectedPack.access + " — all unlocked",
+                            "Start any gig in under 60 seconds",
+                          ].map((item, i) => (
+                            <div key={i} className="flex items-center gap-1.5">
+                              <CheckCircle size={9} className="text-green-500 shrink-0" />
+                              <p className="text-[9px] font-semibold text-green-800">{item}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <RippleButton onClick={() => setModalStep("card")}
+                          className="w-full p-4 rounded-2xl border-2 border-cyan-300 bg-cyan-50 hover:bg-cyan-100 transition-all flex items-center gap-3 shadow-sm">
+                          <PaystackLogo size={40} />
+                          <div className="flex-1 text-left">
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <p className="text-[12px] font-black text-gray-900">Pay by Card</p>
+                              <Badge color="#00C3F7">Recommended</Badge>
+                            </div>
+                            <p className="text-[9px] font-medium text-gray-600">Visa / Mastercard · ${selectedPack.price}.00 · Worldwide</p>
+                            <div className="flex items-center gap-1.5 mt-1"><VisaIcon /><MastercardIcon /></div>
+                          </div>
+                          <ChevronRight size={14} className="text-gray-400 shrink-0" />
+                        </RippleButton>
+
+                        <RippleButton onClick={() => setModalStep("binance")}
+                          className="w-full p-4 rounded-2xl border border-gray-200 bg-gray-50 hover:bg-yellow-50 hover:border-yellow-200 transition-all flex items-center gap-3">
+                          <BinanceLogo size={40} />
+                          <div className="flex-1 text-left">
+                            <p className="text-[12px] font-black text-gray-900">Binance Pay</p>
+                            <p className="text-[9px] font-medium text-gray-500">USDT (TRC20 / ERC20) · ${selectedPack.price}.00 · Instant</p>
+                          </div>
+                          <ChevronRight size={14} className="text-gray-400 shrink-0" />
+                        </RippleButton>
+
+                        <RippleButton onClick={() => setModalStep("mpesa")}
+                          className="w-full p-4 rounded-2xl border border-gray-200 bg-gray-50 hover:bg-green-50 hover:border-green-200 transition-all flex items-center gap-3">
+                          <MpesaLogoSVG size={40} />
+                          <div className="flex-1 text-left">
+                            <div className="flex items-center gap-2">
+                              <p className="text-[12px] font-black text-gray-900">M-Pesa</p>
+                              <Badge color="#16A34A">East Africa</Badge>
+                            </div>
+                            <p className="text-[9px] font-medium text-gray-500">STK Push · KES {selectedPack.price * 130} · Instant</p>
+                          </div>
+                          <ChevronRight size={14} className="text-gray-400 shrink-0" />
+                        </RippleButton>
+                      </div>
+
+                      <div className="flex items-start gap-2">
+                        <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)} id="terms-agree" className="mt-0.5 accent-blue-600 shrink-0" />
+                        <label htmlFor="terms-agree" className="text-[8.5px] text-gray-400 font-medium leading-relaxed cursor-pointer">
+                          I agree to the Nexus Terms of Service. HU credits are non-refundable once gig access is granted.
+                        </label>
+                      </div>
+                    </div>
+                  )}
+
+                  {modalStep === "card" && selectedPack && (
+                    <div className="space-y-3.5">
+                      <div className="flex items-center gap-2.5">
+                        <button onClick={() => setModalStep("choice")} className="p-1.5 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all"><ChevronLeft size={13} /></button>
+                        <div>
+                          <h4 className="text-[12px] font-black text-gray-900">Secure Card Payment</h4>
+                          <p className="text-[9px] text-gray-400 font-medium">Visa & Mastercard · Worldwide · Powered by Paystack</p>
+                        </div>
+                      </div>
+
+                      <div className="p-4 rounded-2xl border border-gray-100 shadow-sm" style={{ background: "linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%)" }}>
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Total</p>
+                            <p className="text-[30px] font-black text-gray-900 leading-none">${selectedPack.price}<span className="text-[14px] text-gray-400 font-bold"> USD</span></p>
+                            <p className="text-[9px] text-blue-600 font-bold mt-0.5">≈ KES {(selectedPack.price * 130).toLocaleString()} on statement</p>
+                          </div>
+                          <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: `${selectedPack.color}12`, color: selectedPack.color }}>
+                            <Zap size={22} />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="bg-white p-2 rounded-xl border border-gray-100">
+                            <p className="text-[7.5px] text-gray-400 font-bold uppercase mb-0.5">Package</p>
+                            <p className="text-[10.5px] font-black text-gray-900">{selectedPack.name}</p>
+                          </div>
+                          <div className="bg-white p-2 rounded-xl border border-gray-100">
+                            <p className="text-[7.5px] text-gray-400 font-bold uppercase mb-0.5">You receive</p>
+                            <p className="text-[10.5px] font-black" style={{ color: selectedPack.color }}>{selectedPack.hu} HU</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-3 rounded-xl border border-green-100" style={{ background: "linear-gradient(135deg, #ECFDF5, #F0FDF4)" }}>
+                        <div className="flex items-center gap-1.5 mb-1.5"><CheckCircle2 size={11} className="text-green-600" /><p className="text-[9.5px] font-black text-green-900">After payment clears:</p></div>
+                        {[`${selectedPack.hu} HU credited instantly`, `${selectedPack.access} — unlocked`, "Start any matching gig with zero wait"].map((item, i) => (
+                          <div key={i} className="flex items-center gap-1.5 mb-1">
+                            <div className="w-3.5 h-3.5 rounded-full bg-green-500 flex items-center justify-center shrink-0"><Check size={7} className="text-white" /></div>
+                            <p className="text-[8.5px] font-semibold text-green-800">{item}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Accepted Cards</p>
+                          <div className="flex items-center gap-1.5"><VisaIcon /><MastercardIcon /></div>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <ShieldCheck size={11} className="text-cyan-500 shrink-0" />
+                          <p className="text-[8.5px] font-medium text-gray-500">256-bit TLS · PCI-DSS Level 1 · No card data stored</p>
+                        </div>
+                      </div>
+
+                      {!agreed && (
+                        <div className="flex items-start gap-2">
+                          <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)} id="terms-card" className="mt-0.5 accent-blue-600 shrink-0" />
+                          <label htmlFor="terms-card" className="text-[8.5px] text-gray-400 font-medium leading-relaxed cursor-pointer">
+                            I agree to the Nexus Terms of Service. HU credits are non-refundable once gig access is granted.
+                          </label>
+                        </div>
+                      )}
+
+                      <RippleButton disabled={isPaying || !agreed} onClick={() => handlePay("CARD")}
+                        className="w-full py-3.5 rounded-xl text-[10.5px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2 shadow-md"
+                        style={{ background: agreed ? "linear-gradient(135deg, #00C3F7, #011B33)" : undefined }}>
+                        {isPaying
+                          ? <><RefreshCw size={13} className="animate-spin" /> Opening Checkout…</>
+                          : <><CreditCard size={13} /> Pay ${selectedPack.price}.00 by Card</>}
+                      </RippleButton>
+                      <p className="text-center text-[8.5px] text-gray-400 font-medium">Secured by Paystack · We never store your card number</p>
+                    </div>
+                  )}
+
+                  {modalStep === "binance" && selectedPack && (
+                    <div className="space-y-3.5">
+                      <div className="flex items-center gap-2.5">
+                        <button onClick={() => setModalStep("choice")} className="p-1.5 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all"><ChevronLeft size={13} /></button>
+                        <h4 className="text-[12px] font-black text-gray-900">Binance Pay (Crypto)</h4>
+                      </div>
+
+                      <div className="flex gap-2">
+                        {(["TRC20", "ERC20"] as const).map(net => (
+                          <button key={net} onClick={() => setSelectedCryptoNet(net)}
+                            className={`flex-1 py-2 rounded-xl text-[9.5px] font-black border transition-all ${selectedCryptoNet === net ? "bg-yellow-500 text-white border-yellow-500" : "border-gray-200 text-gray-500 hover:border-gray-300"}`}>
+                            {net}
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="bg-gray-50 rounded-2xl p-3 flex justify-center border border-gray-200">
+                        <img src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${BINANCE_WALLETS[selectedCryptoNet]}`} alt="QR Code" className="w-32 h-32 block rounded-xl" />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-100">
+                          <p className="text-[8px] text-gray-400 font-medium mb-0.5">Amount</p>
+                          <p className="text-[14px] font-black text-gray-900">${selectedPack.price}.00 USDT</p>
+                        </div>
+                        <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-100">
+                          <p className="text-[8px] text-gray-400 font-medium mb-0.5">Network</p>
+                          <p className="text-[14px] font-black text-yellow-600">{selectedCryptoNet}</p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <p className="text-[9.5px] font-bold text-gray-500 mb-1.5">Wallet Address ({selectedCryptoNet})</p>
+                        <div className="flex gap-2">
+                          <div className="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-[9.5px] font-mono text-gray-600 truncate">{BINANCE_WALLETS[selectedCryptoNet]}</div>
+                          <button onClick={() => copyAddress(BINANCE_WALLETS[selectedCryptoNet])} className="p-2.5 bg-gray-100 border border-gray-200 rounded-xl hover:bg-gray-200 transition-all">
+                            {copied ? <Check size={12} className="text-green-500" /> : <Copy size={12} className="text-gray-500" />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="p-2.5 bg-amber-50 border border-amber-100 rounded-xl">
+                        <p className="text-[9.5px] font-bold text-amber-800">⚠️ Send only USDT on {selectedCryptoNet} network</p>
+                        <p className="text-[8.5px] text-amber-600 font-medium mt-0.5">Wrong network = permanent loss of funds.</p>
+                      </div>
+
+                      <RippleButton onClick={() => handlePay("BINANCE")}
+                        className="w-full py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white shadow-sm"
+                        style={{ background: "linear-gradient(135deg, #F0B90B, #D4921F)" }}>
+                        I've Sent Payment — Confirm
+                      </RippleButton>
+                    </div>
+                  )}
+
+                  {modalStep === "mpesa" && selectedPack && (
+                    <div className="space-y-3.5">
+                      <div className="flex items-center gap-2.5">
+                        <button onClick={() => setModalStep("choice")} className="p-1.5 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all"><ChevronLeft size={13} /></button>
+                        <h4 className="text-[12px] font-black text-gray-900">Pay with M-Pesa</h4>
+                      </div>
+
+                      <div className="p-3.5 bg-green-50 border border-green-200 rounded-xl">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <CheckCircle size={13} className="text-green-500 shrink-0" />
+                          <p className="text-[12px] font-black text-green-800">Total: KES {(selectedPack.price * 130).toLocaleString()}</p>
+                        </div>
+                        <p className="text-[9px] text-green-600 font-medium pl-5">{selectedPack.hu} HU credited instantly after confirmation.</p>
+                      </div>
+
+                      <div>
+                        <p className="text-[9.5px] font-bold text-gray-600 mb-1.5">Your Safaricom Number</p>
+                        <input value={mpesaNum} onChange={e => setMpesaNum(e.target.value)} placeholder="254712345678"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 text-[16px] font-black text-gray-900 outline-none focus:border-green-400 text-center tracking-widest transition-all placeholder:text-gray-300 focus:bg-white" />
+                        <p className="text-[9px] text-gray-400 font-medium mt-1.5 text-center">Format: 254XXXXXXXXX · 12 digits total</p>
+                      </div>
+
+                      {!agreed && (
+                        <div className="flex items-start gap-2">
+                          <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)} id="terms-mpesa" className="mt-0.5 accent-green-600 shrink-0" />
+                          <label htmlFor="terms-mpesa" className="text-[8.5px] text-gray-400 font-medium leading-relaxed cursor-pointer">
+                            I agree to the Nexus Terms of Service. HU credits are non-refundable once gig access is granted.
+                          </label>
+                        </div>
+                      )}
+
+                      <RippleButton disabled={isPaying} onClick={() => handlePay("MPESA")}
+                        className="w-full py-3.5 rounded-xl text-[10.5px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2 shadow-sm"
+                        style={{ background: "linear-gradient(135deg, #16A34A, #15803D)" }}>
+                        {isPaying
+                          ? <><RefreshCw size={13} className="animate-spin" /> Sending Prompt…</>
+                          : `Pay KES ${(selectedPack.price * 130).toLocaleString()}`}
+                      </RippleButton>
+                      <p className="text-center text-[8.5px] text-gray-400 font-medium">Kenya · Tanzania · Uganda · Rwanda · Instant STK Push</p>
+                    </div>
+                  )}
+
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
+        </>
+      )}
 
       <style jsx global>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }
