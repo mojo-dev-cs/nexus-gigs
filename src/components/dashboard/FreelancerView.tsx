@@ -39,6 +39,23 @@ type ModalStep = "packages" | "choice" | "binance" | "mpesa" | "card";
 type ProfileTab = "profile" | "security" | "notifications" | "achievements" | "settings";
 type VaultTab = "overview" | "history" | "limits" | "referral";
 
+interface ChatTarget {
+  id: string;
+  name: string;
+  subtitle: string;
+  avatar: string;
+  type: string;
+  kind: "freelance" | "corporate";
+  context: string;
+}
+
+interface ChatBubble {
+  id: number;
+  from: "them" | "me";
+  body: string;
+  time: string;
+}
+
 // ─────────────────────────────────────────────
 // Primitives
 // ─────────────────────────────────────────────
@@ -406,6 +423,50 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   const [activeVaultTab, setActiveVaultTab] = useState<VaultTab>("overview");
   const [expandedGig, setExpandedGig] = useState<string | null>(null);
   const [justPurchased, setJustPurchased] = useState(false);
+
+  // ── Chat / Paywall state ──
+  const [chatTarget, setChatTarget] = useState<ChatTarget | null>(null);
+  const [chatDraft, setChatDraft] = useState("");
+  const [chatThread, setChatThread] = useState<ChatBubble[]>([]);
+  const [paywall, setPaywall] = useState<{ open: boolean; feature: string; sub: string } | null>(null);
+
+  const openChatForGig = (g: { id: string; title: string; client: string; avatar: string; type: string }) => {
+    const target: ChatTarget = {
+      id: `gig-${g.id}`,
+      name: g.client,
+      subtitle: g.title,
+      avatar: g.avatar,
+      type: g.type,
+      kind: "freelance",
+      context: g.title,
+    };
+    setChatTarget(target);
+    setChatThread([
+      { id: 1, from: "them", body: `Hi! I'm reviewing applicants for "${g.title}". Are you available to start within 24 hours?`, time: "Just now" },
+      { id: 2, from: "them", body: "Send me a quick intro and any portfolio links and we can lock the gig in.", time: "Just now" },
+    ]);
+  };
+
+  const openChatForCorporate = (c: { id: string; title: string; company: string; domain: string; dept: string }) => {
+    const target: ChatTarget = {
+      id: `corp-${c.id}`,
+      name: `${c.company} · Talent Team`,
+      subtitle: c.title,
+      avatar: c.company.slice(0, 2).toUpperCase(),
+      type: c.dept,
+      kind: "corporate",
+      context: `${c.title} @ ${c.company}`,
+    };
+    setChatTarget(target);
+    setChatThread([
+      { id: 1, from: "them", body: `Hello — this is the ${c.company} Talent Team regarding the ${c.title} role.`, time: "Just now" },
+      { id: 2, from: "them", body: "We've shortlisted your profile. Please share an updated CV and your earliest interview availability.", time: "Just now" },
+    ]);
+  };
+
+  const triggerPaywall = (feature: string, sub: string) => {
+    setPaywall({ open: true, feature, sub });
+  };
 
   const [notifications, setNotifications] = useState({ missions: true, payments: true, messages: false, weekly: true, newGigs: true });
   const [twoFAEnabled, setTwoFAEnabled] = useState(false);
@@ -1016,17 +1077,24 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                                 <p className="text-[15px] font-black text-gray-900 leading-none">{fmt(g.budget)}</p>
                                 <p className="text-[7.5px] text-gray-400 font-medium mt-0.5">Project budget</p>
                               </div>
-                              {hasHU
-                                ? <RippleButton onClick={() => handleStartGig(g.title)}
-                                    className="px-3.5 py-2 rounded-xl text-[8.5px] font-black uppercase tracking-widest text-white flex items-center gap-1 shadow-sm"
-                                    style={{ background: `linear-gradient(135deg, ${tc}, ${tc}bb)` }}>
-                                    <PlayCircle size={10} /> Start Gig
-                                  </RippleButton>
-                                : <button onClick={openRefill}
-                                    className="px-3.5 py-2 rounded-xl text-[8.5px] font-black uppercase tracking-widest flex items-center gap-1 border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all">
-                                    <Lock size={9} /> Unlock
-                                  </button>
-                              }
+                              <div className="flex items-center gap-1.5">
+                                <button onClick={() => openChatForGig(g)}
+                                  title="Chat with client"
+                                  className="w-9 h-9 rounded-xl border border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50 flex items-center justify-center text-gray-600 hover:text-blue-600 transition-all shadow-sm">
+                                  <MessageCircle size={13} />
+                                </button>
+                                {hasHU
+                                  ? <RippleButton onClick={() => handleStartGig(g.title)}
+                                      className="px-3.5 py-2 rounded-xl text-[8.5px] font-black uppercase tracking-widest text-white flex items-center gap-1 shadow-sm"
+                                      style={{ background: `linear-gradient(135deg, ${tc}, ${tc}bb)` }}>
+                                      <PlayCircle size={10} /> Start Gig
+                                    </RippleButton>
+                                  : <button onClick={openRefill}
+                                      className="px-3.5 py-2 rounded-xl text-[8.5px] font-black uppercase tracking-widest flex items-center gap-1 border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all">
+                                      <Lock size={9} /> Unlock
+                                    </button>
+                                }
+                              </div>
                             </div>
                           </div>
                         </motion.div>
@@ -1128,17 +1196,24 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                               {c.huRequired >= 100 && <span className="ml-auto text-[7.5px] font-bold text-red-400">Senior Role</span>}
                             </div>
 
-                            {hasHU
+                            <div className="flex gap-1.5">
+                              <button onClick={() => openChatForCorporate(c)}
+                                title="Contact Talent Team"
+                                className="shrink-0 w-10 h-10 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 flex items-center justify-center text-purple-600 transition-all">
+                                <MessageCircle size={13} />
+                              </button>
+                              {hasHU
                               ? <RippleButton onClick={() => handleApplyCorporate(c.title)}
-                                  className="w-full py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-1.5 shadow-sm"
+                                  className="flex-1 py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-1.5 shadow-sm"
                                   style={{ background: "linear-gradient(135deg, #7C3AED, #4F46E5)" }}>
                                   <ClipboardList size={11} /> Submit Application <ArrowUpRight size={10} />
                                 </RippleButton>
                               : <button onClick={openRefill}
-                                  className="w-full py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 border border-purple-200 bg-purple-50 text-purple-600 hover:bg-purple-100 transition-all">
+                                  className="flex-1 py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 border border-purple-200 bg-purple-50 text-purple-600 hover:bg-purple-100 transition-all">
                                   <Lock size={11} /> Purchase HU to Apply
                                 </button>
-                            }
+                              }
+                            </div>
                           </div>
                         </div>
                       );
@@ -2289,6 +2364,213 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
 
             </motion.div>
           </div>
+        )}
+      </AnimatePresence>
+
+      {/* ═══════════════ CHAT OVERLAY (WhatsApp-style) ═══════════════ */}
+      <AnimatePresence>
+        {chatTarget && (
+          <motion.div
+            key="chat-panel"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-stretch justify-center"
+            style={{ background: "rgba(8, 14, 30, 0.55)", backdropFilter: "blur(6px)" }}
+          >
+            <motion.div
+              initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 24, opacity: 0 }}
+              transition={{ duration: 0.22 }}
+              className="relative w-full max-w-md flex flex-col bg-white shadow-2xl md:my-4 md:rounded-3xl overflow-hidden border border-gray-100"
+              style={{ height: "100dvh", maxHeight: "min(100dvh, 780px)" }}
+            >
+              {/* Header */}
+              <div className="px-4 py-3 flex items-center gap-3 border-b border-gray-100"
+                style={{ background: chatTarget.kind === "corporate"
+                  ? "linear-gradient(135deg, #4F46E5, #7C3AED)"
+                  : "linear-gradient(135deg, #0055FF, #0EA5E9)" }}>
+                <button onClick={() => setChatTarget(null)}
+                  className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition-all">
+                  <ChevronLeft size={16} />
+                </button>
+                {chatTarget.kind === "corporate" ? (
+                  <div className="w-10 h-10 rounded-full bg-white/15 border border-white/30 flex items-center justify-center text-white font-black text-[12px] shrink-0">
+                    {chatTarget.avatar}
+                  </div>
+                ) : (
+                  <MarketplaceAvatar initials={chatTarget.avatar} type={chatTarget.type} seed={chatTarget.name} size={40} />
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-[12px] font-black text-white truncate">{chatTarget.name}</p>
+                    <BadgeCheck size={11} className="text-white/90 shrink-0" />
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <PulseDot color="#34D399" size={5} />
+                    <p className="text-[8.5px] font-semibold text-white/85 truncate">
+                      {chatTarget.kind === "corporate" ? "Talent Team · Online" : "Online · Verified Client"}
+                    </p>
+                  </div>
+                </div>
+                <button onClick={() => triggerPaywall(
+                  chatTarget.kind === "corporate" ? "Voice call with recruiter" : "Voice call with client",
+                  "Live voice and video calls are part of the premium pipeline. Unlock with a HU pack.")}
+                  className="w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition-all">
+                  <Phone size={14} />
+                </button>
+                <button onClick={() => triggerPaywall(
+                  chatTarget.kind === "corporate" ? "Video interview" : "Video meeting",
+                  "HD video meetings unlock once you've activated platform access with a HU pack.")}
+                  className="w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition-all">
+                  <Video size={14} />
+                </button>
+              </div>
+
+              {/* Context strip */}
+              <div className="px-4 py-2 bg-gray-50 border-b border-gray-100 flex items-center gap-2">
+                {chatTarget.kind === "corporate"
+                  ? <Building2 size={11} className="text-purple-500 shrink-0" />
+                  : <Briefcase size={11} className="text-blue-500 shrink-0" />}
+                <p className="text-[9px] font-bold text-gray-500 truncate">
+                  RE: <span className="text-gray-800">{chatTarget.subtitle}</span>
+                </p>
+                <Lock size={9} className="text-amber-500 shrink-0 ml-auto" />
+                <p className="text-[8.5px] font-bold text-amber-600 shrink-0">End-to-end secured</p>
+              </div>
+
+              {/* Thread */}
+              <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2.5"
+                style={{ background: "linear-gradient(180deg, #F8FAFC, #EEF2FF)" }}>
+                <div className="flex justify-center">
+                  <span className="text-[8.5px] font-bold text-gray-500 bg-white border border-gray-200 px-2.5 py-1 rounded-full shadow-sm">Today</span>
+                </div>
+                {chatThread.map(b => (
+                  <div key={b.id} className={`flex ${b.from === "me" ? "justify-end" : "justify-start"}`}>
+                    <div className={`max-w-[78%] px-3 py-2 text-[10.5px] leading-relaxed shadow-sm ${
+                      b.from === "me"
+                        ? "rounded-2xl rounded-br-md text-white"
+                        : "rounded-2xl rounded-bl-md bg-white text-gray-800 border border-gray-100"
+                    }`} style={b.from === "me" ? { background: chatTarget.kind === "corporate"
+                          ? "linear-gradient(135deg, #4F46E5, #7C3AED)"
+                          : "linear-gradient(135deg, #0055FF, #0EA5E9)" } : undefined}>
+                      <p className="font-medium">{b.body}</p>
+                      <p className={`text-[7.5px] mt-1 font-bold ${b.from === "me" ? "text-white/70" : "text-gray-400"}`}>{b.time}</p>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Locked-feature reminder */}
+                <div className="flex justify-center pt-2">
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 max-w-[80%] flex items-center gap-2">
+                    <Lock size={11} className="text-amber-500 shrink-0" />
+                    <p className="text-[9px] font-semibold text-amber-700 leading-snug">
+                      Sending messages, calls and file sharing unlock with a HU pack.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Composer */}
+              <div className="px-3 py-3 border-t border-gray-100 bg-white">
+                <div className="flex items-end gap-2">
+                  <button onClick={() => triggerPaywall("Attachments & file sharing", "Send portfolios, contracts and CVs once your HU pack is active.")}
+                    className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition-all shrink-0">
+                    <Plus size={16} />
+                  </button>
+                  <div className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl px-3 py-2 flex items-center gap-2">
+                    <input
+                      value={chatDraft}
+                      onChange={e => setChatDraft(e.target.value)}
+                      placeholder={chatTarget.kind === "corporate" ? "Reply to recruiter…" : "Type a message…"}
+                      className="flex-1 bg-transparent outline-none text-[11px] font-medium text-gray-800 placeholder:text-gray-400"
+                    />
+                    <button onClick={() => triggerPaywall("Voice notes", "Record and send voice notes once your HU pack is active.")}
+                      className="text-gray-400 hover:text-gray-600 transition-all">
+                      <HeadphonesIcon size={14} />
+                    </button>
+                  </div>
+                  <button onClick={() => triggerPaywall(
+                    chatTarget.kind === "corporate" ? "Replying to recruiters" : "Sending messages",
+                    chatTarget.kind === "corporate"
+                      ? "Direct replies to corporate recruiters require an active HU pack. Unlock to continue your application."
+                      : "Direct messaging with clients unlocks instantly once you activate a HU pack.")}
+                    className="w-11 h-11 rounded-full flex items-center justify-center text-white shadow-md transition-all shrink-0"
+                    style={{ background: chatTarget.kind === "corporate"
+                      ? "linear-gradient(135deg, #4F46E5, #7C3AED)"
+                      : "linear-gradient(135deg, #0055FF, #0EA5E9)" }}>
+                    <Send size={15} />
+                  </button>
+                </div>
+                <p className="text-[8.5px] font-semibold text-gray-400 text-center mt-2">
+                  Encrypted · {chatTarget.kind === "corporate" ? "Corporate compliance enabled" : "Verified Nexus client"}
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ═══════════════ PAYWALL POPUP ═══════════════ */}
+      <AnimatePresence>
+        {paywall?.open && (
+          <motion.div
+            key="paywall"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-60 flex items-center justify-center p-4"
+            style={{ background: "rgba(8, 14, 30, 0.7)", backdropFilter: "blur(8px)" }}
+            onClick={() => setPaywall(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.92, y: 16, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.92, y: 16, opacity: 0 }}
+              transition={{ duration: 0.22 }}
+              onClick={e => e.stopPropagation()}
+              className="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100"
+            >
+              <div className="p-5 text-center relative" style={{ background: "linear-gradient(135deg, #EEF2FF, #F5F3FF)" }}>
+                <button onClick={() => setPaywall(null)}
+                  className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/80 hover:bg-white border border-gray-100 flex items-center justify-center text-gray-500">
+                  <X size={12} />
+                </button>
+                <div className="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center text-white shadow-lg mb-3"
+                  style={{ background: "linear-gradient(135deg, #0055FF, #7C3AED)" }}>
+                  <Lock size={22} />
+                </div>
+                <Badge color="#7C3AED" className="mb-2"><Crown size={8} /> Premium Feature</Badge>
+                <h3 className="text-[15px] font-black text-gray-900 leading-tight">{paywall.feature} is locked</h3>
+                <p className="text-[10px] text-gray-500 font-medium mt-1.5 leading-relaxed">{paywall.sub}</p>
+              </div>
+
+              <div className="p-5 space-y-3">
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { icon: <Send size={11} />, label: "Send messages" },
+                    { icon: <Phone size={11} />, label: "Voice & video" },
+                    { icon: <Briefcase size={11} />, label: "Unlock gigs" },
+                  ].map((p, i) => (
+                    <div key={i} className="p-2 rounded-xl border border-gray-100 bg-gray-50 text-center">
+                      <div className="w-6 h-6 mx-auto rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-1">{p.icon}</div>
+                      <p className="text-[7.5px] font-bold text-gray-600 leading-tight">{p.label}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="p-3 rounded-xl border border-blue-100" style={{ background: "linear-gradient(135deg, #EFF6FF, #DBEAFE)" }}>
+                  <div className="flex items-center gap-2">
+                    <Sparkles size={12} className="text-blue-600" />
+                    <p className="text-[9.5px] font-black text-blue-900">From $3 — instant activation, zero applications</p>
+                  </div>
+                </div>
+
+                <RippleButton onClick={() => { setPaywall(null); setChatTarget(null); openRefill(); }}
+                  className="w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-white shadow-md flex items-center justify-center gap-2"
+                  style={{ background: "linear-gradient(135deg, #0055FF, #7C3AED)" }}>
+                  Continue <ArrowRight size={12} />
+                </RippleButton>
+                <button onClick={() => setPaywall(null)}
+                  className="w-full py-2 text-[9.5px] font-bold text-gray-500 hover:text-gray-800 transition-all">
+                  Maybe later
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 
