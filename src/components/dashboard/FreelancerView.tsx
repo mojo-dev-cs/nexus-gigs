@@ -382,104 +382,88 @@ const InstantAccessBanner = ({ huBalance, onBrowse }: { huBalance: number; onBro
 );
 
 // ─────────────────────────────────────────────
-// PREMIUM CALL POPUP (used for call/video/send paywall)
+// PREMIUM PAYWALL POPUP — White, official, generic "Continue" CTA
 // ─────────────────────────────────────────────
 const CallPaywallPopup = ({ open, feature, sub, onClose, onUnlock, kind }: {
   open: boolean; feature: string; sub: string; onClose: () => void; onUnlock: () => void; kind: "freelance" | "corporate";
-}) => (
-  <AnimatePresence>
-    {open && (
-      <motion.div
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="absolute inset-0 z-20 flex items-center justify-center p-6"
-        style={{ background: "rgba(5,8,20,0.75)", backdropFilter: "blur(12px)" }}
-        onClick={onClose}
-      >
+}) => {
+  const accent = kind === "corporate" ? "#7C3AED" : "#0055FF";
+  const accent2 = kind === "corporate" ? "#4F46E5" : "#0EA5E9";
+  return (
+    <AnimatePresence>
+      {open && (
         <motion.div
-          initial={{ scale: 0.88, y: 20, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.88, y: 20, opacity: 0 }}
-          transition={{ type: "spring", damping: 24, stiffness: 340 }}
-          onClick={e => e.stopPropagation()}
-          className="w-full max-w-xs rounded-3xl overflow-hidden shadow-2xl border border-white/10"
-          style={{ background: kind === "corporate"
-            ? "linear-gradient(160deg, #1e1333 0%, #2d1f5e 50%, #1a2550 100%)"
-            : "linear-gradient(160deg, #050f2e 0%, #0a1a4a 50%, #0c2060 100%)" }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          className="absolute inset-0 z-20 flex items-center justify-center p-6"
+          style={{ background: "rgba(15,23,42,0.55)", backdropFilter: "blur(14px)" }}
+          onClick={onClose}
         >
-          {/* Glow */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
-            <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full opacity-20"
-              style={{ background: kind === "corporate" ? "radial-gradient(circle, #a855f7, transparent)" : "radial-gradient(circle, #3b82f6, transparent)" }} />
-            <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full opacity-15"
-              style={{ background: kind === "corporate" ? "radial-gradient(circle, #7c3aed, transparent)" : "radial-gradient(circle, #0055ff, transparent)" }} />
-          </div>
+          <motion.div
+            initial={{ scale: 0.92, y: 20, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.92, y: 20, opacity: 0 }}
+            transition={{ type: "spring", damping: 26, stiffness: 360 }}
+            onClick={e => e.stopPropagation()}
+            className="relative w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl bg-white"
+            style={{ border: "1px solid rgba(15,23,42,0.06)" }}
+          >
+            {/* Top accent bar */}
+            <div className="h-1.5 w-full" style={{ background: `linear-gradient(90deg, ${accent}, ${accent2})` }} />
 
-          <div className="relative p-6 text-center">
-            <button onClick={onClose}
-              className="absolute top-4 right-4 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/60 transition-all">
-              <X size={12} />
-            </button>
+            <div className="relative p-7 text-center">
+              <button onClick={onClose}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-all">
+                <X size={13} />
+              </button>
 
-            {/* Icon */}
-            <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-4 shadow-lg"
-              style={{ background: kind === "corporate"
-                ? "linear-gradient(135deg, rgba(124,58,237,0.4), rgba(79,70,229,0.4))"
-                : "linear-gradient(135deg, rgba(0,85,255,0.4), rgba(14,165,233,0.4))",
-                border: "1px solid rgba(255,255,255,0.15)" }}>
-              <Lock size={26} className="text-white" />
-            </div>
-
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 mb-3">
-              <Crown size={9} className="text-yellow-400" />
-              <span className="text-[8.5px] font-black text-white/80 uppercase tracking-widest">Premium Feature</span>
-            </div>
-
-            <h3 className="text-[16px] font-black text-white leading-tight mb-2">{feature}</h3>
-            <p className="text-[10px] text-white/60 font-medium leading-relaxed mb-6">{sub}</p>
-
-            {/* Features */}
-            <div className="grid grid-cols-3 gap-2 mb-6">
-              {(kind === "corporate"
-                ? [{ icon: <MessageSquare size={11} />, label: "Direct HR Chat" }, { icon: <VideoIcon size={11} />, label: "Interview calls" }, { icon: <FileCheck size={11} />, label: "CV Submission" }]
-                : [{ icon: <Send size={11} />, label: "Message client" }, { icon: <Phone size={11} />, label: "Voice call" }, { icon: <VideoIcon size={11} />, label: "Video call" }]
-              ).map((p, i) => (
-                <div key={i} className="p-2.5 rounded-xl text-center" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}>
-                  <div className="w-7 h-7 mx-auto rounded-lg flex items-center justify-center mb-1.5 text-white/70"
-                    style={{ background: "rgba(255,255,255,0.1)" }}>{p.icon}</div>
-                  <p className="text-[7.5px] font-bold text-white/60 leading-tight">{p.label}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Pricing hint */}
-            <div className="p-3 rounded-2xl mb-4" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}>
-              <div className="flex items-center justify-between">
-                <div className="text-left">
-                  <p className="text-[8px] text-white/50 font-bold uppercase tracking-widest">Starts from</p>
-                  <p className="text-[22px] font-black text-white leading-none">$3<span className="text-[11px] text-white/50 font-medium"> / one-time</span></p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[8px] text-white/50 font-bold uppercase tracking-widest">You get</p>
-                  <p className="text-[14px] font-black text-yellow-400 leading-none">150 HU</p>
-                  <p className="text-[8px] text-white/40 font-medium">instant credit</p>
+              {/* Premium icon */}
+              <div className="relative w-16 h-16 mx-auto mb-5">
+                <div className="absolute inset-0 rounded-2xl opacity-20 blur-xl" style={{ background: accent }} />
+                <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg"
+                  style={{ background: `linear-gradient(135deg, ${accent}, ${accent2})` }}>
+                  <Lock size={26} className="text-white" />
                 </div>
               </div>
-            </div>
 
-            <RippleButton onClick={onUnlock}
-              className="w-full py-3.5 rounded-2xl text-[10.5px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2 shadow-xl"
-              style={{ background: kind === "corporate"
-                ? "linear-gradient(135deg, #7C3AED, #4F46E5)"
-                : "linear-gradient(135deg, #0055FF, #0EA5E9)" }}>
-              <Zap size={12} fill="currentColor" /> Unlock Now — Buy HU
-            </RippleButton>
-            <button onClick={onClose} className="mt-3 text-[9px] font-semibold text-white/40 hover:text-white/60 transition-all">
-              Not right now
-            </button>
-          </div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full mb-3"
+                style={{ background: `${accent}10`, border: `1px solid ${accent}25` }}>
+                <Crown size={9} style={{ color: accent }} />
+                <span className="text-[8.5px] font-black uppercase tracking-widest" style={{ color: accent }}>Premium Feature</span>
+              </div>
+
+              <h3 className="text-[17px] font-black text-slate-900 leading-tight mb-2">{feature}</h3>
+              <p className="text-[11px] text-slate-500 font-medium leading-relaxed mb-6 px-2">{sub}</p>
+
+              {/* Trust strip */}
+              <div className="grid grid-cols-3 gap-2 mb-6">
+                {[
+                  { icon: <ShieldCheck size={12} />, label: "Verified" },
+                  { icon: <Zap size={12} />, label: "Instant" },
+                  { icon: <BadgeCheck size={12} />, label: "Official" },
+                ].map((p, i) => (
+                  <div key={i} className="p-2.5 rounded-xl text-center bg-slate-50 border border-slate-100">
+                    <div className="w-7 h-7 mx-auto rounded-lg flex items-center justify-center mb-1" style={{ background: `${accent}12`, color: accent }}>{p.icon}</div>
+                    <p className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">{p.label}</p>
+                  </div>
+                ))}
+              </div>
+
+              <RippleButton onClick={onUnlock}
+                className="w-full py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2 shadow-lg transition-all"
+                style={{ background: `linear-gradient(135deg, ${accent}, ${accent2})` }}>
+                Continue <ArrowRight size={13} />
+              </RippleButton>
+              <p className="text-[8.5px] font-semibold text-slate-400 mt-3 leading-relaxed">
+                Choose a HU pack on the next screen · Cancel anytime
+              </p>
+              <button onClick={onClose} className="mt-2 text-[10px] font-bold text-slate-400 hover:text-slate-600 transition-all">
+                Maybe later
+              </button>
+            </div>
+          </motion.div>
         </motion.div>
-      </motion.div>
-    )}
-  </AnimatePresence>
-);
+      )}
+    </AnimatePresence>
+  );
+};
 
 // ─────────────────────────────────────────────
 // MAIN COMPONENT
@@ -854,7 +838,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
         </AnimatePresence>
       </div>
 
-      {/* ─── CHAT OVERLAY ─── */}
+      {/* ─── CHAT OVERLAY — Official white theme ─── */}
       <AnimatePresence>
         {chatTarget && (
           <motion.div
@@ -864,140 +848,157 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
             className="fixed inset-0 z-500 flex flex-col"
-            style={{
-              background: chatTarget.kind === "corporate"
-                ? "linear-gradient(160deg, #0d0618 0%, #160a2e 40%, #0a1230 100%)"
-                : "linear-gradient(160deg, #020a1e 0%, #061232 50%, #041a45 100%)"
-            }}
+            style={{ background: "#F7F8FB" }}
           >
-            {/* Ambient glow blobs */}
+            {/* Subtle accent wash */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full opacity-[0.08]"
-                style={{ background: chatTarget.kind === "corporate"
-                  ? "radial-gradient(circle, #a855f7, transparent)"
-                  : "radial-gradient(circle, #3b82f6, transparent)" }} />
-              <div className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full opacity-[0.06]"
+              <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full opacity-[0.06]"
                 style={{ background: chatTarget.kind === "corporate"
                   ? "radial-gradient(circle, #7c3aed, transparent)"
                   : "radial-gradient(circle, #0055ff, transparent)" }} />
+              <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full opacity-[0.05]"
+                style={{ background: chatTarget.kind === "corporate"
+                  ? "radial-gradient(circle, #4f46e5, transparent)"
+                  : "radial-gradient(circle, #0ea5e9, transparent)" }} />
             </div>
 
             {/* ── FREELANCE CHAT HEADER ── */}
             {chatTarget.kind === "freelance" && (
-              <div className="relative z-10 px-4 pt-4 pb-3 flex items-center gap-3"
-                style={{ background: "rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.07)", backdropFilter: "blur(20px)" }}>
+              <div className="relative z-10 px-4 pt-4 pb-3 flex items-center gap-3 bg-white border-b border-slate-200/70 shadow-sm">
                 <button
                   onClick={() => setChatTarget(null)}
-                  className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all shrink-0"
-                  style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}>
-                  <ChevronLeft size={16} className="text-white" />
+                  className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all bg-slate-100 hover:bg-slate-200 shrink-0">
+                  <ChevronLeft size={16} className="text-slate-700" />
                 </button>
 
                 <MarketplaceAvatar initials={chatTarget.avatar} type={chatTarget.type} seed={chatTarget.name} size={42} />
 
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="text-[13px] font-black text-white truncate">{chatTarget.name}</p>
-                    <BadgeCheck size={13} className="text-blue-400 shrink-0" />
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-[13px] font-black text-slate-900 truncate">{chatTarget.name}</p>
+                    <BadgeCheck size={13} className="text-blue-500 shrink-0" />
                   </div>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <PulseDot color="#34D399" size={5} />
-                    <p className="text-[9px] font-semibold text-white/50 truncate">{chatTarget.subtitle}</p>
+                    <PulseDot color="#10b981" size={5} />
+                    <p className="text-[9px] font-semibold text-slate-500 truncate">Online · {chatTarget.subtitle}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-1.5 shrink-0">
                   <button
-                    onClick={() => triggerCallPaywall("Voice call with client", "Activate a HU pack to unlock direct voice calls with verified clients.")}
-                    className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all"
-                    style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}>
-                    <Phone size={14} className="text-white/70" />
+                    onClick={() => triggerCallPaywall("Voice call with client", "Open a verified, encrypted voice channel with this client.")}
+                    className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all bg-blue-50 hover:bg-blue-100">
+                    <Phone size={14} className="text-blue-600" />
                   </button>
                   <button
-                    onClick={() => triggerCallPaywall("Video call with client", "HD video meetings with clients are available once your HU pack is active.")}
-                    className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all"
-                    style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}>
-                    <VideoIcon size={14} className="text-white/70" />
+                    onClick={() => triggerCallPaywall("Video call with client", "Start an HD video meeting with this verified client.")}
+                    className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all bg-blue-50 hover:bg-blue-100">
+                    <VideoIcon size={14} className="text-blue-600" />
+                  </button>
+                  <button
+                    onClick={() => triggerCallPaywall("Chat options", "Manage chat settings, mute, report or block this client.")}
+                    className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all bg-slate-100 hover:bg-slate-200">
+                    <MoreVertical size={14} className="text-slate-600" />
                   </button>
                 </div>
               </div>
             )}
 
-            {/* ── CORPORATE CHAT HEADER ── */}
+            {/* ── CORPORATE CHAT HEADER (HR Portal) ── */}
             {chatTarget.kind === "corporate" && (
-              <div className="relative z-10 flex flex-col"
-                style={{ background: "rgba(255,255,255,0.03)", borderBottom: "1px solid rgba(255,255,255,0.07)", backdropFilter: "blur(20px)" }}>
-
+              <div className="relative z-10 flex flex-col bg-white border-b border-slate-200/70 shadow-sm">
                 {/* Top bar */}
                 <div className="px-4 pt-4 pb-3 flex items-center gap-3">
                   <button
                     onClick={() => setChatTarget(null)}
-                    className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all shrink-0"
-                    style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}>
-                    <ChevronLeft size={16} className="text-white" />
+                    className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all bg-slate-100 hover:bg-slate-200 shrink-0">
+                    <ChevronLeft size={16} className="text-slate-700" />
                   </button>
 
-                  {/* Company logo in circle */}
-                  <div className="w-11 h-11 rounded-2xl overflow-hidden shrink-0 flex items-center justify-center"
-                    style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)" }}>
+                  <div className="w-11 h-11 rounded-2xl overflow-hidden shrink-0 flex items-center justify-center bg-linear-to-br from-purple-50 to-indigo-50 border border-purple-100">
                     {chatTarget.domain ? (
                       <img
                         src={`https://logo.clearbit.com/${chatTarget.domain}`}
                         alt={chatTarget.company || ""}
                         className="w-8 h-8 object-contain"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
-                        }}
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                       />
-                    ) : null}
-                    <Building2 size={18} className="text-purple-300" />
+                    ) : (
+                      <Building2 size={18} className="text-purple-600" />
+                    )}
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-[13px] font-black text-white">{chatTarget.company} Talent</p>
-                      <div className="w-4 h-4 rounded-full bg-purple-500/30 flex items-center justify-center">
-                        <BadgeCheck size={9} className="text-purple-300" />
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-[13px] font-black text-slate-900 truncate">{chatTarget.company} · Talent Team</p>
+                      <div className="w-4 h-4 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
+                        <BadgeCheck size={9} className="text-purple-600" />
                       </div>
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <PulseDot color="#c084fc" size={5} />
-                      <p className="text-[9px] font-semibold text-white/50">Official HR Channel · Verified Employer</p>
+                      <PulseDot color="#a855f7" size={5} />
+                      <p className="text-[9px] font-semibold text-slate-500 truncate">Official HR Channel · Verified Employer</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <button
-                      onClick={() => triggerCallPaywall("Schedule an interview", "Book your formal HR interview call once your HU pack is active and application is submitted.")}
-                      className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all"
-                      style={{ background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.25)" }}>
-                      <VideoIcon size={14} className="text-purple-300" />
+                      onClick={() => triggerCallPaywall("Schedule HR interview", "Book a formal interview slot with the recruiter directly from your calendar.")}
+                      className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all bg-purple-50 hover:bg-purple-100">
+                      <Calendar size={14} className="text-purple-600" />
+                    </button>
+                    <button
+                      onClick={() => triggerCallPaywall("Video interview room", "Join the official video interview room hosted by the company's HR team.")}
+                      className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all bg-purple-50 hover:bg-purple-100">
+                      <VideoIcon size={14} className="text-purple-600" />
+                    </button>
+                    <button
+                      onClick={() => triggerCallPaywall("Recruiter options", "View company profile, request referral, or report this listing.")}
+                      className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all bg-slate-100 hover:bg-slate-200">
+                      <MoreVertical size={14} className="text-slate-600" />
                     </button>
                   </div>
                 </div>
 
                 {/* Corporate job context strip */}
-                <div className="mx-4 mb-3 p-3 rounded-2xl flex items-center gap-3"
-                  style={{ background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.2)" }}>
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                    style={{ background: "rgba(168,85,247,0.2)" }}>
-                    <Briefcase size={13} className="text-purple-300" />
+                <div className="mx-4 mb-3 p-3 rounded-2xl flex items-center gap-3 bg-linear-to-br from-purple-50 to-indigo-50/50 border border-purple-100">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-purple-100">
+                    <Briefcase size={14} className="text-purple-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-black text-white truncate">{chatTarget.subtitle}</p>
-                    <p className="text-[8.5px] text-purple-300/70 font-medium">{chatTarget.dept} · {chatTarget.salary ? fmt(chatTarget.salary) + "/mo" : ""}</p>
+                    <p className="text-[10px] font-black text-slate-900 truncate">{chatTarget.subtitle}</p>
+                    <p className="text-[8.5px] text-purple-600/80 font-semibold">{chatTarget.dept} · {chatTarget.salary ? fmt(chatTarget.salary) + "/mo" : ""}</p>
                   </div>
-                  <div className="shrink-0 px-2 py-1 rounded-lg" style={{ background: "rgba(168,85,247,0.2)" }}>
-                    <p className="text-[8px] font-black text-purple-300 uppercase tracking-widest">Active Listing</p>
+                  <div className="shrink-0 px-2 py-1 rounded-lg bg-purple-600 text-white">
+                    <p className="text-[8px] font-black uppercase tracking-widest">Active</p>
                   </div>
+                </div>
+
+                {/* Corporate quick actions — legit company features */}
+                <div className="px-4 pb-3 flex gap-2 overflow-x-auto scrollbar-hide">
+                  {[
+                    { icon: <FileCheck size={11} />, label: "Submit CV", sub: "Application & cover letter" },
+                    { icon: <Calendar size={11} />, label: "Book Interview", sub: "Schedule HR interview" },
+                    { icon: <FileText size={11} />, label: "Job Description", sub: "Full role details & scope" },
+                    { icon: <Shield size={11} />, label: "Sign NDA", sub: "Mutual non-disclosure" },
+                    { icon: <Gift size={11} />, label: "Benefits", sub: "Compensation breakdown" },
+                    { icon: <Building size={11} />, label: "Company Profile", sub: "About the employer" },
+                  ].map((a, i) => (
+                    <button key={i}
+                      onClick={() => triggerCallPaywall(a.label, a.sub + ".")}
+                      className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-slate-200 hover:border-purple-300 hover:bg-purple-50/50 transition-all">
+                      <span className="text-purple-600">{a.icon}</span>
+                      <span className="text-[9.5px] font-bold text-slate-700">{a.label}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
 
             {/* ── MESSAGES AREA ── */}
-            <div className="flex-1 overflow-y-auto relative z-10" style={{ padding: "16px 16px 8px" }}>
+            <div className="flex-1 overflow-y-auto relative z-10" style={{ padding: "20px 16px 8px" }}>
 
-              {/* Empty state — no messages yet */}
+              {/* Empty state */}
               {chatThread.length === 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: 16 }}
@@ -1007,62 +1008,55 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 >
                   {chatTarget.kind === "corporate" ? (
                     <>
-                      <div className="w-20 h-20 rounded-3xl flex items-center justify-center mb-5 relative"
-                        style={{ background: "rgba(168,85,247,0.12)", border: "1px solid rgba(168,85,247,0.2)" }}>
-                        <Building2 size={34} className="text-purple-400/70" />
-                        <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-xl flex items-center justify-center"
-                          style={{ background: "rgba(168,85,247,0.25)", border: "1px solid rgba(168,85,247,0.3)" }}>
-                          <Lock size={13} className="text-purple-300" />
+                      <div className="w-20 h-20 rounded-3xl flex items-center justify-center mb-5 relative bg-linear-to-br from-purple-50 to-indigo-50 border border-purple-100">
+                        <Building2 size={34} className="text-purple-500" />
+                        <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-xl flex items-center justify-center bg-white border border-purple-200 shadow-sm">
+                          <Lock size={13} className="text-purple-600" />
                         </div>
                       </div>
-                      <p className="text-[16px] font-black text-white mb-2">HR Portal Secured</p>
-                      <p className="text-[10px] text-white/40 font-medium leading-relaxed max-w-55">
-                        This is the official {chatTarget.company} Talent Team channel for the <strong className="text-white/60">{chatTarget.subtitle}</strong> role.
+                      <p className="text-[16px] font-black text-slate-900 mb-2">Secure HR Portal</p>
+                      <p className="text-[10.5px] text-slate-500 font-medium leading-relaxed max-w-xs">
+                        You're connecting with the official <strong className="text-slate-700">{chatTarget.company}</strong> recruiting team for the <strong className="text-slate-700">{chatTarget.subtitle}</strong> role.
                       </p>
-                      <div className="mt-5 p-4 rounded-2xl text-left w-full max-w-65"
-                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                        <p className="text-[9px] font-black text-white/60 uppercase tracking-widest mb-3">Application pipeline</p>
+                      <div className="mt-6 p-4 rounded-2xl text-left w-full max-w-xs bg-white border border-slate-200 shadow-sm">
+                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3">Hiring pipeline</p>
                         {[
-                          { step: "01", label: "Activate HU Pack", done: false, color: "#a855f7" },
-                          { step: "02", label: "Submit your CV", done: false, color: "#8b5cf6" },
-                          { step: "03", label: "HR Reviews (2–5 days)", done: false, color: "#7c3aed" },
-                          { step: "04", label: "Video interview", done: false, color: "#6d28d9" },
-                          { step: "05", label: "Receive offer", done: false, color: "#5b21b6" },
+                          { step: "01", label: "Activate access", done: false },
+                          { step: "02", label: "Submit CV & cover letter", done: false },
+                          { step: "03", label: "HR review (2–5 days)", done: false },
+                          { step: "04", label: "Video interview", done: false },
+                          { step: "05", label: "Receive formal offer", done: false },
                         ].map((s, i) => (
                           <div key={i} className="flex items-center gap-2.5 mb-2 last:mb-0">
-                            <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 text-[8px] font-black"
-                              style={{ background: `${s.color}20`, color: s.color, border: `1px solid ${s.color}30` }}>{s.step}</div>
-                            <p className="text-[9.5px] font-semibold text-white/50">{s.label}</p>
+                            <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 text-[8px] font-black bg-purple-50 text-purple-600 border border-purple-100">{s.step}</div>
+                            <p className="text-[10px] font-semibold text-slate-600">{s.label}</p>
                           </div>
                         ))}
                       </div>
                     </>
                   ) : (
                     <>
-                      <div className="w-20 h-20 rounded-3xl flex items-center justify-center mb-5 relative"
-                        style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)" }}>
-                        <MessageCircle size={34} className="text-blue-400/70" />
-                        <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-xl flex items-center justify-center"
-                          style={{ background: "rgba(59,130,246,0.2)", border: "1px solid rgba(59,130,246,0.3)" }}>
-                          <Lock size={13} className="text-blue-300" />
+                      <div className="w-20 h-20 rounded-3xl flex items-center justify-center mb-5 relative bg-linear-to-br from-blue-50 to-sky-50 border border-blue-100">
+                        <MessageCircle size={34} className="text-blue-500" />
+                        <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-xl flex items-center justify-center bg-white border border-blue-200 shadow-sm">
+                          <Lock size={13} className="text-blue-600" />
                         </div>
                       </div>
-                      <p className="text-[16px] font-black text-white mb-2">Secure Client Channel</p>
-                      <p className="text-[10px] text-white/40 font-medium leading-relaxed max-w-55">
-                        This is your encrypted direct channel with <strong className="text-white/60">{chatTarget.name}</strong> for the <strong className="text-white/60">{chatTarget.subtitle}</strong> gig.
+                      <p className="text-[16px] font-black text-slate-900 mb-2">Encrypted Client Channel</p>
+                      <p className="text-[10.5px] text-slate-500 font-medium leading-relaxed max-w-xs">
+                        Your private channel with <strong className="text-slate-700">{chatTarget.name}</strong> for the <strong className="text-slate-700">{chatTarget.subtitle}</strong> gig.
                       </p>
-                      <div className="mt-5 p-4 rounded-2xl text-left w-full max-w-65"
-                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                        <p className="text-[9px] font-black text-white/60 uppercase tracking-widest mb-3">To start messaging</p>
+                      <div className="mt-6 p-4 rounded-2xl text-left w-full max-w-xs bg-white border border-slate-200 shadow-sm">
+                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3">To start messaging</p>
                         {[
-                          { icon: <Zap size={10} />, label: "Purchase a HU pack (from $3)", color: "#3b82f6" },
-                          { icon: <CheckCircle size={10} />, label: "HU credits instantly activated", color: "#10b981" },
-                          { icon: <Send size={10} />, label: "Full messaging unlocks immediately", color: "#8b5cf6" },
+                          { icon: <Zap size={11} />, label: "Activate your account", color: "#3b82f6" },
+                          { icon: <CheckCircle size={11} />, label: "Instant verification", color: "#10b981" },
+                          { icon: <Send size={11} />, label: "Full messaging unlocks", color: "#8b5cf6" },
                         ].map((s, i) => (
                           <div key={i} className="flex items-center gap-2.5 mb-2 last:mb-0">
                             <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
-                              style={{ background: `${s.color}20`, color: s.color }}>{s.icon}</div>
-                            <p className="text-[9.5px] font-semibold text-white/50">{s.label}</p>
+                              style={{ background: `${s.color}15`, color: s.color }}>{s.icon}</div>
+                            <p className="text-[10px] font-semibold text-slate-600">{s.label}</p>
                           </div>
                         ))}
                       </div>
@@ -1074,18 +1068,18 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
               {/* Actual messages */}
               {chatThread.map(b => (
                 <div key={b.id} className={`flex mb-3 ${b.from === "me" ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[76%] px-3.5 py-2.5 text-[10.5px] leading-relaxed shadow-lg ${
+                  <div className={`max-w-[76%] px-3.5 py-2.5 text-[11px] leading-relaxed shadow-sm ${
                     b.from === "me"
                       ? "rounded-2xl rounded-br-md text-white"
-                      : "rounded-2xl rounded-bl-md border"
+                      : "rounded-2xl rounded-bl-md bg-white border border-slate-200 text-slate-800"
                   }`} style={b.from === "me"
                     ? { background: chatTarget.kind === "corporate"
                         ? "linear-gradient(135deg, #7c3aed, #4f46e5)"
                         : "linear-gradient(135deg, #0055ff, #0ea5e9)" }
-                    : { background: "rgba(255,255,255,0.07)", borderColor: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.9)" }
+                    : undefined
                   }>
                     <p className="font-medium">{b.body}</p>
-                    <p className="text-[7.5px] mt-1 font-bold opacity-50">{b.time}</p>
+                    <p className={`text-[7.5px] mt-1 font-bold ${b.from === "me" ? "opacity-70" : "text-slate-400"}`}>{b.time}</p>
                   </div>
                 </div>
               ))}
@@ -1093,52 +1087,48 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
             </div>
 
             {/* ── COMPOSER ── */}
-            <div className="relative z-10 px-4 pb-6 pt-3"
-              style={{ background: "rgba(255,255,255,0.03)", borderTop: "1px solid rgba(255,255,255,0.07)", backdropFilter: "blur(20px)" }}>
+            <div className="relative z-10 px-4 pb-6 pt-3 bg-white border-t border-slate-200/70">
 
               {/* Lock notice */}
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl mb-3"
-                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <Lock size={10} className="text-white/40 shrink-0" />
-                <p className="text-[9px] font-semibold text-white/40 leading-tight">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl mb-3 bg-slate-50 border border-slate-200">
+                <Lock size={11} className="text-slate-500 shrink-0" />
+                <p className="text-[9.5px] font-semibold text-slate-600 leading-tight">
                   {chatTarget.kind === "corporate"
-                    ? "Purchase HU and submit your application to start communicating with the HR team"
-                    : "Purchase a HU pack to unlock sending, attachments, and calls"}
+                    ? "Activate your account to message the HR team and submit your application"
+                    : "Activate your account to unlock messaging, attachments, and calls"}
                 </p>
               </div>
 
               <div className="flex items-end gap-2.5">
                 <button
-                  onClick={() => triggerCallPaywall("File & attachment sharing", "Send portfolios, CVs, and project files once your HU pack is active.")}
-                  className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 transition-all"
-                  style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}>
-                  <Paperclip size={15} className="text-white/50" />
+                  onClick={() => triggerCallPaywall("Send attachments", "Share portfolios, CVs, contracts and project files securely.")}
+                  className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 transition-all bg-slate-100 hover:bg-slate-200">
+                  <Paperclip size={15} className="text-slate-600" />
                 </button>
 
-                <div className="flex-1 flex items-center gap-2 rounded-2xl px-4 py-3 transition-all"
-                  style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                <div className="flex-1 flex items-center gap-2 rounded-2xl px-4 py-3 transition-all bg-slate-50 border border-slate-200 focus-within:border-slate-300">
                   <input
                     value={chatDraft}
                     onChange={e => setChatDraft(e.target.value)}
                     placeholder={chatTarget.kind === "corporate" ? "Message the Talent Team…" : "Type a message…"}
-                    className="flex-1 bg-transparent outline-none text-[11px] font-medium placeholder:font-medium"
-                    style={{ color: "rgba(255,255,255,0.6)", caretColor: chatTarget.kind === "corporate" ? "#a855f7" : "#3b82f6" }}
+                    className="flex-1 bg-transparent outline-none text-[11.5px] font-medium text-slate-800 placeholder:text-slate-400 placeholder:font-medium"
+                    style={{ caretColor: chatTarget.kind === "corporate" ? "#7c3aed" : "#0055ff" }}
                   />
                   <button
-                    onClick={() => triggerCallPaywall("Voice messages", "Send voice notes once your HU pack is active.")}
-                    className="text-white/30 hover:text-white/50 transition-all">
+                    onClick={() => triggerCallPaywall("Voice messages", "Record and send secure voice notes.")}
+                    className="text-slate-400 hover:text-slate-600 transition-all">
                     <Mic size={14} />
                   </button>
                 </div>
 
                 <button
                   onClick={() => triggerCallPaywall(
-                    chatTarget.kind === "corporate" ? "Messaging the HR team" : "Sending messages",
+                    chatTarget.kind === "corporate" ? "Message the HR team" : "Send message",
                     chatTarget.kind === "corporate"
-                      ? "Purchase a HU pack to open communication with the HR team and begin your application process."
-                      : "Purchase a HU pack to instantly unlock messaging with this verified client."
+                      ? "Open a direct, official communication channel with the recruiting team."
+                      : "Start a secure conversation with this verified client."
                   )}
-                  className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 transition-all shadow-xl"
+                  className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 transition-all shadow-md"
                   style={{ background: chatTarget.kind === "corporate"
                     ? "linear-gradient(135deg, #7c3aed, #4f46e5)"
                     : "linear-gradient(135deg, #0055ff, #0ea5e9)" }}>
@@ -1146,12 +1136,13 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 </button>
               </div>
 
-              <p className="text-center text-[8px] font-semibold text-white/25 mt-3">
+              <p className="text-center text-[8.5px] font-semibold text-slate-400 mt-3 flex items-center justify-center gap-1.5">
+                <ShieldCheck size={9} className="text-emerald-500" />
                 End-to-end encrypted · {chatTarget.kind === "corporate" ? "Official HR portal · Verified employer" : "Verified Nexus client"}
               </p>
             </div>
 
-            {/* Call paywall inside chat */}
+            {/* Paywall popup */}
             {callPaywall && (
               <CallPaywallPopup
                 open={callPaywall.open}
