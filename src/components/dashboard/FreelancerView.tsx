@@ -32,6 +32,7 @@ import {
   Paperclip, Mic, MoreVertical, PhoneCall, VideoIcon,
   AtSign, Hash as HashIcon, Smile, Image as ImageIcon,
   ChevronDown as ChevronDownIcon, Minimize2,
+  Command as CommandIcon, Headphones, ScanFace, Sliders, Verified,
 } from "lucide-react";
 
 // ─────────────────────────────────────────────
@@ -543,6 +544,25 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   const [profileAvailability, setProfileAvailability] = useState("Available Now");
   const [showApiKey, setShowApiKey] = useState(false);
   const [showCurrencyMenu, setShowCurrencyMenu] = useState(false);
+  // ─── Premium feature state ───
+  const [showCmdK, setShowCmdK] = useState(false);
+  const [cmdQuery, setCmdQuery] = useState("");
+  const [showNotifPanel, setShowNotifPanel] = useState(false);
+  const [notifList, setNotifList] = useState<{ id: number; title: string; sub: string; time: string; unread: boolean; type: "gig" | "pay" | "msg" | "sys" }[]>([
+    { id: 1, title: "New gig matched to you", sub: "React Dashboard · $1,200 · 92% AI match", time: "Just now", unread: true, type: "gig" },
+    { id: 2, title: "Escrow funded by client", sub: "Stripe held $2,400 in milestone escrow", time: "12m", unread: true, type: "pay" },
+    { id: 3, title: "Verified employer messaged you", sub: "Tesla Talent Team · interview slot", time: "1h", unread: true, type: "msg" },
+    { id: 4, title: "Weekly payout summary ready", sub: "View earnings & withdrawal options", time: "Yesterday", unread: false, type: "sys" },
+  ]);
+  const [activityTick, setActivityTick] = useState<{ id: number; flag: string; text: string }[]>([
+    { id: 1, flag: "🇺🇸", text: "Sarah from New York just earned $1,250" },
+    { id: 2, flag: "🇩🇪", text: "Max from Berlin unlocked Pro tier" },
+    { id: 3, flag: "🇰🇪", text: "Wanjiku from Nairobi received escrow release" },
+    { id: 4, flag: "🇸🇬", text: "Wei from Singapore matched 4 new gigs" },
+    { id: 5, flag: "🇧🇷", text: "Lucas from São Paulo signed Tesla offer" },
+    { id: 6, flag: "🇬🇧", text: "Olivia from London withdrew $3,400" },
+    { id: 7, flag: "🇯🇵", text: "Hiro from Tokyo verified KYC ID" },
+  ]);
 
   const uplinkPackages = [
     {
@@ -816,6 +836,19 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
     { id: 7, title: "Referral King", desc: "Referred 5 friends", icon: <Gift size={14} />, color: "#EC4899", earned: false },
     { id: 8, title: "Elite Worker", desc: "Completed 10 jobs", icon: <Trophy size={14} />, color: "#7C3AED", earned: false },
   ];
+
+  // Global ⌘K / Ctrl+K listener for command palette
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setShowCmdK(v => !v);
+      }
+      if (e.key === "Escape") { setShowCmdK(false); setShowNotifPanel(false); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   // ─────────────────────────────────────────────
   // RENDER
@@ -1160,7 +1193,45 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
       {/* ─── MAIN CONTENT (only when not in chat) ─── */}
       {!chatTarget && (
         <>
-          <div className="max-w-5xl mx-auto pt-4 px-3 relative z-10">
+          <div className="max-w-5xl mx-auto pt-3 px-3 relative z-10">
+            {/* ─── Live Global Activity Ticker ─── */}
+            <div className="mb-3 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden flex items-center">
+              <div className="flex items-center gap-1.5 px-3 py-2 bg-linear-to-br from-emerald-50 to-emerald-100/60 border-r border-emerald-100 shrink-0">
+                <PulseDot color="#10b981" size={5} />
+                <span className="text-[8.5px] font-black uppercase tracking-widest text-emerald-700">Live</span>
+              </div>
+              <div className="flex-1 overflow-hidden relative h-7">
+                <motion.div
+                  className="absolute inset-y-0 left-0 flex items-center gap-8 whitespace-nowrap"
+                  animate={{ x: ["0%", "-50%"] }}
+                  transition={{ duration: 38, repeat: Infinity, ease: "linear" }}
+                >
+                  {[...activityTick, ...activityTick].map((a, i) => (
+                    <span key={i} className="text-[10px] font-semibold text-slate-600 flex items-center gap-1.5">
+                      <span className="text-[12px]">{a.flag}</span>{a.text}
+                    </span>
+                  ))}
+                </motion.div>
+              </div>
+              <div className="flex items-center gap-1 px-2 shrink-0 border-l border-slate-100">
+                <button
+                  onClick={() => setShowCmdK(true)}
+                  title="Command palette (⌘K)"
+                  className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[9px] font-bold text-slate-500 bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-all">
+                  <Search size={10} /> Search <kbd className="px-1 py-px rounded bg-white border border-slate-200 text-[8px] font-black text-slate-400">⌘K</kbd>
+                </button>
+                <button
+                  onClick={() => setShowNotifPanel(v => !v)}
+                  title="Notifications"
+                  className="relative w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition-all">
+                  <Bell size={14} className="text-slate-600" />
+                  {notifList.some(n => n.unread) && (
+                    <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white" />
+                  )}
+                </button>
+              </div>
+            </div>
+
             <AnimatePresence mode="wait">
 
               {/* ═══════════════ HOME ═══════════════ */}
@@ -1453,6 +1524,11 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                                     <Badge color={lc}>{g.level}</Badge>
                                   </div>
                                 </div>
+                                <div className="flex items-center gap-1.5 mb-2 flex-wrap">
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-[7.5px] font-black text-emerald-700"><BadgeCheck size={8} /> Verified Client</span>
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-blue-50 border border-blue-200 text-[7.5px] font-black text-blue-700"><Shield size={8} /> Escrow</span>
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-violet-50 border border-violet-200 text-[7.5px] font-black text-violet-700"><Sparkles size={8} /> {(80 + (g.id ? g.id.length * 3 : 5) % 19)}% Match</span>
+                                </div>
                                 <h4 className="text-[11.5px] font-black text-gray-900 mb-0.5 leading-snug">{g.title}</h4>
                                 <p className="text-[9px] text-gray-400 font-medium mb-1.5">{g.client} · {g.duration}</p>
                                 <p className="text-[9.5px] text-gray-500 leading-relaxed mb-2.5 line-clamp-2">{g.desc}</p>
@@ -1569,6 +1645,10 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                                   <div className="min-w-0 flex-1">
                                     <p className="text-[8.5px] font-bold uppercase tracking-wide text-gray-400 mb-0.5">{c.company}</p>
                                     <h4 className="text-[11.5px] font-black text-gray-900 leading-snug">{c.title}</h4>
+                                    <div className="flex items-center gap-1 mt-1 flex-wrap">
+                                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-purple-50 border border-purple-200 text-[7.5px] font-black text-purple-700"><BadgeCheck size={8} /> Verified Employer</span>
+                                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-[7.5px] font-black text-emerald-700"><Shield size={8} /> KYC</span>
+                                    </div>
                                     <div className="flex gap-1 mt-1 flex-wrap">
                                       <Badge color="#8B5CF6">{c.badge}</Badge>
                                       <Badge color="#06B6D4">{c.dept}</Badge>
@@ -2016,6 +2096,58 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                         {item.action && <ChevronRight size={12} className="text-gray-400 shrink-0" />}
                       </div>
                     ))}
+                  </Card>
+
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-6 h-6 rounded-lg bg-rose-50 flex items-center justify-center"><Shield size={12} className="text-rose-600" /></div>
+                      <span className="text-[10.5px] font-black text-gray-800">Dispute Resolution Center</span>
+                      <Badge color="#10B981" className="ml-auto"><CheckCircle size={7} /> Neutral</Badge>
+                    </div>
+                    <p className="text-[9.5px] text-gray-500 font-medium leading-relaxed mb-3">
+                      Funds in escrow stay protected. Open a dispute and our resolution team responds within an SLA of 24 hours.
+                    </p>
+                    <div className="grid grid-cols-3 gap-2 mb-3">
+                      {[
+                        { label: "Open Cases", value: "0", color: "#3B82F6" },
+                        { label: "Avg Resolution", value: "18h", color: "#10B981" },
+                        { label: "Win Rate", value: "94%", color: "#8B5CF6" },
+                      ].map((m, i) => (
+                        <div key={i} className="p-2.5 rounded-xl border border-gray-100 bg-gray-50/60 text-center">
+                          <p className="text-[14px] font-black" style={{ color: m.color }}>{m.value}</p>
+                          <p className="text-[7.5px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">{m.label}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => addToast("Dispute center is open — no active cases on your account", "info")}
+                      className="w-full py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-rose-600 bg-rose-50 border border-rose-100 hover:bg-rose-100 transition-all flex items-center justify-center gap-1.5">
+                      <AlertTriangle size={11} /> Open a New Dispute
+                    </button>
+                  </Card>
+
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-6 h-6 rounded-lg bg-blue-50 flex items-center justify-center"><BookOpen size={12} className="text-blue-600" /></div>
+                      <span className="text-[10.5px] font-black text-gray-800">Knowledge Base & Guides</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { icon: <PlayCircle size={12} />, label: "Getting Started", color: "#3B82F6" },
+                        { icon: <Shield size={12} />, label: "Escrow & Payments", color: "#10B981" },
+                        { icon: <Briefcase size={12} />, label: "Winning Gigs", color: "#8B5CF6" },
+                        { icon: <ScanFace size={12} />, label: "ID Verification", color: "#F59E0B" },
+                        { icon: <Building2 size={12} />, label: "Corporate Roles", color: "#EC4899" },
+                        { icon: <Wallet size={12} />, label: "Withdrawals", color: "#06B6D4" },
+                      ].map((g, i) => (
+                        <button key={i}
+                          onClick={() => addToast(`Opening "${g.label}" guide`, "info")}
+                          className="p-3 rounded-xl border border-gray-100 bg-white hover:border-blue-200 hover:shadow-sm transition-all flex items-center gap-2 text-left">
+                          <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${g.color}15`, color: g.color }}>{g.icon}</div>
+                          <span className="text-[9.5px] font-bold text-gray-700">{g.label}</span>
+                        </button>
+                      ))}
+                    </div>
                   </Card>
                 </motion.div>
               )}
@@ -2754,6 +2886,145 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
               </div>
             )}
           </AnimatePresence>
+
+          {/* ─── Notifications Drawer ─── */}
+          <AnimatePresence>
+            {showNotifPanel && (
+              <>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  onClick={() => setShowNotifPanel(false)}
+                  className="fixed inset-0 bg-black/30 z-600" />
+                <motion.div
+                  initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
+                  transition={{ type: "spring", damping: 28, stiffness: 260 }}
+                  className="fixed top-0 right-0 bottom-0 z-610 w-full max-w-sm bg-white shadow-2xl flex flex-col">
+                  <div className="px-4 py-4 border-b border-slate-200 flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center"><Bell size={15} className="text-blue-600" /></div>
+                    <div className="flex-1">
+                      <p className="text-[13px] font-black text-slate-900">Notifications</p>
+                      <p className="text-[9px] text-slate-500 font-semibold">{notifList.filter(n=>n.unread).length} unread · Real-time</p>
+                    </div>
+                    <button onClick={() => setNotifList(l => l.map(n => ({ ...n, unread: false })))}
+                      className="text-[8.5px] font-black text-blue-600 hover:text-blue-800 uppercase tracking-widest">Mark all read</button>
+                    <button onClick={() => setShowNotifPanel(false)} className="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center"><X size={14} className="text-slate-600" /></button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-3 space-y-2">
+                    {notifList.length === 0 && (
+                      <div className="text-center py-12 text-slate-400">
+                        <Inbox size={28} className="mx-auto mb-2 opacity-40" />
+                        <p className="text-[11px] font-semibold">You're all caught up</p>
+                      </div>
+                    )}
+                    {notifList.map(n => {
+                      const ic = n.type === "gig" ? <Briefcase size={13} /> : n.type === "pay" ? <DollarSign size={13} /> : n.type === "msg" ? <MessageCircle size={13} /> : <Bell size={13} />;
+                      const cl = n.type === "gig" ? "#3B82F6" : n.type === "pay" ? "#10B981" : n.type === "msg" ? "#8B5CF6" : "#F59E0B";
+                      return (
+                        <button key={n.id}
+                          onClick={() => setNotifList(l => l.map(x => x.id === n.id ? { ...x, unread: false } : x))}
+                          className={`w-full text-left p-3 rounded-xl border flex gap-3 transition-all ${n.unread ? "bg-blue-50/50 border-blue-100" : "bg-white border-slate-100 hover:border-slate-200"}`}>
+                          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${cl}15`, color: cl }}>{ic}</div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[10.5px] font-black text-slate-900 leading-tight">{n.title}</p>
+                            <p className="text-[9px] text-slate-500 font-medium mt-0.5 truncate">{n.sub}</p>
+                            <p className="text-[8px] text-slate-400 font-bold mt-1">{n.time}</p>
+                          </div>
+                          {n.unread && <span className="w-2 h-2 rounded-full bg-blue-500 mt-1 shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="p-3 border-t border-slate-200">
+                    <button onClick={() => { setShowNotifPanel(false); setActiveTab("messages"); }}
+                      className="w-full py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest text-white bg-linear-to-r from-blue-600 to-indigo-600 hover:opacity-90 transition-all">
+                      Open Inbox
+                    </button>
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+
+          {/* ─── ⌘K Command Palette ─── */}
+          <AnimatePresence>
+            {showCmdK && (
+              <>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  onClick={() => setShowCmdK(false)}
+                  className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-700" />
+                <motion.div
+                  initial={{ opacity: 0, y: -20, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -10, scale: 0.97 }}
+                  transition={{ duration: 0.18 }}
+                  className="fixed left-1/2 top-[12%] -translate-x-1/2 z-710 w-[92%] max-w-xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+                  <div className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-200">
+                    <CommandIcon size={16} className="text-slate-400" />
+                    <input
+                      autoFocus
+                      value={cmdQuery}
+                      onChange={e => setCmdQuery(e.target.value)}
+                      placeholder="Search gigs, navigate, or run an action…"
+                      className="flex-1 bg-transparent outline-none text-[13px] font-medium text-slate-800 placeholder:text-slate-400"
+                    />
+                    <kbd className="px-2 py-1 rounded-md bg-slate-100 text-[9px] font-black text-slate-500">ESC</kbd>
+                  </div>
+                  <div className="max-h-80 overflow-y-auto p-2">
+                    {(() => {
+                      const allCmds = [
+                        { group: "Navigate", icon: <Home size={13} />, label: "Go to Home", run: () => setActiveTab("home") },
+                        { group: "Navigate", icon: <Briefcase size={13} />, label: "Browse Freelance Gigs", run: () => { setActiveTab("tasks"); setGigMode("marketplace"); } },
+                        { group: "Navigate", icon: <Building2 size={13} />, label: "Browse Corporate Roles", run: () => { setActiveTab("tasks"); setGigMode("corporate"); } },
+                        { group: "Navigate", icon: <Wallet size={13} />, label: "Open Wallet & Earnings", run: () => setActiveTab("earnings") },
+                        { group: "Navigate", icon: <MessageSquare size={13} />, label: "Open Messages", run: () => setActiveTab("messages") },
+                        { group: "Navigate", icon: <BarChart3 size={13} />, label: "View Analytics", run: () => setActiveTab("analytics") },
+                        { group: "Navigate", icon: <LifeBuoy size={13} />, label: "Open Support & FAQ", run: () => setActiveTab("support") },
+                        { group: "Navigate", icon: <User size={13} />, label: "Open Profile", run: () => setActiveTab("me") },
+                        { group: "Actions", icon: <Zap size={13} />, label: "Buy HU — Top Up", run: openRefill },
+                        { group: "Actions", icon: <Shield size={13} />, label: "View Dispute Center", run: () => setActiveTab("support") },
+                        { group: "Actions", icon: <Bell size={13} />, label: "Open Notifications", run: () => setShowNotifPanel(true) },
+                        { group: "Actions", icon: <ScanFace size={13} />, label: "Verify ID (KYC)", run: () => addToast("KYC verification flow coming soon", "info") },
+                        { group: "Currency", icon: <DollarSign size={13} />, label: "Switch to USD", run: () => setCurrency("USD") },
+                        { group: "Currency", icon: <DollarSign size={13} />, label: "Switch to EUR", run: () => setCurrency("EUR") },
+                        { group: "Currency", icon: <DollarSign size={13} />, label: "Switch to GBP", run: () => setCurrency("GBP") },
+                        { group: "Currency", icon: <DollarSign size={13} />, label: "Switch to KES", run: () => setCurrency("KES") },
+                      ];
+                      const q = cmdQuery.trim().toLowerCase();
+                      const filtered = q ? allCmds.filter(c => c.label.toLowerCase().includes(q) || c.group.toLowerCase().includes(q)) : allCmds;
+                      const grouped: Record<string, typeof allCmds> = {};
+                      filtered.forEach(c => { (grouped[c.group] ||= []).push(c); });
+                      const groups = Object.keys(grouped);
+                      if (groups.length === 0) return (
+                        <div className="text-center py-10 text-slate-400">
+                          <Search size={22} className="mx-auto mb-2 opacity-40" />
+                          <p className="text-[11px] font-semibold">No results for "{cmdQuery}"</p>
+                        </div>
+                      );
+                      return groups.map(g => (
+                        <div key={g} className="mb-2 last:mb-0">
+                          <p className="px-2 py-1.5 text-[8.5px] font-black uppercase tracking-widest text-slate-400">{g}</p>
+                          {grouped[g].map((c, i) => (
+                            <button key={i}
+                              onClick={() => { c.run(); setShowCmdK(false); setCmdQuery(""); }}
+                              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left hover:bg-blue-50 group transition-all">
+                              <span className="w-7 h-7 rounded-lg bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center text-slate-600 group-hover:text-blue-600 transition-all">{c.icon}</span>
+                              <span className="flex-1 text-[11.5px] font-bold text-slate-800">{c.label}</span>
+                              <ChevronRight size={12} className="text-slate-300 group-hover:text-blue-500" />
+                            </button>
+                          ))}
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                  <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50 flex items-center justify-between text-[8.5px] font-bold text-slate-400">
+                    <div className="flex items-center gap-2">
+                      <kbd className="px-1.5 py-0.5 rounded bg-white border border-slate-200">↑↓</kbd> Navigate
+                      <kbd className="px-1.5 py-0.5 rounded bg-white border border-slate-200 ml-2">↵</kbd> Select
+                    </div>
+                    <div className="flex items-center gap-1.5"><Sparkles size={9} className="text-blue-500" /> Premium</div>
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+
         </>
       )}
 
