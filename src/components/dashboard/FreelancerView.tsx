@@ -418,67 +418,90 @@ const CallPaywallPopup = ({ open, feature, sub, onClose, onUnlock, kind }: {
       {open && (
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          className="absolute inset-0 z-20 flex items-center justify-center p-6"
-          style={{ background: "rgba(15,23,42,0.55)", backdropFilter: "blur(14px)" }}
+          className="fixed inset-0 z-800 flex items-center justify-center p-4"
+          style={{ background: "rgba(15,23,42,0.6)", backdropFilter: "blur(16px)" }}
           onClick={onClose}
         >
           <motion.div
-            initial={{ scale: 0.92, y: 20, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.92, y: 20, opacity: 0 }}
+            initial={{ scale: 0.90, y: 24, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.90, y: 24, opacity: 0 }}
             transition={{ type: "spring", damping: 26, stiffness: 360 }}
             onClick={e => e.stopPropagation()}
-            className="relative w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl bg-white"
-            style={{ border: "1px solid rgba(15,23,42,0.06)" }}
+            className="relative w-full max-w-sm rounded-3xl shadow-2xl bg-white flex flex-col overflow-hidden"
+            style={{ border: "1px solid rgba(15,23,42,0.06)", maxHeight: "90vh" }}
           >
-            {/* Top accent bar */}
-            <div className="h-1.5 w-full" style={{ background: `linear-gradient(90deg, ${accent}, ${accent2})` }} />
-
-            <div className="relative p-7 text-center">
+            {/* Sticky header — always visible */}
+            <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-slate-100 shrink-0">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full"
+                style={{ background: `${accent}10`, border: `1px solid ${accent}22` }}>
+                <Crown size={9} style={{ color: accent }} />
+                <span className="text-[8px] font-black uppercase tracking-widest" style={{ color: accent }}>Premium Feature</span>
+              </div>
               <button onClick={onClose}
-                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-all">
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-all shrink-0">
                 <X size={13} />
               </button>
+            </div>
 
+            {/* Top accent bar */}
+            <div className="h-0.5 w-full shrink-0" style={{ background: `linear-gradient(90deg, ${accent}, ${accent2})` }} />
+
+            {/* Scrollable body */}
+            <div className="overflow-y-auto flex-1 px-6 py-5 text-center">
               {/* Premium icon */}
-              <div className="relative w-16 h-16 mx-auto mb-5">
-                <div className="absolute inset-0 rounded-2xl opacity-20 blur-xl" style={{ background: accent }} />
+              <div className="relative w-16 h-16 mx-auto mb-4">
+                <div className="absolute inset-0 rounded-2xl opacity-25 blur-xl" style={{ background: accent }} />
                 <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg"
                   style={{ background: `linear-gradient(135deg, ${accent}, ${accent2})` }}>
                   <Lock size={26} className="text-white" />
                 </div>
               </div>
 
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full mb-3"
-                style={{ background: `${accent}10`, border: `1px solid ${accent}25` }}>
-                <Crown size={9} style={{ color: accent }} />
-                <span className="text-[8.5px] font-black uppercase tracking-widest" style={{ color: accent }}>Premium Feature</span>
-              </div>
-
-              <h3 className="text-[17px] font-black text-slate-900 leading-tight mb-2">{feature}</h3>
-              <p className="text-[11px] text-slate-500 font-medium leading-relaxed mb-6 px-2">{sub}</p>
+              <h3 className="text-[18px] font-black text-slate-900 leading-tight mb-2">{feature}</h3>
+              <p className="text-[10.5px] text-slate-500 font-medium leading-relaxed mb-5 px-2">{sub}</p>
 
               {/* Trust strip */}
-              <div className="grid grid-cols-3 gap-2 mb-6">
+              <div className="grid grid-cols-3 gap-2 mb-5">
                 {[
-                  { icon: <ShieldCheck size={12} />, label: "Verified" },
-                  { icon: <Zap size={12} />, label: "Instant" },
-                  { icon: <BadgeCheck size={12} />, label: "Official" },
+                  { icon: <ShieldCheck size={13} />, label: "Verified" },
+                  { icon: <Zap size={13} />, label: "Instant" },
+                  { icon: <BadgeCheck size={13} />, label: "Official" },
                 ].map((p, i) => (
-                  <div key={i} className="p-2.5 rounded-xl text-center bg-slate-50 border border-slate-100">
-                    <div className="w-7 h-7 mx-auto rounded-lg flex items-center justify-center mb-1" style={{ background: `${accent}12`, color: accent }}>{p.icon}</div>
+                  <div key={i} className="py-3 rounded-xl text-center bg-slate-50 border border-slate-100">
+                    <div className="w-8 h-8 mx-auto rounded-xl flex items-center justify-center mb-1.5" style={{ background: `${accent}12`, color: accent }}>{p.icon}</div>
                     <p className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">{p.label}</p>
                   </div>
                 ))}
               </div>
 
+              {/* Feature list */}
+              <div className="space-y-2 mb-5 text-left">
+                {(kind === "corporate"
+                  ? ["Direct HR team messaging", "Scheduled video interviews", "CV & document submission", "Interview calendar alerts"]
+                  : ["Message verified clients", "High-quality voice calls", "HD video meetings", "File & portfolio sharing"]
+                ).map((f, i) => (
+                  <div key={i} className="flex items-center gap-2.5 p-2.5 rounded-xl"
+                    style={{ background: `${accent}06`, border: `1px solid ${accent}15` }}>
+                    <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+                      style={{ background: `${accent}15`, color: accent }}>
+                      <Check size={9} />
+                    </div>
+                    <p className="text-[9.5px] font-semibold text-slate-700">{f}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Sticky footer — always visible */}
+            <div className="px-6 pb-6 pt-3 border-t border-slate-100 bg-white shrink-0">
               <RippleButton onClick={onUnlock}
-                className="w-full py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2 shadow-lg transition-all"
+                className="w-full py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2 shadow-lg transition-all mb-3"
                 style={{ background: `linear-gradient(135deg, ${accent}, ${accent2})` }}>
                 Continue <ArrowRight size={13} />
               </RippleButton>
-              <p className="text-[8.5px] font-semibold text-slate-400 mt-3 leading-relaxed">
+              <p className="text-[8.5px] font-semibold text-slate-400 text-center mb-1 leading-relaxed">
                 Choose a HU pack on the next screen · Cancel anytime
               </p>
-              <button onClick={onClose} className="mt-2 text-[10px] font-bold text-slate-400 hover:text-slate-600 transition-all">
+              <button onClick={onClose} className="w-full py-1.5 text-[10px] font-bold text-slate-400 hover:text-slate-700 transition-all text-center">
                 Maybe later
               </button>
             </div>
@@ -500,22 +523,22 @@ const ClientProfileModal = ({ client, onClose, onMessage, onApply }: {
       {client && (
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          className="absolute inset-0 z-30 flex items-center justify-center p-4"
-          style={{ background: "rgba(15,23,42,0.55)", backdropFilter: "blur(14px)" }}
+          className="fixed inset-0 z-900 flex items-center justify-center p-4"
+          style={{ background: "rgba(15,23,42,0.6)", backdropFilter: "blur(16px)" }}
           onClick={onClose}
         >
           <motion.div
             initial={{ scale: 0.94, y: 24, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.94, y: 20, opacity: 0 }}
             transition={{ type: "spring", damping: 26, stiffness: 340 }}
             onClick={e => e.stopPropagation()}
-            className="relative w-full max-w-md rounded-3xl overflow-hidden shadow-2xl bg-white max-h-[88vh] flex flex-col"
-            style={{ border: "1px solid rgba(15,23,42,0.06)" }}
+            className="relative w-full max-w-md rounded-3xl shadow-2xl bg-white flex flex-col overflow-hidden"
+            style={{ border: "1px solid rgba(15,23,42,0.06)", maxHeight: "90vh" }}
           >
-            {/* Cover */}
-            <div className="relative h-24" style={{ background: "linear-gradient(135deg, #0F172A, #1E293B)" }}>
+            {/* Cover — sticky */}
+            <div className="relative h-24 shrink-0" style={{ background: "linear-gradient(135deg, #0F172A, #1E293B)" }}>
               <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 20% 30%, #3B82F6 0%, transparent 40%), radial-gradient(circle at 80% 70%, #8B5CF6 0%, transparent 40%)" }} />
               <button onClick={onClose}
-                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 backdrop-blur-md flex items-center justify-center text-white transition-all">
+                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/15 hover:bg-white/30 backdrop-blur-md flex items-center justify-center text-white transition-all z-10">
                 <X size={13} />
               </button>
               <div className="absolute -bottom-8 left-5 flex items-end gap-3">
@@ -530,7 +553,8 @@ const ClientProfileModal = ({ client, onClose, onMessage, onApply }: {
               )}
             </div>
 
-            <div className="px-5 pt-10 pb-4 overflow-y-auto">
+            {/* Scrollable body */}
+            <div className="px-5 pt-10 pb-4 overflow-y-auto flex-1">
               <div className="flex items-start justify-between gap-3 mb-1">
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
@@ -610,8 +634,8 @@ const ClientProfileModal = ({ client, onClose, onMessage, onApply }: {
               </div>
             </div>
 
-            {/* Footer actions */}
-            <div className="border-t border-slate-100 p-3 flex gap-2 bg-white">
+            {/* Sticky footer actions */}
+            <div className="border-t border-slate-100 p-3 flex gap-2 bg-white shrink-0">
               <button onClick={onMessage}
                 className="flex-1 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 transition-all">
                 <MessageCircle size={12} /> Message
@@ -2853,25 +2877,59 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
           {/* ═══════════════ REFILL MODAL ═══════════════ */}
           <AnimatePresence>
             {showModal && (
-              <div className="fixed inset-0 z-600 flex items-end sm:items-center justify-center p-3">
+              <div className="fixed inset-0 z-700 flex items-center justify-center p-4">
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                  className="absolute inset-0 bg-black/55" style={{ backdropFilter: "blur(8px)" }}
+                  className="absolute inset-0 bg-black/60" style={{ backdropFilter: "blur(10px)" }}
                   onClick={() => !isPaying && setShowModal(false)} />
 
-                <motion.div initial={{ scale: 0.93, y: 24 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.93, y: 24 }}
-                  transition={{ type: "spring", damping: 26, stiffness: 320 }}
-                  className="relative w-full max-w-sm bg-white border border-gray-200 rounded-3xl p-5 shadow-2xl overflow-hidden max-h-[94vh] overflow-y-auto no-scrollbar">
+                <motion.div initial={{ scale: 0.93, y: 20, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.93, y: 20, opacity: 0 }}
+                  transition={{ type: "spring", damping: 28, stiffness: 340 }}
+                  className="relative w-full max-w-sm bg-white border border-gray-200 rounded-3xl shadow-2xl flex flex-col overflow-hidden"
+                  style={{ maxHeight: "92vh" }}>
+
+                  {/* ── Sticky Modal Header — always visible ── */}
+                  <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-gray-100 shrink-0 bg-white rounded-t-3xl">
+                    <div>
+                      {modalStep === "packages" && <>
+                        <h3 className="text-[17px] font-black text-gray-900 leading-none">Unlock Gigs</h3>
+                        <p className="text-[9.5px] text-gray-400 font-medium mt-0.5">One purchase · instant access</p>
+                      </>}
+                      {modalStep === "choice" && selectedPack && <>
+                        <h3 className="text-[17px] font-black text-gray-900 leading-none">Payment Method</h3>
+                        <p className="text-[9.5px] font-bold mt-0.5" style={{ color: selectedPack.color }}>{selectedPack.name} · ${selectedPack.price}.00 · {selectedPack.hu} HU</p>
+                      </>}
+                      {modalStep === "card" && <>
+                        <h3 className="text-[17px] font-black text-gray-900 leading-none">Card Payment</h3>
+                        <p className="text-[9.5px] text-gray-400 font-medium mt-0.5">Visa & Mastercard · Paystack</p>
+                      </>}
+                      {modalStep === "binance" && <>
+                        <h3 className="text-[17px] font-black text-gray-900 leading-none">Binance Pay</h3>
+                        <p className="text-[9.5px] text-gray-400 font-medium mt-0.5">USDT crypto · instant</p>
+                      </>}
+                      {modalStep === "mpesa" && <>
+                        <h3 className="text-[17px] font-black text-gray-900 leading-none">M-Pesa</h3>
+                        <p className="text-[9.5px] text-gray-400 font-medium mt-0.5">STK Push · East Africa</p>
+                      </>}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {modalStep !== "packages" && (
+                        <button onClick={() => setModalStep(modalStep === "card" || modalStep === "binance" || modalStep === "mpesa" ? "choice" : "packages")}
+                          className="w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition-all">
+                          <ChevronLeft size={14} />
+                        </button>
+                      )}
+                      <button onClick={() => !isPaying && setShowModal(false)}
+                        className="w-8 h-8 rounded-xl bg-gray-100 hover:bg-red-50 hover:text-red-500 flex items-center justify-center text-gray-500 transition-all">
+                        <X size={14} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* ── Scrollable Modal Body ── */}
+                  <div className="overflow-y-auto flex-1 no-scrollbar px-5 py-4">
 
                   {modalStep === "packages" && (
                     <div className="space-y-3">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="text-[18px] font-black text-gray-900 leading-none">Unlock Gigs Instantly</h3>
-                          <p className="text-[10px] text-gray-400 font-medium mt-0.5">One purchase → all matching freelance gigs unlock immediately.</p>
-                        </div>
-                        <button onClick={() => setShowModal(false)} className="p-1.5 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all"><X size={14} /></button>
-                      </div>
-
                       <div className="p-3 rounded-xl border border-green-200 bg-green-50 flex items-center gap-2">
                         <CheckCircle2 size={12} className="text-green-600 shrink-0" />
                         <p className="text-[9.5px] font-semibold text-green-800 leading-relaxed">
@@ -2947,16 +3005,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
 
                   {modalStep === "choice" && selectedPack && (
                     <div className="space-y-3">
-                      <div className="flex items-center gap-2.5">
-                        <button onClick={() => setModalStep("packages")} className="p-1.5 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all"><ChevronLeft size={13} /></button>
-                        <div>
-                          <h4 className="text-[12px] font-black text-gray-900">Choose Payment Method</h4>
-                          <p className="text-[9.5px] text-gray-400 font-medium mt-0.5">
-                            {selectedPack.name} · {selectedPack.hu} HU · <span className="font-black" style={{ color: selectedPack.color }}>${selectedPack.price}.00</span>
-                          </p>
-                        </div>
-                      </div>
-
                       <div className="p-3 rounded-xl border border-green-200 bg-green-50">
                         <div className="flex items-center gap-2 mb-1.5">
                           <Zap size={11} className="text-green-600 shrink-0" fill="#10B981" />
@@ -3026,14 +3074,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
 
                   {modalStep === "card" && selectedPack && (
                     <div className="space-y-3.5">
-                      <div className="flex items-center gap-2.5">
-                        <button onClick={() => setModalStep("choice")} className="p-1.5 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all"><ChevronLeft size={13} /></button>
-                        <div>
-                          <h4 className="text-[12px] font-black text-gray-900">Secure Card Payment</h4>
-                          <p className="text-[9px] text-gray-400 font-medium">Visa & Mastercard · Worldwide · Powered by Paystack</p>
-                        </div>
-                      </div>
-
                       <div className="p-4 rounded-2xl border border-gray-100 shadow-sm" style={{ background: "linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%)" }}>
                         <div className="flex items-start justify-between mb-3">
                           <div>
@@ -3100,11 +3140,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
 
                   {modalStep === "binance" && selectedPack && (
                     <div className="space-y-3.5">
-                      <div className="flex items-center gap-2.5">
-                        <button onClick={() => setModalStep("choice")} className="p-1.5 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all"><ChevronLeft size={13} /></button>
-                        <h4 className="text-[12px] font-black text-gray-900">Binance Pay (Crypto)</h4>
-                      </div>
-
                       <div className="flex gap-2">
                         {(["TRC20", "ERC20"] as const).map(net => (
                           <button key={net} onClick={() => setSelectedCryptoNet(net)}
@@ -3154,11 +3189,6 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
 
                   {modalStep === "mpesa" && selectedPack && (
                     <div className="space-y-3.5">
-                      <div className="flex items-center gap-2.5">
-                        <button onClick={() => setModalStep("choice")} className="p-1.5 bg-gray-100 rounded-xl text-gray-500 hover:bg-gray-200 transition-all"><ChevronLeft size={13} /></button>
-                        <h4 className="text-[12px] font-black text-gray-900">Pay with M-Pesa</h4>
-                      </div>
-
                       <div className="p-3.5 bg-green-50 border border-green-200 rounded-xl">
                         <div className="flex items-center gap-2 mb-0.5">
                           <CheckCircle size={13} className="text-green-500 shrink-0" />
@@ -3194,6 +3224,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                     </div>
                   )}
 
+                  </div>{/* end scrollable body */}
                 </motion.div>
               </div>
             )}
@@ -3205,11 +3236,11 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
               <>
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                   onClick={() => setShowNotifPanel(false)}
-                  className="fixed inset-0 bg-black/30 z-600" />
+                  className="fixed inset-0 bg-black/30 z-750" />
                 <motion.div
                   initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
                   transition={{ type: "spring", damping: 28, stiffness: 260 }}
-                  className="fixed top-0 right-0 bottom-0 z-610 w-full max-w-sm bg-white shadow-2xl flex flex-col">
+                  className="fixed top-0 right-0 bottom-0 z-760 w-full max-w-sm bg-white shadow-2xl flex flex-col">
                   <div className="px-4 py-4 border-b border-slate-200 flex items-center gap-3">
                     <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center"><Bell size={15} className="text-blue-600" /></div>
                     <div className="flex-1">
@@ -3262,11 +3293,11 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
               <>
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                   onClick={() => setShowCmdK(false)}
-                  className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-700" />
+                  className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-770" />
                 <motion.div
                   initial={{ opacity: 0, y: -20, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -10, scale: 0.97 }}
                   transition={{ duration: 0.18 }}
-                  className="fixed left-1/2 top-[12%] -translate-x-1/2 z-710 w-[92%] max-w-xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+                  className="fixed left-1/2 top-[8%] -translate-x-1/2 z-780 w-[92%] max-w-xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
                   <div className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-200">
                     <CommandIcon size={16} className="text-slate-400" />
                     <input
