@@ -65,6 +65,29 @@ interface ChatBubble {
   time: string;
 }
 
+interface ClientInfo {
+  id: string;
+  name: string;
+  avatar: string;
+  type: string;
+  country: string;
+  flag: string;
+  joined: string;
+  rating: number;
+  reviews: number;
+  jobsPosted: number;
+  hireRate: number;
+  totalSpent: number;
+  paymentVerified: boolean;
+  identityVerified: boolean;
+  topClient: boolean;
+  bio: string;
+  industry: string;
+  responseTime: string;
+  recentJobs: { title: string; budget: number; status: string }[];
+  testimonials: { from: string; role: string; text: string; rating: number }[];
+}
+
 // ─────────────────────────────────────────────
 // Primitives
 // ─────────────────────────────────────────────
@@ -469,6 +492,143 @@ const CallPaywallPopup = ({ open, feature, sub, onClose, onUnlock, kind }: {
 // ─────────────────────────────────────────────
 // MAIN COMPONENT
 // ─────────────────────────────────────────────
+const ClientProfileModal = ({ client, onClose, onMessage, onApply }: {
+  client: ClientInfo | null; onClose: () => void; onMessage: () => void; onApply: () => void;
+}) => {
+  return (
+    <AnimatePresence>
+      {client && (
+        <motion.div
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          className="absolute inset-0 z-30 flex items-center justify-center p-4"
+          style={{ background: "rgba(15,23,42,0.55)", backdropFilter: "blur(14px)" }}
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ scale: 0.94, y: 24, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.94, y: 20, opacity: 0 }}
+            transition={{ type: "spring", damping: 26, stiffness: 340 }}
+            onClick={e => e.stopPropagation()}
+            className="relative w-full max-w-md rounded-3xl overflow-hidden shadow-2xl bg-white max-h-[88vh] flex flex-col"
+            style={{ border: "1px solid rgba(15,23,42,0.06)" }}
+          >
+            {/* Cover */}
+            <div className="relative h-24" style={{ background: "linear-gradient(135deg, #0F172A, #1E293B)" }}>
+              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 20% 30%, #3B82F6 0%, transparent 40%), radial-gradient(circle at 80% 70%, #8B5CF6 0%, transparent 40%)" }} />
+              <button onClick={onClose}
+                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 backdrop-blur-md flex items-center justify-center text-white transition-all">
+                <X size={13} />
+              </button>
+              <div className="absolute -bottom-8 left-5 flex items-end gap-3">
+                <div className="rounded-2xl ring-4 ring-white shadow-lg">
+                  <MarketplaceAvatar initials={client.avatar} type={client.type} seed={client.id} size={64} />
+                </div>
+              </div>
+              {client.topClient && (
+                <div className="absolute bottom-3 right-3 px-2 py-1 rounded-full bg-amber-400/90 text-amber-950 text-[8px] font-black uppercase tracking-widest flex items-center gap-1 shadow">
+                  <Crown size={9} /> Top Client
+                </div>
+              )}
+            </div>
+
+            <div className="px-5 pt-10 pb-4 overflow-y-auto">
+              <div className="flex items-start justify-between gap-3 mb-1">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <h3 className="text-[16px] font-black text-slate-900 leading-tight truncate">{client.name}</h3>
+                    {client.identityVerified && <BadgeCheck size={14} className="text-blue-600 shrink-0" />}
+                  </div>
+                  <p className="text-[10px] font-semibold text-slate-500 mt-0.5">{client.industry} · {client.flag} {client.country}</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="flex items-center gap-1 justify-end">
+                    <Star size={11} className="fill-amber-400 text-amber-400" />
+                    <span className="text-[12px] font-black text-slate-900">{client.rating.toFixed(1)}</span>
+                  </div>
+                  <p className="text-[8.5px] font-bold text-slate-400">{client.reviews} reviews</p>
+                </div>
+              </div>
+
+              {/* Trust badges */}
+              <div className="flex flex-wrap gap-1 mt-2 mb-3">
+                {client.paymentVerified && <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-[8px] font-black text-emerald-700"><CreditCard size={9} /> Payment Verified</span>}
+                {client.identityVerified && <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-blue-50 border border-blue-200 text-[8px] font-black text-blue-700"><Fingerprint size={9} /> KYC Verified</span>}
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-violet-50 border border-violet-200 text-[8px] font-black text-violet-700"><Clock size={9} /> Replies in {client.responseTime}</span>
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-[8px] font-black text-slate-600"><Calendar size={9} /> Joined {client.joined}</span>
+              </div>
+
+              <p className="text-[10.5px] text-slate-600 leading-relaxed mb-3">{client.bio}</p>
+
+              {/* Stats grid */}
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                  <p className="text-[14px] font-black text-slate-900 leading-none">{client.jobsPosted}</p>
+                  <p className="text-[7.5px] font-bold text-slate-400 uppercase tracking-wider mt-1">Jobs Posted</p>
+                </div>
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                  <p className="text-[14px] font-black text-emerald-600 leading-none">{client.hireRate}%</p>
+                  <p className="text-[7.5px] font-bold text-slate-400 uppercase tracking-wider mt-1">Hire Rate</p>
+                </div>
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                  <p className="text-[14px] font-black text-blue-600 leading-none">${(client.totalSpent / 1000).toFixed(0)}K</p>
+                  <p className="text-[7.5px] font-bold text-slate-400 uppercase tracking-wider mt-1">Total Spent</p>
+                </div>
+              </div>
+
+              {/* Recent jobs */}
+              <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Recent Jobs</p>
+              <div className="space-y-1.5 mb-4">
+                {client.recentJobs.map((j, i) => (
+                  <div key={i} className="flex items-center justify-between p-2.5 rounded-xl bg-white border border-slate-100">
+                    <div className="min-w-0">
+                      <p className="text-[10.5px] font-bold text-slate-800 truncate">{j.title}</p>
+                      <p className="text-[8.5px] font-semibold text-slate-400">${j.budget.toLocaleString()}</p>
+                    </div>
+                    <span className={`shrink-0 px-2 py-0.5 rounded-full text-[7.5px] font-black uppercase tracking-wider ${j.status === "Completed" ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-blue-50 text-blue-700 border border-blue-200"}`}>{j.status}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Testimonials */}
+              <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Freelancer Reviews</p>
+              <div className="space-y-2 mb-4">
+                {client.testimonials.map((t, i) => (
+                  <div key={i} className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                    <div className="flex items-center justify-between mb-1">
+                      <div>
+                        <p className="text-[10px] font-black text-slate-800">{t.from}</p>
+                        <p className="text-[8.5px] font-semibold text-slate-400">{t.role}</p>
+                      </div>
+                      <div className="flex">
+                        {Array.from({ length: 5 }).map((_, k) => (
+                          <Star key={k} size={9} className={k < t.rating ? "fill-amber-400 text-amber-400" : "text-slate-300"} />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-[9.5px] text-slate-600 italic leading-relaxed">&ldquo;{t.text}&rdquo;</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Footer actions */}
+            <div className="border-t border-slate-100 p-3 flex gap-2 bg-white">
+              <button onClick={onMessage}
+                className="flex-1 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 transition-all">
+                <MessageCircle size={12} /> Message
+              </button>
+              <RippleButton onClick={onApply}
+                className="flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-1.5 shadow-md"
+                style={{ background: "linear-gradient(135deg, #0055FF, #0EA5E9)" }}>
+                <Rocket size={12} /> Apply Now
+              </RippleButton>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
 export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetadata: any }) => {
   const { user } = useUser();
 
@@ -523,6 +683,9 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   const [chatThread, setChatThread] = useState<ChatBubble[]>([]);
   const [callPaywall, setCallPaywall] = useState<{ open: boolean; feature: string; sub: string } | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Client profile modal & "see more" gigs paywall
+  const [clientProfile, setClientProfile] = useState<ClientInfo | null>(null);
 
   const [notifications, setNotifications] = useState({ missions: true, payments: true, messages: false, weekly: true, newGigs: true });
   const [twoFAEnabled, setTwoFAEnabled] = useState(false);
@@ -628,6 +791,14 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
     { id: "m22", title: "Enterprise CRM Custom Integration", budget: 3200, client: "SalesForce Partners", avatar: "SP", type: "Web Dev", duration: "21 Days", level: "Expert", desc: "Build a custom Salesforce integration with real-time webhook sync and bi-directional data flow.", skills: ["Salesforce API", "Node.js", "REST"], deliverables: "Integration + documentation", huRequired: 50 },
     { id: "m23", title: "Deep Learning Computer Vision System", budget: 4000, client: "VisionAI Labs", avatar: "VA", type: "AI", duration: "21 Days", level: "Expert", desc: "Train a YOLOv8 object detection model on custom dataset for real-time product defect detection.", skills: ["PyTorch", "YOLOv8", "OpenCV"], deliverables: "Trained model + inference API", huRequired: 50 },
     { id: "m24", title: "DeFi Protocol Architecture & Audit", budget: 5000, client: "DeFi Builders DAO", avatar: "DB", type: "Web3", duration: "30 Days", level: "Expert", desc: "Design and audit a multi-chain DeFi liquidity protocol with formal security audit and testnet launch.", skills: ["Solidity", "DeFi", "Security"], deliverables: "Protocol + audit report + docs", huRequired: 50 },
+    { id: "m25", title: "Shopify Headless Storefront (Hydrogen)", budget: 1700, client: "Lume Beauty Co", avatar: "LB", type: "Web Dev", duration: "12 Days", level: "Advanced", desc: "Build a headless Shopify storefront in Hydrogen + Remix with custom checkout, predictive search, and Klaviyo integration.", skills: ["Hydrogen", "Remix", "Shopify"], deliverables: "Deployed storefront + admin docs", huRequired: 30 },
+    { id: "m26", title: "Motion Graphics Reel (Premium Brand)", budget: 1100, client: "Aurora Studios", avatar: "AS", type: "Video", duration: "9 Days", level: "Advanced", desc: "Produce a 60-second cinematic motion graphics reel for a luxury fashion launch. After Effects + Cinema 4D.", skills: ["After Effects", "C4D", "Sound Design"], deliverables: "60s 4K reel + project files", huRequired: 30 },
+    { id: "m27", title: "iOS / Android App (Flutter)", budget: 3400, client: "FitOrbit Health", avatar: "FO", type: "Web Dev", duration: "21 Days", level: "Expert", desc: "Build a cross-platform fitness tracking app with HealthKit / Google Fit integration, in-app purchases, and offline sync.", skills: ["Flutter", "Dart", "Firebase"], deliverables: "Published app on both stores", huRequired: 50 },
+    { id: "m28", title: "Data Engineering Pipeline (dbt + Snowflake)", budget: 2600, client: "Atlas Analytics", avatar: "AA", type: "Data", duration: "14 Days", level: "Expert", desc: "Design an end-to-end ELT pipeline from 8 SaaS sources into Snowflake using Fivetran + dbt + Airflow, with CI tests.", skills: ["dbt", "Snowflake", "Airflow"], deliverables: "Pipeline + dashboards + runbook", huRequired: 50 },
+    { id: "m29", title: "AI Voice Cloning Platform (LLM + TTS)", budget: 4200, client: "VoxForge Labs", avatar: "VF", type: "AI", duration: "20 Days", level: "Expert", desc: "Build a voice cloning SaaS with ElevenLabs / OpenAI Realtime, custom dashboard, billing, and rate limiting.", skills: ["Next.js", "OpenAI", "Stripe"], deliverables: "Live SaaS + admin panel", huRequired: 50 },
+    { id: "m30", title: "Brand Photography & Retouching (50 shots)", budget: 850, client: "Heritage Coffee Co", avatar: "HC", type: "Design", duration: "7 Days", level: "Standard", desc: "Lifestyle product photography for a specialty coffee brand. 50 retouched hero shots + 100 supporting images.", skills: ["Photography", "Lightroom", "Photoshop"], deliverables: "150 retouched images + license", huRequired: 20 },
+    { id: "m31", title: "Localization Package (10 Languages)", budget: 950, client: "GlobalReach SaaS", avatar: "GR", type: "Writing", duration: "10 Days", level: "Standard", desc: "Translate and culturally adapt a SaaS product (UI + marketing pages) into 10 languages with native QA review.", skills: ["i18n", "Translation", "Localization"], deliverables: "JSON locale files + QA report", huRequired: 20 },
+    { id: "m32", title: "Stripe Subscription Billing Integration", budget: 1350, client: "MetricMind SaaS", avatar: "MM", type: "Web Dev", duration: "8 Days", level: "Advanced", desc: "Implement Stripe Billing with metered usage, customer portal, dunning emails, and tax handling for a B2B SaaS.", skills: ["Stripe", "Node.js", "Webhooks"], deliverables: "Live billing + admin docs", huRequired: 30 },
   ], []);
 
   const corporateGigs = useMemo(() => [
@@ -726,6 +897,71 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
 
   const triggerCallPaywall = (feature: string, sub: string) => {
     setCallPaywall({ open: true, feature, sub });
+  };
+
+  // Build a deterministic, realistic client profile for a gig
+  const openClientProfile = (g: { id: string; client: string; avatar: string; type: string; budget: number; title: string }) => {
+    const seed = g.client.length + g.id.charCodeAt(g.id.length - 1);
+    const countries = [
+      { c: "United States", f: "🇺🇸" }, { c: "United Kingdom", f: "🇬🇧" }, { c: "Germany", f: "🇩🇪" },
+      { c: "Canada", f: "🇨🇦" }, { c: "Australia", f: "🇦🇺" }, { c: "Singapore", f: "🇸🇬" },
+      { c: "Netherlands", f: "🇳🇱" }, { c: "United Arab Emirates", f: "🇦🇪" }, { c: "Japan", f: "🇯🇵" },
+      { c: "France", f: "🇫🇷" }, { c: "Switzerland", f: "🇨🇭" }, { c: "Sweden", f: "🇸🇪" },
+    ];
+    const loc = countries[seed % countries.length];
+    const industries: Record<string, string> = {
+      "Web Dev": "SaaS & Technology", "Design": "Brand & Creative Agency", "Writing": "Media & Publishing",
+      "Marketing": "Growth & Performance", "Data": "Analytics & BI", "AI": "Artificial Intelligence",
+      "Security": "Cybersecurity", "Web3": "Blockchain & DeFi", "Video": "Production Studio",
+    };
+    const rating = Math.round((4.6 + (seed % 5) / 10) * 10) / 10;
+    const reviews = 24 + (seed * 7) % 480;
+    const jobs = 8 + (seed * 3) % 90;
+    const hire = 78 + (seed % 22);
+    const spent = (g.budget * (8 + (seed % 14)));
+    const months = ["Jan", "Mar", "Jun", "Sep", "Nov"];
+    const years = ["2019", "2020", "2021", "2022"];
+    const joined = `${months[seed % months.length]} ${years[seed % years.length]}`;
+    const responseTimes = ["under 1h", "under 2h", "under 4h", "under 6h"];
+    const recentJobs = [
+      { title: g.title, budget: g.budget, status: "Open" },
+      { title: `${g.type} Sprint — Phase 2`, budget: Math.round(g.budget * 0.7), status: "Completed" },
+      { title: `Ongoing ${g.type} Retainer`, budget: Math.round(g.budget * 1.4), status: "Completed" },
+    ];
+    const testimonials = [
+      { from: "Daniel R.", role: "Senior React Engineer", text: "Crystal clear briefs, fast feedback, and milestones paid on time. Would absolutely work with them again.", rating: 5 },
+      { from: "Priya M.", role: "Brand Designer", text: "Highly professional team — escrow released within hours of approval. Top-tier client.", rating: 5 },
+    ];
+    setClientProfile({
+      id: g.id,
+      name: g.client,
+      avatar: g.avatar,
+      type: g.type,
+      country: loc.c,
+      flag: loc.f,
+      joined,
+      rating,
+      reviews,
+      jobsPosted: jobs,
+      hireRate: hire,
+      totalSpent: spent,
+      paymentVerified: true,
+      identityVerified: true,
+      topClient: spent > 12000,
+      bio: `${g.client} is a ${industries[g.type] || "global"} company sourcing world-class talent on Nexus. Verified payment, fast hiring decisions, and a track record of long-term collaborations.`,
+      industry: industries[g.type] || "Global Business",
+      responseTime: responseTimes[seed % responseTimes.length],
+      recentJobs,
+      testimonials,
+    });
+  };
+
+  const openSeeMorePaywall = () => {
+    setCallPaywall({
+      open: true,
+      feature: "Unlock 200+ More Premium Gigs",
+      sub: "You're seeing a curated preview. Top-paying global gigs and senior corporate roles are reserved for active members. Add HUs to unlock the full marketplace.",
+    });
   };
 
   const navItems = [
@@ -872,6 +1108,41 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
       </div>
 
       {/* ─── CHAT OVERLAY — Official white theme ─── */}
+      <AnimatePresence>
+      </AnimatePresence>
+
+      {/* ─── Client Profile Modal (top-level) ─── */}
+      <ClientProfileModal
+        client={clientProfile}
+        onClose={() => setClientProfile(null)}
+        onMessage={() => {
+          if (!clientProfile) return;
+          const c = clientProfile;
+          setClientProfile(null);
+          openChatForGig({ id: c.id, title: c.recentJobs[0]?.title || c.name, client: c.name, avatar: c.avatar, type: c.type, budget: c.recentJobs[0]?.budget || 0 });
+        }}
+        onApply={() => {
+          setClientProfile(null);
+          if (hasHU) {
+            handleStartGig(clientProfile?.recentJobs[0]?.title || "Application");
+          } else {
+            openRefill();
+          }
+        }}
+      />
+
+      {/* ─── See-more / generic paywall (works outside chat) ─── */}
+      {!chatTarget && callPaywall && (
+        <CallPaywallPopup
+          open={callPaywall.open}
+          feature={callPaywall.feature}
+          sub={callPaywall.sub}
+          kind="freelance"
+          onClose={() => setCallPaywall(null)}
+          onUnlock={() => { setCallPaywall(null); openRefill(); }}
+        />
+      )}
+
       <AnimatePresence>
         {chatTarget && (
           <motion.div
@@ -1518,7 +1789,10 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                               )}
                               <div className="p-4">
                                 <div className="flex items-start justify-between mb-2.5">
-                                  <MarketplaceAvatar initials={g.avatar} type={g.type} seed={g.client} size={38} />
+                                  <button onClick={() => openClientProfile(g)} title={`View ${g.client}'s profile`}
+                                    className="rounded-xl hover:ring-2 hover:ring-blue-300 transition-all">
+                                    <MarketplaceAvatar initials={g.avatar} type={g.type} seed={g.client} size={38} />
+                                  </button>
                                   <div className="flex gap-1 flex-wrap justify-end pr-12">
                                     <Badge color={tc}>{g.type}</Badge>
                                     <Badge color={lc}>{g.level}</Badge>
@@ -1530,7 +1804,13 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                                   <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-violet-50 border border-violet-200 text-[7.5px] font-black text-violet-700"><Sparkles size={8} /> {(80 + (g.id ? g.id.length * 3 : 5) % 19)}% Match</span>
                                 </div>
                                 <h4 className="text-[11.5px] font-black text-gray-900 mb-0.5 leading-snug">{g.title}</h4>
-                                <p className="text-[9px] text-gray-400 font-medium mb-1.5">{g.client} · {g.duration}</p>
+                                <p className="text-[9px] text-gray-400 font-medium mb-1.5">
+                                  <button onClick={() => openClientProfile(g)}
+                                    className="font-bold text-blue-600 hover:underline transition-all">
+                                    {g.client}
+                                  </button>
+                                  <span> · {g.duration}</span>
+                                </p>
                                 <p className="text-[9.5px] text-gray-500 leading-relaxed mb-2.5 line-clamp-2">{g.desc}</p>
                                 <div className="flex gap-1 flex-wrap mb-2.5">
                                   {g.skills.map((s, si) => (
@@ -1599,6 +1879,38 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                             className="mt-2 px-4 py-2 rounded-xl text-[9.5px] font-bold text-blue-600 bg-blue-50 border border-blue-100 hover:bg-blue-100 transition-all">
                             Clear Filters
                           </button>
+                        </div>
+                      )}
+
+                      {filteredMarket.length > 0 && (
+                        <div className="relative mt-4">
+                          {/* Faded preview row of locked gigs */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 opacity-50 blur-[2px] pointer-events-none select-none">
+                            {[
+                              { t: "Generative AI Video Editor", p: "$3,800", c: "Pixel Forge AI" },
+                              { t: "Enterprise SSO + SAML Integration", p: "$2,400", c: "VaultCore Security" },
+                              { t: "Custom Headless CMS", p: "$2,900", c: "Northwind Media" },
+                            ].map((x, i) => (
+                              <div key={i} className="bg-white border border-gray-100 rounded-2xl p-4 h-40">
+                                <div className="w-10 h-10 rounded-xl bg-gray-200 mb-2" />
+                                <div className="h-2.5 w-3/4 bg-gray-200 rounded mb-1.5" />
+                                <div className="h-2 w-1/2 bg-gray-200 rounded mb-2" />
+                                <div className="h-2 w-full bg-gray-100 rounded mb-1" />
+                                <div className="h-2 w-5/6 bg-gray-100 rounded mb-3" />
+                                <p className="text-[11px] font-black text-gray-700">{x.t}</p>
+                                <p className="text-[9px] text-gray-400">{x.c} · {x.p}</p>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* See more CTA overlay */}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <RippleButton onClick={openSeeMorePaywall}
+                              className="px-6 py-3.5 rounded-2xl text-[10.5px] font-black uppercase tracking-widest text-white flex items-center gap-2 shadow-2xl"
+                              style={{ background: "linear-gradient(135deg, #0F172A, #1E293B)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                              <Lock size={12} /> See More Gigs <ArrowRight size={12} />
+                            </RippleButton>
+                          </div>
                         </div>
                       )}
                     </>
@@ -2603,7 +2915,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                               </div>
                               <div className="text-right">
                                 <p className="text-[20px] font-black leading-none" style={{ color: pack.color }}>${pack.price}</p>
-                                <p className="text-[8px] text-gray-400 font-medium">one-time</p>
+                                <p className="text-[8px] text-gray-400 font-medium">HU credit</p>
                               </div>
                             </div>
                             <p className="text-[9.5px] text-gray-500 font-medium mb-2">{pack.desc}</p>
