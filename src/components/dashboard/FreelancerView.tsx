@@ -85,7 +85,7 @@ interface ClientInfo {
   industry: string;
   responseTime: string;
   recentJobs: { title: string; budget: number; status: string }[];
-  testimonials: { from: string; role: string; text: string; rating: number }[];
+  testimonials: { from: string; role: string; seed: string; text: string; rating: number }[];
 }
 
 // ─────────────────────────────────────────────
@@ -543,7 +543,7 @@ const ClientProfileModal = ({ client, onClose, onMessage, onApply }: {
               </button>
               <div className="absolute -bottom-8 left-5 flex items-end gap-3">
                 <div className="rounded-2xl ring-4 ring-white shadow-lg">
-                  <MarketplaceAvatar initials={client.avatar} type={client.type} seed={client.id} size={64} />
+                  <MarketplaceAvatar initials={client.avatar} type={client.type} seed={client.name} size={64} />
                 </div>
               </div>
               {client.topClient && (
@@ -617,10 +617,13 @@ const ClientProfileModal = ({ client, onClose, onMessage, onApply }: {
               <div className="space-y-2 mb-4">
                 {client.testimonials.map((t, i) => (
                   <div key={i} className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                    <div className="flex items-center justify-between mb-1">
-                      <div>
-                        <p className="text-[10px] font-black text-slate-800">{t.from}</p>
-                        <p className="text-[8.5px] font-semibold text-slate-400">{t.role}</p>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center gap-2">
+                        <MarketplaceAvatar initials={t.from.split(" ").map(w => w[0]).join("")} type="Design" seed={t.seed} size={28} />
+                        <div>
+                          <p className="text-[10px] font-black text-slate-800">{t.from}</p>
+                          <p className="text-[8.5px] font-semibold text-slate-400">{t.role}</p>
+                        </div>
                       </div>
                       <div className="flex">
                         {Array.from({ length: 5 }).map((_, k) => (
@@ -707,6 +710,20 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   const [chatThread, setChatThread] = useState<ChatBubble[]>([]);
   const [callPaywall, setCallPaywall] = useState<{ open: boolean; feature: string; sub: string } | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  // Draft persistence per chat
+  const [chatDrafts, setChatDrafts] = useState<Record<string, string>>({});
+  // Call history
+  const [callHistory, setCallHistory] = useState<{ id: number; target: string; kind: string; type: "voice" | "video"; time: string; status: "missed" | "attempted" }[]>([]);
+  // Messages tab sub-tab
+  const [messagesSubTab, setMessagesSubTab] = useState<"inbox" | "calls">("inbox");
+  // Track which system messages have been read
+  const [readMsgIds, setReadMsgIds] = useState<Set<number>>(new Set());
+  // Verification step popup
+  const [verifyStepPopup, setVerifyStepPopup] = useState<string | null>(null);
+  // Knowledge Base guide popup
+  const [kbGuidePopup, setKbGuidePopup] = useState<{ title: string; content: string } | null>(null);
+  // Scroll container ref for scroll-to-top on tab change
+  const mainScrollRef = useRef<HTMLDivElement>(null);
 
   // Client profile modal & "see more" gigs paywall
   const [clientProfile, setClientProfile] = useState<ClientInfo | null>(null);
@@ -826,28 +843,28 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
   ], []);
 
   const corporateGigs = useMemo(() => [
-    { id: "c1", title: "Remote Fleet Data Analyst", salary: 8000, domain: "tesla.com", company: "Tesla", badge: "EV · Remote", dept: "Engineering", desc: "Analyze fleet telemetry data from 500k+ Tesla vehicles. Build dashboards tracking range and charging patterns.", skills: ["Python", "SQL", "Tableau"], type: "Full-time Remote", huRequired: 50 },
-    { id: "c2", title: "Cloud Support Engineer", salary: 9000, domain: "amazon.com", company: "Amazon", badge: "AWS · Senior", dept: "Cloud", desc: "Provide enterprise-level AWS support for Fortune 500 clients. Resolve complex infrastructure issues.", skills: ["AWS", "Linux", "Networking"], type: "Full-time Remote", huRequired: 50 },
-    { id: "c3", title: "Payment Integrity Analyst", salary: 11000, domain: "stripe.com", company: "Stripe", badge: "FinTech · Remote", dept: "Finance", desc: "Investigate payment anomalies, fraud patterns, and dispute trends across Stripe's global transaction network.", skills: ["SQL", "Python", "Risk Analysis"], type: "Full-time Remote", huRequired: 50 },
-    { id: "c4", title: "Security Operations Specialist", salary: 12000, domain: "kraken.com", company: "Kraken", badge: "Crypto · Remote", dept: "Security", desc: "Monitor Kraken's security posture 24/7: threat intelligence, incident response, and security automation.", skills: ["SIEM", "Incident Response", "Crypto"], type: "Full-time Remote", huRequired: 50 },
-    { id: "c5", title: "Frontend Engineer (React)", salary: 10500, domain: "shopify.com", company: "Shopify", badge: "E-Com · Remote", dept: "Engineering", desc: "Build Shopify's merchant-facing dashboard features in React. Work on accessibility and performance.", skills: ["React", "TypeScript", "Polaris"], type: "Full-time Remote", huRequired: 50 },
-    { id: "c6", title: "Data Platform Engineer", salary: 13500, domain: "databricks.com", company: "Databricks", badge: "Data · Senior", dept: "Data", desc: "Build and scale Databricks' internal data infrastructure. Design lakehouse pipelines processing 100TB+ daily.", skills: ["Spark", "Delta Lake", "Python"], type: "Senior Full-time Remote", huRequired: 100 },
-    { id: "c7", title: "Product Manager — Global Expansion", salary: 9500, domain: "google.com", company: "Google", badge: "Remote · Senior", dept: "Product", desc: "Lead product strategy for Google's expansion into 15 new emerging markets. Define roadmaps and own OKRs.", skills: ["Product Strategy", "Analytics", "Leadership"], type: "Senior Full-time Remote", huRequired: 100 },
-    { id: "c8", title: "Mobile Engineer (iOS/Android)", salary: 11000, domain: "meta.com", company: "Meta", badge: "Remote · Mid", dept: "Engineering", desc: "Build features in the Facebook/Instagram mobile apps used by 3 billion people.", skills: ["React Native", "Swift", "Kotlin"], type: "Full-time Remote", huRequired: 100 },
-    { id: "c9", title: "DevOps Engineer", salary: 10000, domain: "microsoft.com", company: "Microsoft", badge: "Azure · Remote", dept: "Infrastructure", desc: "Maintain CI/CD pipelines, Kubernetes clusters, and Azure infrastructure for Microsoft's developer tools.", skills: ["Kubernetes", "Azure", "Terraform"], type: "Full-time Remote", huRequired: 50 },
-    { id: "c10", title: "UX Researcher", salary: 8500, domain: "airbnb.com", company: "Airbnb", badge: "Remote · Contract", dept: "Design", desc: "Conduct user research for Airbnb's host experience product. Synthesize insights into actionable design directions.", skills: ["User Research", "Figma", "Data Analysis"], type: "Contract Remote", huRequired: 50 },
-    { id: "c11", title: "Blockchain Developer", salary: 14000, domain: "coinbase.com", company: "Coinbase", badge: "Crypto · Remote", dept: "Engineering", desc: "Build and audit smart contracts on Ethereum, Base, and Polygon for Coinbase's DeFi and NFT products.", skills: ["Solidity", "Go", "Web3.js"], type: "Senior Full-time Remote", huRequired: 100 },
-    { id: "c12", title: "Growth Marketing Manager", salary: 9000, domain: "spotify.com", company: "Spotify", badge: "Marketing · Remote", dept: "Marketing", desc: "Drive artist and listener acquisition campaigns globally. Manage $2M+ monthly ad budget.", skills: ["Growth", "Paid Media", "Analytics"], type: "Full-time Remote", huRequired: 50 },
-    { id: "c13", title: "ML Infrastructure Engineer", salary: 15000, domain: "openai.com", company: "OpenAI", badge: "AI · Remote", dept: "AI", desc: "Build and scale infrastructure powering OpenAI's model training and inference with GPU clusters.", skills: ["PyTorch", "CUDA", "Distributed Systems"], type: "Senior Full-time Remote", huRequired: 100 },
-    { id: "c14", title: "Backend Engineer (Go/Rust)", salary: 12000, domain: "discord.com", company: "Discord", badge: "Remote · Mid", dept: "Engineering", desc: "Build low-latency microservices handling 4 billion messages daily.", skills: ["Go", "Rust", "Distributed Systems"], type: "Full-time Remote", huRequired: 50 },
-    { id: "c15", title: "Data Scientist — Ads Platform", salary: 13000, domain: "twitter.com", company: "X (Twitter)", badge: "Data · Senior", dept: "Data", desc: "Build ML models optimizing ad relevance and bidding for X's advertising platform.", skills: ["Python", "TensorFlow", "Causal ML"], type: "Senior Full-time Remote", huRequired: 100 },
-    { id: "c16", title: "Smart Contract Auditor", salary: 17000, domain: "binance.com", company: "Binance", badge: "Crypto · Senior", dept: "Security", desc: "Audit DeFi protocols integrated with Binance Smart Chain. Identify vulnerabilities and write PoCs.", skills: ["Solidity", "Security", "DeFi"], type: "Senior Full-time Remote", huRequired: 100 },
-    { id: "c17", title: "API Developer (Payments)", salary: 10000, domain: "paypal.com", company: "PayPal", badge: "FinTech · Remote", dept: "Engineering", desc: "Design and build payment APIs handling $1.5T in annual transaction volume.", skills: ["Java", "REST", "Payments"], type: "Full-time Remote", huRequired: 50 },
-    { id: "c18", title: "Content Strategy Manager", salary: 7500, domain: "hubspot.com", company: "HubSpot", badge: "Marketing · Remote", dept: "Marketing", desc: "Lead HubSpot's blog and resource content strategy. Own SEO content roadmap and drive 2M+ monthly visits.", skills: ["Content Strategy", "SEO", "Leadership"], type: "Full-time Remote", huRequired: 30 },
-    { id: "c19", title: "Cloud Security Architect", salary: 16000, domain: "cloudflare.com", company: "Cloudflare", badge: "Security · Senior", dept: "Security", desc: "Design Cloudflare's zero-trust security architecture protecting 25M+ websites.", skills: ["Zero Trust", "Networking", "AWS/GCP"], type: "Senior Full-time Remote", huRequired: 100 },
-    { id: "c20", title: "iOS Engineer", salary: 11500, domain: "uber.com", company: "Uber", badge: "Mobile · Remote", dept: "Engineering", desc: "Build the Uber Eats iOS app used by 100M+ customers. Optimize cold start, animations, and A/B testing.", skills: ["Swift", "SwiftUI", "XCTest"], type: "Full-time Remote", huRequired: 50 },
-    { id: "c21", title: "Full Stack Engineer (TypeScript)", salary: 10000, domain: "notion.so", company: "Notion", badge: "SaaS · Remote", dept: "Engineering", desc: "Build Notion's collaborative workspace features: real-time sync, block editor, API integrations.", skills: ["TypeScript", "React", "Node.js"], type: "Full-time Remote", huRequired: 50 },
-    { id: "c22", title: "Analytics Engineer", salary: 9500, domain: "figma.com", company: "Figma", badge: "Design · Remote", dept: "Data", desc: "Own Figma's data warehouse and analytics stack. Build dbt models and enable data-driven decisions.", skills: ["dbt", "SQL", "Looker"], type: "Full-time Remote", huRequired: 50 },
+    { id: "c1", title: "Remote Fleet Data Analyst", salary: 8000, domain: "tesla.com", company: "Tesla", badge: "EV · Remote", dept: "Engineering", desc: "Analyze fleet telemetry data from 500k+ Tesla vehicles. Build dashboards tracking range and charging patterns.", skills: ["Python", "SQL", "Tableau"], type: "Full-time Remote", huRequired: 500 },
+    { id: "c2", title: "Cloud Support Engineer", salary: 9000, domain: "amazon.com", company: "Amazon", badge: "AWS · Senior", dept: "Cloud", desc: "Provide enterprise-level AWS support for Fortune 500 clients. Resolve complex infrastructure issues.", skills: ["AWS", "Linux", "Networking"], type: "Full-time Remote", huRequired: 500 },
+    { id: "c3", title: "Payment Integrity Analyst", salary: 11000, domain: "stripe.com", company: "Stripe", badge: "FinTech · Remote", dept: "Finance", desc: "Investigate payment anomalies, fraud patterns, and dispute trends across Stripe's global transaction network.", skills: ["SQL", "Python", "Risk Analysis"], type: "Full-time Remote", huRequired: 500 },
+    { id: "c4", title: "Security Operations Specialist", salary: 12000, domain: "kraken.com", company: "Kraken", badge: "Crypto · Remote", dept: "Security", desc: "Monitor Kraken's security posture 24/7: threat intelligence, incident response, and security automation.", skills: ["SIEM", "Incident Response", "Crypto"], type: "Full-time Remote", huRequired: 500 },
+    { id: "c5", title: "Frontend Engineer (React)", salary: 10500, domain: "shopify.com", company: "Shopify", badge: "E-Com · Remote", dept: "Engineering", desc: "Build Shopify's merchant-facing dashboard features in React. Work on accessibility and performance.", skills: ["React", "TypeScript", "Polaris"], type: "Full-time Remote", huRequired: 500 },
+    { id: "c6", title: "Data Platform Engineer", salary: 13500, domain: "databricks.com", company: "Databricks", badge: "Data · Senior", dept: "Data", desc: "Build and scale Databricks' internal data infrastructure. Design lakehouse pipelines processing 100TB+ daily.", skills: ["Spark", "Delta Lake", "Python"], type: "Senior Full-time Remote", huRequired: 1150 },
+    { id: "c7", title: "Product Manager — Global Expansion", salary: 9500, domain: "google.com", company: "Google", badge: "Remote · Senior", dept: "Product", desc: "Lead product strategy for Google's expansion into 15 new emerging markets. Define roadmaps and own OKRs.", skills: ["Product Strategy", "Analytics", "Leadership"], type: "Senior Full-time Remote", huRequired: 1150 },
+    { id: "c8", title: "Mobile Engineer (iOS/Android)", salary: 11000, domain: "meta.com", company: "Meta", badge: "Remote · Mid", dept: "Engineering", desc: "Build features in the Facebook/Instagram mobile apps used by 3 billion people.", skills: ["React Native", "Swift", "Kotlin"], type: "Full-time Remote", huRequired: 1150 },
+    { id: "c9", title: "DevOps Engineer", salary: 10000, domain: "microsoft.com", company: "Microsoft", badge: "Azure · Remote", dept: "Infrastructure", desc: "Maintain CI/CD pipelines, Kubernetes clusters, and Azure infrastructure for Microsoft's developer tools.", skills: ["Kubernetes", "Azure", "Terraform"], type: "Full-time Remote", huRequired: 500 },
+    { id: "c10", title: "UX Researcher", salary: 8500, domain: "airbnb.com", company: "Airbnb", badge: "Remote · Contract", dept: "Design", desc: "Conduct user research for Airbnb's host experience product. Synthesize insights into actionable design directions.", skills: ["User Research", "Figma", "Data Analysis"], type: "Contract Remote", huRequired: 500 },
+    { id: "c11", title: "Blockchain Developer", salary: 14000, domain: "coinbase.com", company: "Coinbase", badge: "Crypto · Remote", dept: "Engineering", desc: "Build and audit smart contracts on Ethereum, Base, and Polygon for Coinbase's DeFi and NFT products.", skills: ["Solidity", "Go", "Web3.js"], type: "Senior Full-time Remote", huRequired: 1150 },
+    { id: "c12", title: "Growth Marketing Manager", salary: 9000, domain: "spotify.com", company: "Spotify", badge: "Marketing · Remote", dept: "Marketing", desc: "Drive artist and listener acquisition campaigns globally. Manage $2M+ monthly ad budget.", skills: ["Growth", "Paid Media", "Analytics"], type: "Full-time Remote", huRequired: 500 },
+    { id: "c13", title: "ML Infrastructure Engineer", salary: 15000, domain: "openai.com", company: "OpenAI", badge: "AI · Remote", dept: "AI", desc: "Build and scale infrastructure powering OpenAI's model training and inference with GPU clusters.", skills: ["PyTorch", "CUDA", "Distributed Systems"], type: "Senior Full-time Remote", huRequired: 1150 },
+    { id: "c14", title: "Backend Engineer (Go/Rust)", salary: 12000, domain: "discord.com", company: "Discord", badge: "Remote · Mid", dept: "Engineering", desc: "Build low-latency microservices handling 4 billion messages daily.", skills: ["Go", "Rust", "Distributed Systems"], type: "Full-time Remote", huRequired: 500 },
+    { id: "c15", title: "Data Scientist — Ads Platform", salary: 13000, domain: "twitter.com", company: "X (Twitter)", badge: "Data · Senior", dept: "Data", desc: "Build ML models optimizing ad relevance and bidding for X's advertising platform.", skills: ["Python", "TensorFlow", "Causal ML"], type: "Senior Full-time Remote", huRequired: 1150 },
+    { id: "c16", title: "Smart Contract Auditor", salary: 17000, domain: "binance.com", company: "Binance", badge: "Crypto · Senior", dept: "Security", desc: "Audit DeFi protocols integrated with Binance Smart Chain. Identify vulnerabilities and write PoCs.", skills: ["Solidity", "Security", "DeFi"], type: "Senior Full-time Remote", huRequired: 1150 },
+    { id: "c17", title: "API Developer (Payments)", salary: 10000, domain: "paypal.com", company: "PayPal", badge: "FinTech · Remote", dept: "Engineering", desc: "Design and build payment APIs handling $1.5T in annual transaction volume.", skills: ["Java", "REST", "Payments"], type: "Full-time Remote", huRequired: 500 },
+    { id: "c18", title: "Content Strategy Manager", salary: 7500, domain: "hubspot.com", company: "HubSpot", badge: "Marketing · Remote", dept: "Marketing", desc: "Lead HubSpot's blog and resource content strategy. Own SEO content roadmap and drive 2M+ monthly visits.", skills: ["Content Strategy", "SEO", "Leadership"], type: "Full-time Remote", huRequired: 500 },
+    { id: "c19", title: "Cloud Security Architect", salary: 16000, domain: "cloudflare.com", company: "Cloudflare", badge: "Security · Senior", dept: "Security", desc: "Design Cloudflare's zero-trust security architecture protecting 25M+ websites.", skills: ["Zero Trust", "Networking", "AWS/GCP"], type: "Senior Full-time Remote", huRequired: 1150 },
+    { id: "c20", title: "iOS Engineer", salary: 11500, domain: "uber.com", company: "Uber", badge: "Mobile · Remote", dept: "Engineering", desc: "Build the Uber Eats iOS app used by 100M+ customers. Optimize cold start, animations, and A/B testing.", skills: ["Swift", "SwiftUI", "XCTest"], type: "Full-time Remote", huRequired: 500 },
+    { id: "c21", title: "Full Stack Engineer (TypeScript)", salary: 10000, domain: "notion.so", company: "Notion", badge: "SaaS · Remote", dept: "Engineering", desc: "Build Notion's collaborative workspace features: real-time sync, block editor, API integrations.", skills: ["TypeScript", "React", "Node.js"], type: "Full-time Remote", huRequired: 500 },
+    { id: "c22", title: "Analytics Engineer", salary: 9500, domain: "figma.com", company: "Figma", badge: "Design · Remote", dept: "Data", desc: "Own Figma's data warehouse and analytics stack. Build dbt models and enable data-driven decisions.", skills: ["dbt", "SQL", "Looker"], type: "Full-time Remote", huRequired: 500 },
   ], []);
 
   const gigCategories = ["All", "Web Dev", "Design", "Writing", "Marketing", "Data", "AI", "Security", "Web3"];
@@ -884,10 +901,15 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
     document.body.appendChild(script);
   }, []);
 
-  // Open freelance chat — empty thread
+  // Open freelance chat — restore saved draft
   const openChatForGig = (g: { id: string; title: string; client: string; avatar: string; type: string; budget: number }) => {
+    const chatId = `gig-${g.id}`;
+    // Save current draft before switching
+    if (chatTarget && chatDraft.trim()) {
+      setChatDrafts(prev => ({ ...prev, [chatTarget.id]: chatDraft }));
+    }
     setChatTarget({
-      id: `gig-${g.id}`,
+      id: chatId,
       name: g.client,
       subtitle: g.title,
       avatar: g.avatar,
@@ -897,13 +919,17 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
       budget: g.budget,
     });
     setChatThread([]);
-    setChatDraft("");
+    setChatDraft(chatDrafts[chatId] || "");
   };
 
-  // Open corporate chat — empty thread
+  // Open corporate chat — restore saved draft
   const openChatForCorporate = (c: { id: string; title: string; company: string; domain: string; dept: string; salary: number; badge: string }) => {
+    const chatId = `corp-${c.id}`;
+    if (chatTarget && chatDraft.trim()) {
+      setChatDrafts(prev => ({ ...prev, [chatTarget.id]: chatDraft }));
+    }
     setChatTarget({
-      id: `corp-${c.id}`,
+      id: chatId,
       name: `${c.company}`,
       subtitle: c.title,
       avatar: c.domain,
@@ -916,12 +942,45 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
       salary: c.salary,
     });
     setChatThread([]);
-    setChatDraft("");
+    setChatDraft(chatDrafts[chatId] || "");
+  };
+
+  // Close chat — save draft if any text
+  const closeChat = () => {
+    if (chatTarget && chatDraft.trim()) {
+      setChatDrafts(prev => ({ ...prev, [chatTarget.id]: chatDraft }));
+    }
+    setChatTarget(null);
+  };
+
+  // Trigger call attempt — adds to history
+  const triggerCallAttempt = (type: "voice" | "video") => {
+    if (!chatTarget) return;
+    setCallHistory(prev => [{
+      id: Date.now(),
+      target: chatTarget.name,
+      kind: chatTarget.kind,
+      type,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      status: "attempted",
+    }, ...prev]);
+    triggerCallPaywall(
+      type === "voice" ? "Voice call with client" : "Video call with client",
+      type === "voice" ? "Open a verified, encrypted voice channel with this client." : "Start an HD video meeting with this verified client."
+    );
   };
 
   const triggerCallPaywall = (feature: string, sub: string) => {
     setCallPaywall({ open: true, feature, sub });
   };
+
+  // Scroll to top whenever the active tab changes
+  useEffect(() => {
+    if (mainScrollRef.current) {
+      mainScrollRef.current.scrollTo({ top: 0, behavior: "instant" });
+    }
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [activeTab]);
 
   // Build a deterministic, realistic client profile for a gig
   const openClientProfile = (g: { id: string; client: string; avatar: string; type: string; budget: number; title: string }) => {
@@ -952,10 +1011,19 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
       { title: `${g.type} Sprint — Phase 2`, budget: Math.round(g.budget * 0.7), status: "Completed" },
       { title: `Ongoing ${g.type} Retainer`, budget: Math.round(g.budget * 1.4), status: "Completed" },
     ];
-    const testimonials = [
-      { from: "Daniel R.", role: "Senior React Engineer", text: "Crystal clear briefs, fast feedback, and milestones paid on time. Would absolutely work with them again.", rating: 5 },
-      { from: "Priya M.", role: "Brand Designer", text: "Highly professional team — escrow released within hours of approval. Top-tier client.", rating: 5 },
+    const testimonialPool = [
+      { from: "Daniel R.", role: "Senior React Engineer", seed: "daniel-react", text: "Crystal clear briefs, fast feedback, and milestones paid on time. Would absolutely work with them again.", rating: 5 },
+      { from: "Priya M.", role: "Brand Designer", seed: "priya-brand", text: "Highly professional team — escrow released within hours of approval. Top-tier client.", rating: 5 },
+      { from: "James K.", role: "Full-Stack Developer", seed: "james-dev", text: "One of the best clients I've worked with on Nexus. Clear requirements and very responsive.", rating: 5 },
+      { from: "Sofia L.", role: "UX/UI Designer", seed: "sofia-ux", text: "Smooth project from start to finish. Payment was instant and the brief was incredibly detailed.", rating: 4 },
+      { from: "Marcus O.", role: "Data Scientist", seed: "marcus-data", text: "Great communication throughout. They knew exactly what they wanted and respected my expertise.", rating: 5 },
+      { from: "Aisha B.", role: "Copywriter", seed: "aisha-copy", text: "Professional, timely, and genuinely appreciative. Already booked me for a follow-up project.", rating: 5 },
+      { from: "Yuki T.", role: "Backend Engineer", seed: "yuki-backend", text: "Escrow funded upfront, requirements were crystal clear. Zero surprises. Highly recommend.", rating: 4 },
+      { from: "Carlos V.", role: "Security Consultant", seed: "carlos-sec", text: "They value quality over speed which is refreshing. Payment released same day as delivery.", rating: 5 },
     ];
+    const t1 = testimonialPool[(seed * 3) % testimonialPool.length];
+    const t2 = testimonialPool[(seed * 5 + 2) % testimonialPool.length];
+    const testimonials = [t1, t2 !== t1 ? t2 : testimonialPool[(seed + 1) % testimonialPool.length]];
     setClientProfile({
       id: g.id,
       name: g.client,
@@ -1194,7 +1262,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
             {chatTarget.kind === "freelance" && (
               <div className="relative z-10 px-4 pt-4 pb-3 flex items-center gap-3 bg-white border-b border-slate-200/70 shadow-sm">
                 <button
-                  onClick={() => setChatTarget(null)}
+                  onClick={closeChat}
                   className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all bg-slate-100 hover:bg-slate-200 shrink-0">
                   <ChevronLeft size={16} className="text-slate-700" />
                 </button>
@@ -1214,12 +1282,12 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
 
                 <div className="flex items-center gap-1.5 shrink-0">
                   <button
-                    onClick={() => triggerCallPaywall("Voice call with client", "Open a verified, encrypted voice channel with this client.")}
+                    onClick={() => triggerCallAttempt("voice")}
                     className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all bg-blue-50 hover:bg-blue-100">
                     <Phone size={14} className="text-blue-600" />
                   </button>
                   <button
-                    onClick={() => triggerCallPaywall("Video call with client", "Start an HD video meeting with this verified client.")}
+                    onClick={() => triggerCallAttempt("video")}
                     className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all bg-blue-50 hover:bg-blue-100">
                     <VideoIcon size={14} className="text-blue-600" />
                   </button>
@@ -1238,7 +1306,7 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
                 {/* Top bar */}
                 <div className="px-4 pt-4 pb-3 flex items-center gap-3">
                   <button
-                    onClick={() => setChatTarget(null)}
+                    onClick={closeChat}
                     className="w-9 h-9 rounded-2xl flex items-center justify-center transition-all bg-slate-100 hover:bg-slate-200 shrink-0">
                     <ChevronLeft size={16} className="text-slate-700" />
                   </button>
@@ -1488,43 +1556,23 @@ export const FreelancerView = ({ jobs, userMetadata }: { jobs: any[]; userMetada
       {/* ─── MAIN CONTENT (only when not in chat) ─── */}
       {!chatTarget && (
         <>
-          <div className="max-w-5xl mx-auto pt-3 px-3 relative z-10">
-            {/* ─── Live Global Activity Ticker ─── */}
-            <div className="mb-3 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden flex items-center">
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-linear-to-br from-emerald-50 to-emerald-100/60 border-r border-emerald-100 shrink-0">
-                <PulseDot color="#10b981" size={5} />
-                <span className="text-[8.5px] font-black uppercase tracking-widest text-emerald-700">Live</span>
-              </div>
-              <div className="flex-1 overflow-hidden relative h-7">
-                <motion.div
-                  className="absolute inset-y-0 left-0 flex items-center gap-8 whitespace-nowrap"
-                  animate={{ x: ["0%", "-50%"] }}
-                  transition={{ duration: 38, repeat: Infinity, ease: "linear" }}
-                >
-                  {[...activityTick, ...activityTick].map((a, i) => (
-                    <span key={i} className="text-[10px] font-semibold text-slate-600 flex items-center gap-1.5">
-                      <span className="text-[12px]">{a.flag}</span>{a.text}
-                    </span>
-                  ))}
-                </motion.div>
-              </div>
-              <div className="flex items-center gap-1 px-2 shrink-0 border-l border-slate-100">
-                <button
-                  onClick={() => setShowCmdK(true)}
-                  title="Command palette (⌘K)"
-                  className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[9px] font-bold text-slate-500 bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-all">
-                  <Search size={10} /> Search <kbd className="px-1 py-px rounded bg-white border border-slate-200 text-[8px] font-black text-slate-400">⌘K</kbd>
-                </button>
-                <button
-                  onClick={() => setShowNotifPanel(v => !v)}
-                  title="Notifications"
-                  className="relative w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition-all">
-                  <Bell size={14} className="text-slate-600" />
-                  {notifList.some(n => n.unread) && (
-                    <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white" />
-                  )}
-                </button>
-              </div>
+          <div ref={mainScrollRef} className="max-w-5xl mx-auto pt-3 px-3 relative z-10">
+
+            {/* ── Top bar with search + notifications ── */}
+            <div className="mb-3 flex items-center justify-end gap-2">
+              <button
+                onClick={() => setShowCmdK(true)}
+                className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[9px] font-bold text-slate-500 bg-white hover:bg-slate-50 border border-slate-200 transition-all shadow-sm">
+                <Search size={10} /> Search <kbd className="px-1 py-px rounded bg-slate-100 border border-slate-200 text-[8px] font-black text-slate-400">⌘K</kbd>
+              </button>
+              <button
+                onClick={() => setShowNotifPanel(v => !v)}
+                className="relative w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-all shadow-sm">
+                <Bell size={14} className="text-slate-600" />
+                {notifList.some(n => n.unread) && (
+                  <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white" />
+                )}
+              </button>
             </div>
 
             <AnimatePresence mode="wait">
