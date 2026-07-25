@@ -65,7 +65,7 @@ const Nav = () => {
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 w-full z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-[rgba(2,4,15,0.82)] backdrop-blur-2xl border-b border-white/6 shadow-2xl shadow-black/30"
+          ? "bg-[rgba(255,255,255,0.86)] backdrop-blur-2xl border-b border-slate-900/8 shadow-sm shadow-slate-900/5"
           : "bg-transparent"
       }`}
     >
@@ -75,7 +75,7 @@ const Nav = () => {
             style={{ background: "linear-gradient(135deg, #6366f1, #3b82f6)" }}>
             <Terminal size={13} className="text-white" />
           </div>
-          <span className="text-white font-black text-[16px] tracking-tight" style={{ fontFamily: "'Syne', sans-serif" }}>
+          <span className="text-slate-900 font-black text-[16px] tracking-tight" style={{ fontFamily: "'Syne', sans-serif" }}>
             nexus<span style={{ color: "#6366f1" }}>gigs</span>
           </span>
         </div>
@@ -83,7 +83,7 @@ const Nav = () => {
         <nav className="hidden md:flex items-center gap-7">
           {["Features", "How It Works", "Talent", "Pricing", "For Business"].map((item) => (
             <a key={item} href="#"
-              className="text-[12px] font-medium text-white/50 hover:text-white transition-colors tracking-wide">
+              className="text-[12px] font-medium text-slate-900/50 hover:text-slate-900 transition-colors tracking-wide">
               {item}
             </a>
           ))}
@@ -91,7 +91,7 @@ const Nav = () => {
 
         <div className="hidden md:flex items-center gap-2.5">
           <SignInButton mode="modal">
-            <button className="text-[12px] font-semibold text-white/60 hover:text-white transition-colors px-4 py-2">
+            <button className="text-[12px] font-semibold text-slate-900/60 hover:text-slate-900 transition-colors px-4 py-2">
               Sign in
             </button>
           </SignInButton>
@@ -103,7 +103,7 @@ const Nav = () => {
           </SignUpButton>
         </div>
 
-        <button className="md:hidden p-2 text-white/60" onClick={() => setMobileOpen(!mobileOpen)}>
+        <button className="md:hidden p-2 text-slate-900/60" onClick={() => setMobileOpen(!mobileOpen)}>
           {mobileOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
       </div>
@@ -114,15 +114,15 @@ const Nav = () => {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="md:hidden bg-[rgba(2,4,15,0.95)] backdrop-blur-2xl border-t border-white/6 px-5 pb-5 overflow-hidden"
+            className="md:hidden bg-[rgba(255,255,255,0.97)] backdrop-blur-2xl border-t border-slate-900/8 px-5 pb-5 overflow-hidden"
           >
             <div className="flex flex-col gap-4 pt-4">
               {["Features", "How It Works", "Talent", "Pricing", "For Business"].map((item) => (
-                <a key={item} href="#" className="text-[13px] font-medium text-white/50">{item}</a>
+                <a key={item} href="#" className="text-[13px] font-medium text-slate-900/50">{item}</a>
               ))}
-              <div className="flex flex-col gap-2 pt-3 border-t border-white/6">
+              <div className="flex flex-col gap-2 pt-3 border-t border-slate-900/6">
                 <SignInButton mode="modal">
-                  <button className="w-full py-3 rounded-xl text-[12px] font-semibold text-white/70 border border-white/10">Sign in</button>
+                  <button className="w-full py-3 rounded-xl text-[12px] font-semibold text-slate-900/70 border border-slate-900/10">Sign in</button>
                 </SignInButton>
                 <SignUpButton mode="modal">
                   <button className="w-full py-3 rounded-xl text-[12px] font-semibold text-white"
@@ -147,12 +147,12 @@ const GlassCard = ({ children, className = "", hover = true }: {
   children: React.ReactNode; className?: string; hover?: boolean;
 }) => (
   <div className={`
-    rounded-2xl border border-white/9 transition-all duration-300
-    ${hover ? "hover:border-white/18 hover:shadow-2xl hover:shadow-indigo-500/5" : ""}
+    rounded-2xl border border-slate-900/9 transition-all duration-300
+    ${hover ? "hover:border-slate-900/18 hover:shadow-2xl hover:shadow-indigo-500/5" : ""}
     ${className}
   `}
     style={{
-      background: "rgba(255,255,255,0.04)",
+      background: "rgba(15,23,42,0.04)",
       backdropFilter: "blur(20px)",
     }}>
     {children}
@@ -283,21 +283,21 @@ const LandingPage = () => {
     { name: "PayPal", sub: "Minutes", icon: <CreditCard size={14} className="text-blue-400" /> },
     { name: "Binance", sub: "Crypto USDT", icon: <Bitcoin size={14} className="text-yellow-400" /> },
     { name: "Stripe", sub: "Card · Global", icon: <Layers size={14} className="text-indigo-400" /> },
-    { name: "Bank Wire", sub: "1–2 Days", icon: <Landmark size={14} className="text-white/50" /> },
+    { name: "Bank Wire", sub: "1–2 Days", icon: <Landmark size={14} className="text-slate-900/50" /> },
   ];
 
   return (
-    <div className="min-h-screen text-white" style={{
-      background: "#02040f",
+    <div className="min-h-screen text-slate-900" style={{
+      background: "#ffffff",
       fontFamily: "'DM Sans', system-ui, sans-serif"
     }}>
       {/* Ambient orbs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-[-20%] right-[-10%] w-175 h-175 rounded-full opacity-[0.12]"
+        <div className="absolute top-[-20%] right-[-10%] w-175 h-175 rounded-full opacity-[0.06]"
           style={{ background: "radial-gradient(circle, #6366f1, transparent 70%)", filter: "blur(60px)" }} />
-        <div className="absolute bottom-[20%] left-[-10%] w-125 h-125 rounded-full opacity-[0.08]"
+        <div className="absolute bottom-[20%] left-[-10%] w-125 h-125 rounded-full opacity-[0.045]"
           style={{ background: "radial-gradient(circle, #3b82f6, transparent 70%)", filter: "blur(60px)" }} />
-        <div className="absolute top-[50%] left-[40%] w-100 h-100 rounded-full opacity-[0.06]"
+        <div className="absolute top-[50%] left-[40%] w-100 h-100 rounded-full opacity-[0.035]"
           style={{ background: "radial-gradient(circle, #8b5cf6, transparent 70%)", filter: "blur(80px)" }} />
       </div>
 
@@ -338,7 +338,7 @@ const LandingPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="max-w-lg mx-auto text-[14px] text-white/45 leading-relaxed mb-9"
+              className="max-w-lg mx-auto text-[14px] text-slate-900/45 leading-relaxed mb-9"
             >
               NexusGigs connects vetted freelancers with serious clients across 184 countries.
               Escrow-protected contracts, instant global payouts, zero platform fees on Pro.
@@ -356,8 +356,8 @@ const LandingPage = () => {
                   Start earning — it's free <ArrowRight size={14} />
                 </button>
               </SignUpButton>
-              <button className="px-7 py-3.5 rounded-full text-[13px] font-semibold text-white/70 border border-white/10 hover:border-white/20 hover:text-white transition-all flex items-center gap-2"
-                style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(10px)" }}>
+              <button className="px-7 py-3.5 rounded-full text-[13px] font-semibold text-slate-900/70 border border-slate-900/10 hover:border-slate-900/20 hover:text-slate-900 transition-all flex items-center gap-2"
+                style={{ background: "rgba(15,23,42,0.04)", backdropFilter: "blur(10px)" }}>
                 <PlayCircle size={14} /> Watch 90s demo
               </button>
             </motion.div>
@@ -366,7 +366,7 @@ const LandingPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.65 }}
-              className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-[11px] text-white/35"
+              className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-[11px] text-slate-900/35"
             >
               <span className="flex items-center gap-1.5"><CheckCircle2 size={11} className="text-green-400" /> 5 free HU on signup</span>
               <span className="flex items-center gap-1.5"><CheckCircle2 size={11} className="text-green-400" /> No card required</span>
@@ -384,10 +384,10 @@ const LandingPage = () => {
           >
             {heroStats.map((stat, i) => (
               <GlassCard key={i} className="text-center p-5">
-                <p className="text-[32px] font-black text-white leading-none mb-0.5" style={{ fontFamily: "'Syne', sans-serif" }}>
+                <p className="text-[32px] font-black text-slate-900 leading-none mb-0.5" style={{ fontFamily: "'Syne', sans-serif" }}>
                   <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                 </p>
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-white/35">{stat.label}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-900/35">{stat.label}</p>
               </GlassCard>
             ))}
           </motion.div>
@@ -399,14 +399,14 @@ const LandingPage = () => {
             transition={{ delay: 0.9 }}
             className="mt-10 flex flex-wrap justify-center items-center gap-2.5"
           >
-            <span className="text-[10px] font-semibold text-white/30 uppercase tracking-widest">Pay & withdraw via</span>
+            <span className="text-[10px] font-semibold text-slate-900/30 uppercase tracking-widest">Pay & withdraw via</span>
             {paymentMethods.map((p, i) => (
               <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-xl"
-                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                style={{ background: "rgba(15,23,42,0.05)", border: "1px solid rgba(15,23,42,0.08)" }}>
                 {p.icon}
                 <div>
-                  <p className="text-[10px] font-black text-white leading-none">{p.name}</p>
-                  <p className="text-[8px] text-white/35 mt-0.5">{p.sub}</p>
+                  <p className="text-[10px] font-black text-slate-900 leading-none">{p.name}</p>
+                  <p className="text-[8px] text-slate-900/35 mt-0.5">{p.sub}</p>
                 </div>
               </div>
             ))}
@@ -415,7 +415,7 @@ const LandingPage = () => {
       </section>
 
       {/* ─────── TICKER ─────── */}
-      <div className="py-4 overflow-hidden relative z-10" style={{ borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.02)" }}>
+      <div className="py-4 overflow-hidden relative z-10" style={{ borderTop: "1px solid rgba(15,23,42,0.05)", borderBottom: "1px solid rgba(15,23,42,0.05)", background: "rgba(15,23,42,0.02)" }}>
         <motion.div
           className="whitespace-nowrap flex gap-14 items-center"
           animate={{ x: [0, -1200] }}
@@ -432,7 +432,7 @@ const LandingPage = () => {
             "David N. applied to Tesla Data Analyst",
             "Alice V. withdrew KES 14,000",
           ].map((t, i) => (
-            <span key={i} className="inline-flex items-center gap-3 text-[11px] font-medium text-white/35">
+            <span key={i} className="inline-flex items-center gap-3 text-[11px] font-medium text-slate-900/35">
               <span className="w-1 h-1 rounded-full bg-indigo-400 shrink-0" />
               {t}
             </span>
@@ -444,14 +444,14 @@ const LandingPage = () => {
       <section className="py-20 px-5 relative z-10">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 mb-4 text-[10px] font-semibold text-white/50"
-              style={{ background: "rgba(255,255,255,0.04)" }}>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-900/10 mb-4 text-[10px] font-semibold text-slate-900/50"
+              style={{ background: "rgba(15,23,42,0.04)" }}>
               <Sparkles size={10} className="text-indigo-400" /> Platform features
             </div>
-            <h2 className="text-[36px] md:text-[48px] font-black leading-[0.95] tracking-tight text-white mb-3" style={{ fontFamily: "'Syne', sans-serif" }}>
+            <h2 className="text-[36px] md:text-[48px] font-black leading-[0.95] tracking-tight text-slate-900 mb-3" style={{ fontFamily: "'Syne', sans-serif" }}>
               Everything a modern<br />freelancer needs.
             </h2>
-            <p className="text-white/40 text-[13px] max-w-sm">Built from the ground up for the global workforce — not an afterthought.</p>
+            <p className="text-slate-900/40 text-[13px] max-w-sm">Built from the ground up for the global workforce — not an afterthought.</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -469,10 +469,10 @@ const LandingPage = () => {
                       style={{ background: "rgba(99,102,241,0.12)" }}>
                       {f.icon}
                     </div>
-                    <span className="text-[9px] font-semibold text-white/30 uppercase tracking-widest border border-white/7 px-2 py-1 rounded-full">{f.tag}</span>
+                    <span className="text-[9px] font-semibold text-slate-900/30 uppercase tracking-widest border border-slate-900/7 px-2 py-1 rounded-full">{f.tag}</span>
                   </div>
-                  <h3 className="text-[14px] font-bold text-white mb-1.5">{f.title}</h3>
-                  <p className="text-[12px] text-white/40 leading-relaxed">{f.desc}</p>
+                  <h3 className="text-[14px] font-bold text-slate-900 mb-1.5">{f.title}</h3>
+                  <p className="text-[12px] text-slate-900/40 leading-relaxed">{f.desc}</p>
                 </GlassCard>
               </motion.div>
             ))}
@@ -484,11 +484,11 @@ const LandingPage = () => {
       <section className="py-20 px-5 relative z-10">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 mb-4 text-[10px] font-semibold text-white/50"
-              style={{ background: "rgba(255,255,255,0.04)" }}>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-900/10 mb-4 text-[10px] font-semibold text-slate-900/50"
+              style={{ background: "rgba(15,23,42,0.04)" }}>
               <ListChecks size={10} className="text-indigo-400" /> Simple process
             </div>
-            <h2 className="text-[36px] md:text-[48px] font-black tracking-tight text-white" style={{ fontFamily: "'Syne', sans-serif" }}>
+            <h2 className="text-[36px] md:text-[48px] font-black tracking-tight text-slate-900" style={{ fontFamily: "'Syne', sans-serif" }}>
               From signup to payout<br />in 4 steps.
             </h2>
           </motion.div>
@@ -504,17 +504,17 @@ const LandingPage = () => {
               >
                 <GlassCard className="relative p-6 h-full">
                   <div className="flex items-center justify-between mb-5">
-                    <span className="text-[10px] font-black text-white/15 tracking-widest">{step.num}</span>
+                    <span className="text-[10px] font-black text-slate-900/15 tracking-widest">{step.num}</span>
                     <div className="w-8 h-8 rounded-xl flex items-center justify-center text-indigo-300"
                       style={{ background: "rgba(99,102,241,0.15)" }}>
                       {step.icon}
                     </div>
                   </div>
-                  <h3 className="text-[13px] font-bold text-white mb-1.5">{step.title}</h3>
-                  <p className="text-[11px] text-white/40 leading-relaxed">{step.desc}</p>
+                  <h3 className="text-[13px] font-bold text-slate-900 mb-1.5">{step.title}</h3>
+                  <p className="text-[11px] text-slate-900/40 leading-relaxed">{step.desc}</p>
                   {i < steps.length - 1 && (
                     <div className="hidden lg:block absolute -right-2 top-1/2 -translate-y-1/2 z-10">
-                      <ChevronRight size={14} className="text-white/20" />
+                      <ChevronRight size={14} className="text-slate-900/20" />
                     </div>
                   )}
                 </GlassCard>
@@ -529,14 +529,14 @@ const LandingPage = () => {
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 mb-4 text-[10px] font-semibold text-white/50"
-                style={{ background: "rgba(255,255,255,0.04)" }}>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-900/10 mb-4 text-[10px] font-semibold text-slate-900/50"
+                style={{ background: "rgba(15,23,42,0.04)" }}>
                 <Globe size={10} className="text-indigo-400" /> Global reach
               </div>
-              <h2 className="text-[36px] md:text-[48px] font-black tracking-tight text-white leading-tight mb-4" style={{ fontFamily: "'Syne', sans-serif" }}>
+              <h2 className="text-[36px] md:text-[48px] font-black tracking-tight text-slate-900 leading-tight mb-4" style={{ fontFamily: "'Syne', sans-serif" }}>
                 Live across<br />6 continents.
               </h2>
-              <p className="text-[13px] text-white/40 leading-relaxed mb-7">
+              <p className="text-[13px] text-slate-900/40 leading-relaxed mb-7">
                 From Lagos to London, Manila to Manhattan — NexusGigs settles work and payments in 70+ local currencies at mid-market rates.
               </p>
               <SignUpButton mode="modal">
@@ -550,8 +550,8 @@ const LandingPage = () => {
             <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
               <div className="flex flex-wrap gap-2">
                 {REGIONS.map((r) => (
-                  <div key={r.name} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium text-white/50 transition-all hover:text-white/80"
-                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                  <div key={r.name} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium text-slate-900/50 transition-all hover:text-slate-900/80"
+                    style={{ background: "rgba(15,23,42,0.04)", border: "1px solid rgba(15,23,42,0.08)" }}>
                     <span className="text-sm leading-none">{r.flag}</span>
                     {r.name}
                   </div>
@@ -570,11 +570,11 @@ const LandingPage = () => {
       <section className="py-20 px-5 relative z-10">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 mb-4 text-[10px] font-semibold text-white/50"
-              style={{ background: "rgba(255,255,255,0.04)" }}>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-900/10 mb-4 text-[10px] font-semibold text-slate-900/50"
+              style={{ background: "rgba(15,23,42,0.04)" }}>
               <HeartHandshake size={10} className="text-pink-400" /> Loved worldwide
             </div>
-            <h2 className="text-[36px] md:text-[48px] font-black tracking-tight text-white" style={{ fontFamily: "'Syne', sans-serif" }}>
+            <h2 className="text-[36px] md:text-[48px] font-black tracking-tight text-slate-900" style={{ fontFamily: "'Syne', sans-serif" }}>
               Trusted by 420,000+<br />freelancers.
             </h2>
           </motion.div>
@@ -592,24 +592,24 @@ const LandingPage = () => {
                   <div className="flex gap-0.5 mb-3">
                     {[...Array(5)].map((_, k) => <Star key={k} size={11} fill="#f59e0b" stroke="#f59e0b" />)}
                   </div>
-                  <p className="text-[12px] text-white/55 leading-relaxed mb-4 flex-1">"{t.quote}"</p>
-                  <div className="flex items-center justify-between pt-3 border-t border-white/6">
+                  <p className="text-[12px] text-slate-900/55 leading-relaxed mb-4 flex-1">"{t.quote}"</p>
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-900/6">
                     <div className="flex items-center gap-2.5">
                       <img
                         src={t.avatar}
                         alt={t.name}
-                        className="w-8 h-8 rounded-full object-cover ring-2 ring-white/10"
+                        className="w-8 h-8 rounded-full object-cover ring-2 ring-slate-900/10"
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display = "none";
                         }}
                       />
                       <div>
-                        <p className="text-[11px] font-bold text-white">{t.name}</p>
-                        <p className="text-[9px] text-white/35">{t.role} · {t.location}</p>
+                        <p className="text-[11px] font-bold text-slate-900">{t.name}</p>
+                        <p className="text-[9px] text-slate-900/35">{t.role} · {t.location}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-[10px] text-white/30">Earned</p>
+                      <p className="text-[10px] text-slate-900/30">Earned</p>
                       <p className="text-[11px] font-black text-green-400">{t.earned}</p>
                     </div>
                   </div>
@@ -624,11 +624,11 @@ const LandingPage = () => {
       <section className="py-20 px-5 relative z-10">
         <div className="max-w-2xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 mb-4 text-[10px] font-semibold text-white/50"
-              style={{ background: "rgba(255,255,255,0.04)" }}>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-900/10 mb-4 text-[10px] font-semibold text-slate-900/50"
+              style={{ background: "rgba(15,23,42,0.04)" }}>
               <MessageCircle size={10} className="text-indigo-400" /> Common questions
             </div>
-            <h2 className="text-[36px] md:text-[48px] font-black tracking-tight text-white" style={{ fontFamily: "'Syne', sans-serif" }}>
+            <h2 className="text-[36px] md:text-[48px] font-black tracking-tight text-slate-900" style={{ fontFamily: "'Syne', sans-serif" }}>
               Questions, answered.
             </h2>
           </motion.div>
@@ -642,14 +642,14 @@ const LandingPage = () => {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.05 }}
                 className="rounded-xl overflow-hidden"
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+                style={{ background: "rgba(15,23,42,0.04)", border: "1px solid rgba(15,23,42,0.08)" }}
               >
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full flex items-center justify-between p-4 text-left hover:bg-white/3 transition-colors"
+                  className="w-full flex items-center justify-between p-4 text-left hover:bg-slate-900/3 transition-colors"
                 >
-                  <span className="text-[13px] font-semibold text-white/80">{f.q}</span>
-                  <ChevronDown size={14} className={`text-white/30 shrink-0 ml-4 transition-transform duration-200 ${openFaq === i ? "rotate-180" : ""}`} />
+                  <span className="text-[13px] font-semibold text-slate-900/80">{f.q}</span>
+                  <ChevronDown size={14} className={`text-slate-900/30 shrink-0 ml-4 transition-transform duration-200 ${openFaq === i ? "rotate-180" : ""}`} />
                 </button>
                 <AnimatePresence>
                   {openFaq === i && (
@@ -659,7 +659,7 @@ const LandingPage = () => {
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <div className="px-4 pb-4 text-[12px] text-white/40 leading-relaxed border-t border-white/6 pt-3">
+                      <div className="px-4 pb-4 text-[12px] text-slate-900/40 leading-relaxed border-t border-slate-900/6 pt-3">
                         {f.a}
                       </div>
                     </motion.div>
@@ -680,22 +680,22 @@ const LandingPage = () => {
             viewport={{ once: true }}
             className="relative rounded-3xl p-12 md:p-16 text-center overflow-hidden"
             style={{
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.08)",
+              background: "rgba(15,23,42,0.04)",
+              border: "1px solid rgba(15,23,42,0.08)",
               backdropFilter: "blur(20px)",
             }}
           >
             <div className="absolute inset-0 pointer-events-none"
               style={{ background: "radial-gradient(circle at 30% 0%, rgba(99,102,241,0.15), transparent 50%), radial-gradient(circle at 70% 100%, rgba(59,130,246,0.1), transparent 50%)" }} />
             <div className="relative">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 mb-7 text-[10px] font-semibold text-white/50"
-                style={{ background: "rgba(255,255,255,0.04)" }}>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-900/10 mb-7 text-[10px] font-semibold text-slate-900/50"
+                style={{ background: "rgba(15,23,42,0.04)" }}>
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> Platform status: All systems operational
               </div>
-              <h2 className="text-[36px] md:text-[56px] font-black text-white leading-tight tracking-tight mb-4" style={{ fontFamily: "'Syne', sans-serif" }}>
+              <h2 className="text-[36px] md:text-[56px] font-black text-slate-900 leading-tight tracking-tight mb-4" style={{ fontFamily: "'Syne', sans-serif" }}>
                 Ready to go global?
               </h2>
-              <p className="text-white/40 text-[14px] mb-9 max-w-md mx-auto leading-relaxed">
+              <p className="text-slate-900/40 text-[14px] mb-9 max-w-md mx-auto leading-relaxed">
                 Join 420,000+ freelancers earning on NexusGigs across 184 countries. Your first 5 Hustle Units are free.
               </p>
               <div className="flex flex-wrap justify-center gap-3">
@@ -706,7 +706,7 @@ const LandingPage = () => {
                   </button>
                 </SignUpButton>
                 <SignInButton mode="modal">
-                  <button className="px-8 py-3.5 rounded-full text-[13px] font-semibold text-white/60 border border-white/10 hover:border-white/20 hover:text-white transition-all">
+                  <button className="px-8 py-3.5 rounded-full text-[13px] font-semibold text-slate-900/60 border border-slate-900/10 hover:border-slate-900/20 hover:text-slate-900 transition-all">
                     I already have one
                   </button>
                 </SignInButton>
@@ -717,7 +717,7 @@ const LandingPage = () => {
       </section>
 
       {/* ─────── FOOTER ─────── */}
-      <footer className="border-t border-white/5 py-12 px-5 relative z-10">
+      <footer className="border-t border-slate-900/5 py-12 px-5 relative z-10">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-5 gap-10 mb-10">
             <div className="md:col-span-2">
@@ -726,14 +726,14 @@ const LandingPage = () => {
                   style={{ background: "linear-gradient(135deg, #6366f1, #3b82f6)" }}>
                   <Terminal size={12} className="text-white" />
                 </div>
-                <span className="text-white font-black text-[15px]" style={{ fontFamily: "'Syne', sans-serif" }}>
+                <span className="text-slate-900 font-black text-[15px]" style={{ fontFamily: "'Syne', sans-serif" }}>
                   nexus<span style={{ color: "#6366f1" }}>gigs</span>
                 </span>
               </div>
-              <p className="text-[12px] text-white/30 max-w-xs leading-relaxed">
+              <p className="text-[12px] text-slate-900/30 max-w-xs leading-relaxed">
                 The freelance economy, rebuilt for the world. Escrow-secured, instantly paid, globally connected.
               </p>
-              <div className="mt-4 flex items-center gap-2 text-[10px] text-white/25">
+              <div className="mt-4 flex items-center gap-2 text-[10px] text-slate-900/25">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
                 All systems operational
               </div>
@@ -744,24 +744,24 @@ const LandingPage = () => {
               { h: "Legal", l: ["Privacy", "Terms", "Security", "Compliance"] },
             ].map((c) => (
               <div key={c.h}>
-                <p className="text-[10px] font-bold tracking-widest text-white/25 uppercase mb-3">{c.h}</p>
+                <p className="text-[10px] font-bold tracking-widest text-slate-900/25 uppercase mb-3">{c.h}</p>
                 <ul className="space-y-2">
                   {c.l.map((x) => (
                     <li key={x}>
-                      <a href="#" className="text-[12px] text-white/35 hover:text-white/70 transition-colors">{x}</a>
+                      <a href="#" className="text-[12px] text-slate-900/35 hover:text-slate-900/70 transition-colors">{x}</a>
                     </li>
                   ))}
                 </ul>
               </div>
             ))}
           </div>
-          <div className="pt-7 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-white/25">
+          <div className="pt-7 border-t border-slate-900/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-900/25">
             <span>© 2016–{new Date().getFullYear()} NexusGigs Global Inc. · 184 Countries</span>
             <div className="flex items-center gap-5">
-              <a href="mailto:hello@nexusgigs.com" className="flex items-center gap-1.5 hover:text-white/50 transition-colors">
+              <a href="mailto:hello@nexusgigs.com" className="flex items-center gap-1.5 hover:text-slate-900/50 transition-colors">
                 <Mail size={10} /> hello@nexusgigs.com
               </a>
-              <a href="#" className="flex items-center gap-1.5 hover:text-white/50 transition-colors">
+              <a href="#" className="flex items-center gap-1.5 hover:text-slate-900/50 transition-colors">
                 <MessageCircle size={10} /> Live Chat
               </a>
             </div>
@@ -777,7 +777,7 @@ const LandingPage = () => {
 // ─────────────────────────────────────────────
 
 const EmailConfirmScreen = ({ email }: { email?: string }) => (
-  <div className="min-h-screen flex items-center justify-center p-5" style={{ background: "#02040f" }}>
+  <div className="min-h-screen flex items-center justify-center p-5" style={{ background: "#ffffff" }}>
     <motion.div
       initial={{ opacity: 0, scale: 0.96, y: 16 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -789,8 +789,8 @@ const EmailConfirmScreen = ({ email }: { email?: string }) => (
           style={{ background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.2)" }}>
           <Mail size={28} className="text-indigo-400" />
         </div>
-        <h2 className="text-[22px] font-black text-white mb-2" style={{ fontFamily: "'Syne', sans-serif" }}>Check your inbox</h2>
-        <p className="text-[12px] text-white/40 leading-relaxed mb-7">
+        <h2 className="text-[22px] font-black text-slate-900 mb-2" style={{ fontFamily: "'Syne', sans-serif" }}>Check your inbox</h2>
+        <p className="text-[12px] text-slate-900/40 leading-relaxed mb-7">
           We sent a confirmation link to{" "}
           <span className="text-indigo-400 font-semibold">{email || "your email"}</span>.
           Click it to activate your account.
@@ -798,14 +798,14 @@ const EmailConfirmScreen = ({ email }: { email?: string }) => (
         <div className="space-y-2 mb-7">
           {["Open your email app", "Find the email from NexusGigs", "Click the confirmation link", "Return here to continue"].map((s, i) => (
             <div key={i} className="flex items-center gap-3 text-left p-3 rounded-xl"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
+              style={{ background: "rgba(15,23,42,0.04)", border: "1px solid rgba(15,23,42,0.06)" }}>
               <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
                 style={{ background: "linear-gradient(135deg, #6366f1, #3b82f6)" }}>{i + 1}</div>
-              <span className="text-[11px] font-medium text-white/50">{s}</span>
+              <span className="text-[11px] font-medium text-slate-900/50">{s}</span>
             </div>
           ))}
         </div>
-        <div className="flex items-center justify-center gap-2 text-[11px] text-white/30">
+        <div className="flex items-center justify-center gap-2 text-[11px] text-slate-900/30">
           <RefreshCw size={11} />
           <span>Didn't receive it? Check your spam folder.</span>
         </div>
@@ -819,7 +819,7 @@ const EmailConfirmScreen = ({ email }: { email?: string }) => (
 // ─────────────────────────────────────────────
 
 const ConsentScreen = ({ onContinue }: { onContinue: () => void }) => (
-  <div className="min-h-screen flex items-center justify-center p-5" style={{ background: "#02040f" }}>
+  <div className="min-h-screen flex items-center justify-center p-5" style={{ background: "#ffffff" }}>
     <motion.div
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -828,13 +828,13 @@ const ConsentScreen = ({ onContinue }: { onContinue: () => void }) => (
     >
       <GlassCard className="p-10 text-center" hover={false}>
         <div className="w-16 h-16 rounded-2xl mx-auto mb-7 flex items-center justify-center"
-          style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <Fingerprint size={28} className="text-white/60" />
+          style={{ background: "rgba(15,23,42,0.05)", border: "1px solid rgba(15,23,42,0.08)" }}>
+          <Fingerprint size={28} className="text-slate-900/60" />
         </div>
-        <h2 className="text-[22px] font-black text-white mb-3 leading-tight" style={{ fontFamily: "'Syne', sans-serif" }}>
+        <h2 className="text-[22px] font-black text-slate-900 mb-3 leading-tight" style={{ fontFamily: "'Syne', sans-serif" }}>
           Identity Verification
         </h2>
-        <p className="text-[12px] text-white/40 leading-relaxed mb-7">
+        <p className="text-[12px] text-slate-900/40 leading-relaxed mb-7">
           To maintain quality and safety across the NexusGigs network, all new members complete a brief verification process. Takes about 3 minutes.
         </p>
 
@@ -845,14 +845,14 @@ const ConsentScreen = ({ onContinue }: { onContinue: () => void }) => (
             { icon: <ShieldCheck size={14} />, label: "GDPR" },
           ].map((item, i) => (
             <div key={i} className="p-3.5 rounded-xl text-center"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+              style={{ background: "rgba(15,23,42,0.04)", border: "1px solid rgba(15,23,42,0.07)" }}>
               <div className="text-indigo-400 flex justify-center mb-1.5">{item.icon}</div>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-white/35">{item.label}</p>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-slate-900/35">{item.label}</p>
             </div>
           ))}
         </div>
 
-        <p className="text-[10px] text-white/25 mb-6 leading-relaxed">
+        <p className="text-[10px] text-slate-900/25 mb-6 leading-relaxed">
           By continuing, you agree to our{" "}
           <span className="text-indigo-400 font-medium cursor-pointer">Terms of Service</span> and{" "}
           <span className="text-indigo-400 font-medium cursor-pointer">Privacy Policy</span>.
@@ -876,7 +876,7 @@ const ConsentScreen = ({ onContinue }: { onContinue: () => void }) => (
 // ─────────────────────────────────────────────
 
 const PathSelection = ({ onSelect }: { onSelect: (role: string) => void }) => (
-  <div className="min-h-screen flex items-center justify-center p-5" style={{ background: "#02040f" }}>
+  <div className="min-h-screen flex items-center justify-center p-5" style={{ background: "#ffffff" }}>
     <div className="max-w-2xl w-full">
       <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
         <div className="flex items-center justify-center gap-2 mb-5">
@@ -884,12 +884,12 @@ const PathSelection = ({ onSelect }: { onSelect: (role: string) => void }) => (
             style={{ background: "linear-gradient(135deg, #6366f1, #3b82f6)" }}>
             <Terminal size={13} className="text-white" />
           </div>
-          <span className="text-white font-black text-[16px]" style={{ fontFamily: "'Syne', sans-serif" }}>
+          <span className="text-slate-900 font-black text-[16px]" style={{ fontFamily: "'Syne', sans-serif" }}>
             nexus<span style={{ color: "#6366f1" }}>gigs</span>
           </span>
         </div>
-        <h2 className="text-[30px] md:text-[40px] font-black text-white mb-1.5" style={{ fontFamily: "'Syne', sans-serif" }}>How are you joining?</h2>
-        <p className="text-[12px] text-white/35 font-medium">Choose your role on the platform</p>
+        <h2 className="text-[30px] md:text-[40px] font-black text-slate-900 mb-1.5" style={{ fontFamily: "'Syne', sans-serif" }}>How are you joining?</h2>
+        <p className="text-[12px] text-slate-900/35 font-medium">Choose your role on the platform</p>
       </motion.div>
 
       <div className="grid md:grid-cols-2 gap-3">
@@ -921,8 +921,8 @@ const PathSelection = ({ onSelect }: { onSelect: (role: string) => void }) => (
             onClick={() => onSelect(opt.role)}
             className="group p-7 rounded-2xl text-left transition-all duration-300 hover:-translate-y-0.5"
             style={{
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.08)",
+              background: "rgba(15,23,42,0.04)",
+              border: "1px solid rgba(15,23,42,0.08)",
               backdropFilter: "blur(20px)",
             }}
             onMouseEnter={(e) => {
@@ -930,20 +930,20 @@ const PathSelection = ({ onSelect }: { onSelect: (role: string) => void }) => (
               (e.currentTarget as HTMLElement).style.boxShadow = "0 0 40px rgba(99,102,241,0.12)";
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.08)";
+              (e.currentTarget as HTMLElement).style.borderColor = "rgba(15,23,42,0.08)";
               (e.currentTarget as HTMLElement).style.boxShadow = "none";
             }}
           >
             <div className="flex items-start justify-between mb-5">
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-indigo-400 transition-colors group-hover:text-white"
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-indigo-400 transition-colors group-hover:text-slate-900"
                 style={{ background: "rgba(99,102,241,0.12)" }}>
                 {opt.icon}
               </div>
-              <span className="text-[9px] font-semibold text-white/30 uppercase tracking-widest border border-white/7 px-2.5 py-1 rounded-full">{opt.badge}</span>
+              <span className="text-[9px] font-semibold text-slate-900/30 uppercase tracking-widest border border-slate-900/7 px-2.5 py-1 rounded-full">{opt.badge}</span>
             </div>
-            <p className="text-[10px] font-semibold text-white/30 uppercase tracking-wider mb-0.5">{opt.sub}</p>
-            <h3 className="text-[19px] font-black text-white mb-2.5" style={{ fontFamily: "'Syne', sans-serif" }}>{opt.title}</h3>
-            <p className="text-[12px] text-white/40 mb-5 leading-relaxed">{opt.description}</p>
+            <p className="text-[10px] font-semibold text-slate-900/30 uppercase tracking-wider mb-0.5">{opt.sub}</p>
+            <h3 className="text-[19px] font-black text-slate-900 mb-2.5" style={{ fontFamily: "'Syne', sans-serif" }}>{opt.title}</h3>
+            <p className="text-[12px] text-slate-900/40 mb-5 leading-relaxed">{opt.description}</p>
             <div className="space-y-1.5">
               {opt.perks.map((perk) => (
                 <div key={perk} className="flex items-center gap-2">
@@ -951,7 +951,7 @@ const PathSelection = ({ onSelect }: { onSelect: (role: string) => void }) => (
                     style={{ background: "rgba(16,185,129,0.2)" }}>
                     <Check size={8} className="text-green-400" />
                   </div>
-                  <span className="text-[11px] text-white/40">{perk}</span>
+                  <span className="text-[11px] text-slate-900/40">{perk}</span>
                 </div>
               ))}
             </div>
@@ -1049,20 +1049,20 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
     setData((d) => ({ ...d, country: name, code: found?.code || "+254" }));
   };
 
-  const inputBase = "w-full rounded-xl px-4 py-3 text-[12px] text-white outline-none transition-all placeholder-white/20"
-    + " border border-white/9 focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/10"
-    + " bg-white/4";
+  const inputBase = "w-full rounded-xl px-4 py-3 text-[12px] text-slate-900 outline-none transition-all placeholder-slate-900/20"
+    + " border border-slate-900/9 focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/10"
+    + " bg-slate-900/4";
 
-  const labelBase = "block text-[10px] font-semibold uppercase tracking-widest text-white/35 mb-1.5";
+  const labelBase = "block text-[10px] font-semibold uppercase tracking-widest text-slate-900/35 mb-1.5";
 
   const ChipButton = ({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: React.ReactNode }) => (
     <button type="button" onClick={onClick}
       className={`px-3 py-2 rounded-xl text-[11px] font-semibold border transition-all ${
         selected
-          ? "text-white border-indigo-500/60"
-          : "border-white/8 text-white/40 hover:border-white/20 hover:text-white/60"
+          ? "text-slate-900 border-indigo-500/60"
+          : "border-slate-900/8 text-slate-900/40 hover:border-slate-900/20 hover:text-slate-900/60"
       }`}
-      style={selected ? { background: "rgba(99,102,241,0.18)" } : { background: "rgba(255,255,255,0.03)" }}>
+      style={selected ? { background: "rgba(99,102,241,0.18)" } : { background: "rgba(15,23,42,0.03)" }}>
       {selected && <span className="mr-1 text-indigo-400">✓</span>}
       {children}
     </button>
@@ -1107,10 +1107,10 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
   const stepDescs = ["Tell us who you are", "Showcase your capabilities", "How & when you work", "Secure your account & earnings"];
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-5" style={{ background: "#02040f" }}>
+    <div className="min-h-screen flex items-center justify-center p-5" style={{ background: "#ffffff" }}>
       {/* Ambient */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-[-20%] right-[-10%] w-150 h-150 rounded-full opacity-[0.08]"
+        <div className="absolute top-[-20%] right-[-10%] w-150 h-150 rounded-full opacity-[0.045]"
           style={{ background: "radial-gradient(circle, #6366f1, transparent 70%)", filter: "blur(60px)" }} />
       </div>
 
@@ -1122,25 +1122,25 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
               style={{ background: "linear-gradient(135deg, #6366f1, #3b82f6)" }}>
               <Terminal size={12} className="text-white" />
             </div>
-            <span className="text-white font-black text-[15px]" style={{ fontFamily: "'Syne', sans-serif" }}>
+            <span className="text-slate-900 font-black text-[15px]" style={{ fontFamily: "'Syne', sans-serif" }}>
               nexus<span style={{ color: "#6366f1" }}>gigs</span>
             </span>
           </div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-white/30 mb-1">Step {step} of {totalSteps}</p>
-          <h2 className="text-[22px] font-black text-white" style={{ fontFamily: "'Syne', sans-serif" }}>{stepTitles[step - 1]}</h2>
-          <p className="text-[11px] text-white/35 mt-0.5">{stepDescs[step - 1]}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-900/30 mb-1">Step {step} of {totalSteps}</p>
+          <h2 className="text-[22px] font-black text-slate-900" style={{ fontFamily: "'Syne', sans-serif" }}>{stepTitles[step - 1]}</h2>
+          <p className="text-[11px] text-slate-900/35 mt-0.5">{stepDescs[step - 1]}</p>
         </div>
 
         {/* Progress */}
         <div className="flex gap-1 mb-6">
           {Array.from({ length: totalSteps }, (_, i) => (
             <div key={i} className="h-0.5 rounded-full flex-1 transition-all duration-500"
-              style={{ background: i < step ? "linear-gradient(90deg, #6366f1, #3b82f6)" : "rgba(255,255,255,0.08)" }} />
+              style={{ background: i < step ? "linear-gradient(90deg, #6366f1, #3b82f6)" : "rgba(15,23,42,0.08)" }} />
           ))}
         </div>
 
         <div className="rounded-2xl overflow-hidden"
-          style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(20px)" }}>
+          style={{ background: "rgba(15,23,42,0.04)", border: "1px solid rgba(15,23,42,0.08)", backdropFilter: "blur(20px)" }}>
           <div className="p-6">
             <AnimatePresence mode="wait">
 
@@ -1165,7 +1165,7 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
                       <label className={labelBase}>Country</label>
                       <select value={data.country} onChange={(e) => handleCountry(e.target.value)} className={inputBase}>
                         {countries.map((c) => (
-                          <option key={c.name} value={c.name} style={{ background: "#0d0f1e" }}>
+                          <option key={c.name} value={c.name} style={{ background: "#ffffff" }}>
                             {c.flag} {c.name} ({c.code})
                           </option>
                         ))}
@@ -1181,8 +1181,8 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
                   <div>
                     <label className={labelBase}>WhatsApp / Phone</label>
                     <div className="flex gap-2">
-                      <div className="px-3 py-3 rounded-xl text-[12px] font-semibold text-white/40 shrink-0"
-                        style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.09)" }}>
+                      <div className="px-3 py-3 rounded-xl text-[12px] font-semibold text-slate-900/40 shrink-0"
+                        style={{ background: "rgba(15,23,42,0.06)", border: "1px solid rgba(15,23,42,0.09)" }}>
                         {data.code}
                       </div>
                       <input value={data.phone} onChange={(e) => update("phone", e.target.value)}
@@ -1195,7 +1195,7 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
                     <textarea value={data.bio} onChange={(e) => update("bio", e.target.value)}
                       rows={3} className={`${inputBase} resize-none`}
                       placeholder="2–3 sentences about who you are and what you do best..." />
-                    <p className="text-[9px] text-white/25 mt-1 ml-1">This appears on your public profile card</p>
+                    <p className="text-[9px] text-slate-900/25 mt-1 ml-1">This appears on your public profile card</p>
                   </div>
 
                   <div>
@@ -1219,11 +1219,11 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
                         <button key={j.id} type="button" onClick={() => update("job", j.id)}
                           className={`flex items-center gap-2 p-2.5 rounded-xl border text-left transition-all text-[11px] font-semibold ${
                             data.job === j.id
-                              ? "border-indigo-500/60 text-white"
-                              : "border-white/8 text-white/40 hover:border-white/20 hover:text-white/60"
+                              ? "border-indigo-500/60 text-slate-900"
+                              : "border-slate-900/8 text-slate-900/40 hover:border-slate-900/20 hover:text-slate-900/60"
                           }`}
-                          style={data.job === j.id ? { background: "rgba(99,102,241,0.15)" } : { background: "rgba(255,255,255,0.03)" }}>
-                          <span className={data.job === j.id ? "text-indigo-400" : "text-white/30"}>{j.icon}</span>
+                          style={data.job === j.id ? { background: "rgba(99,102,241,0.15)" } : { background: "rgba(15,23,42,0.03)" }}>
+                          <span className={data.job === j.id ? "text-indigo-400" : "text-slate-900/30"}>{j.icon}</span>
                           {j.id}
                         </button>
                       ))}
@@ -1234,7 +1234,7 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
                     <label className={labelBase}>Specialization / Niche</label>
                     <input value={data.specialization} onChange={(e) => update("specialization", e.target.value)}
                       className={inputBase} placeholder="e.g. E-commerce React apps, SaaS UI/UX, Fintech APIs" />
-                    <p className="text-[9px] text-white/25 mt-1 ml-1">Be specific — this boosts your match rate by 4×</p>
+                    <p className="text-[9px] text-slate-900/25 mt-1 ml-1">Be specific — this boosts your match rate by 4×</p>
                   </div>
 
                   <div>
@@ -1247,7 +1247,7 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
                   </div>
 
                   <div>
-                    <label className={labelBase}>Top Skills <span className="text-white/20 normal-case">(select all that apply)</span></label>
+                    <label className={labelBase}>Top Skills <span className="text-slate-900/20 normal-case">(select all that apply)</span></label>
                     <div className="flex flex-wrap gap-1.5">
                       {skillOptions.map((s) => (
                         <ChipButton key={s} selected={data.skills.includes(s)} onClick={() => toggleSkill(s)}>{s}</ChipButton>
@@ -1261,7 +1261,7 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
                   <div>
                     <label className={labelBase}>Portfolio / Website</label>
                     <div className="relative">
-                      <Link2 size={12} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
+                      <Link2 size={12} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-900/30" />
                       <input value={data.portfolio} onChange={(e) => update("portfolio", e.target.value)}
                         className={`${inputBase} pl-9`} placeholder="https://yourportfolio.com" />
                     </div>
@@ -1271,7 +1271,7 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
                     <div>
                       <label className={labelBase}>LinkedIn</label>
                       <div className="relative">
-                        <Link2 size={12} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
+                        <Link2 size={12} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-900/30" />
                         <input value={data.linkedin} onChange={(e) => update("linkedin", e.target.value)}
                           className={`${inputBase} pl-9`} placeholder="linkedin.com/in/you" />
                       </div>
@@ -1279,7 +1279,7 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
                     <div>
                       <label className={labelBase}>GitHub</label>
                       <div className="relative">
-                        <Code size={12} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
+                        <Code size={12} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-900/30" />
                         <input value={data.github} onChange={(e) => update("github", e.target.value)}
                           className={`${inputBase} pl-9`} placeholder="github.com/you" />
                       </div>
@@ -1334,7 +1334,7 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
                     <label className={labelBase}>Timezone</label>
                     <select value={data.timezone} onChange={(e) => update("timezone", e.target.value)} className={inputBase}>
                       {timezones.map((t) => (
-                        <option key={t} value={t} style={{ background: "#0d0f1e" }}>{t}</option>
+                        <option key={t} value={t} style={{ background: "#ffffff" }}>{t}</option>
                       ))}
                     </select>
                   </div>
@@ -1366,7 +1366,7 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
                     <label className={labelBase}>ID Number</label>
                     <input value={data.idNumber} onChange={(e) => update("idNumber", e.target.value)}
                       className={inputBase} placeholder="e.g. 12345678" />
-                    <p className="text-[9px] text-white/25 mt-1 ml-1">Used for identity verification only. Never shared.</p>
+                    <p className="text-[9px] text-slate-900/25 mt-1 ml-1">Used for identity verification only. Never shared.</p>
                   </div>
 
                   <div>
@@ -1375,16 +1375,16 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
                       {paymentOptions.map((p) => (
                         <button key={p.id} type="button" onClick={() => update("pay", p.id)}
                           className={`w-full flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all ${
-                            data.pay === p.id ? "border-indigo-500/50" : "border-white/8 hover:border-white/15"
+                            data.pay === p.id ? "border-indigo-500/50" : "border-slate-900/8 hover:border-slate-900/15"
                           }`}
-                          style={data.pay === p.id ? { background: "rgba(99,102,241,0.1)" } : { background: "rgba(255,255,255,0.03)" }}>
-                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${data.pay === p.id ? "text-indigo-300" : "text-white/30"}`}
-                            style={{ background: "rgba(255,255,255,0.06)" }}>
+                          style={data.pay === p.id ? { background: "rgba(99,102,241,0.1)" } : { background: "rgba(15,23,42,0.03)" }}>
+                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${data.pay === p.id ? "text-indigo-300" : "text-slate-900/30"}`}
+                            style={{ background: "rgba(15,23,42,0.06)" }}>
                             {p.icon}
                           </div>
                           <div className="flex-1">
-                            <p className={`text-[12px] font-semibold ${data.pay === p.id ? "text-white" : "text-white/50"}`}>{p.id}</p>
-                            <p className="text-[10px] text-white/30">{p.desc}</p>
+                            <p className={`text-[12px] font-semibold ${data.pay === p.id ? "text-slate-900" : "text-slate-900/50"}`}>{p.id}</p>
+                            <p className="text-[10px] text-slate-900/30">{p.desc}</p>
                           </div>
                           {data.pay === p.id && (
                             <div className="w-4 h-4 rounded-full flex items-center justify-center"
@@ -1399,8 +1399,8 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
 
                   {/* Summary */}
                   <div className="p-4 rounded-xl"
-                    style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                    <p className="text-[9px] font-bold uppercase tracking-widest text-white/25 mb-2.5">Profile Summary</p>
+                    style={{ background: "rgba(15,23,42,0.03)", border: "1px solid rgba(15,23,42,0.07)" }}>
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-slate-900/25 mb-2.5">Profile Summary</p>
                     <div className="space-y-1.5 text-[11px]">
                       {[
                         { label: "Name", value: data.legalName || "—" },
@@ -1411,8 +1411,8 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
                         { label: "Payout", value: data.pay },
                       ].map((r) => (
                         <div key={r.label} className="flex justify-between">
-                          <span className="text-white/30">{r.label}</span>
-                          <span className="font-semibold text-white/60">{r.value}</span>
+                          <span className="text-slate-900/30">{r.label}</span>
+                          <span className="font-semibold text-slate-900/60">{r.value}</span>
                         </div>
                       ))}
                     </div>
@@ -1425,8 +1425,8 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
             <div className="flex gap-2.5 mt-7">
               {step > 1 && (
                 <button type="button" onClick={() => setStep((s) => s - 1)}
-                  className="px-5 py-3.5 rounded-xl text-[12px] font-semibold text-white/50 border border-white/8 hover:border-white/15 hover:text-white/70 transition-all"
-                  style={{ background: "rgba(255,255,255,0.04)" }}>
+                  className="px-5 py-3.5 rounded-xl text-[12px] font-semibold text-slate-900/50 border border-slate-900/8 hover:border-slate-900/15 hover:text-slate-900/70 transition-all"
+                  style={{ background: "rgba(15,23,42,0.04)" }}>
                   Back
                 </button>
               )}
@@ -1434,7 +1434,7 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
                 onClick={() => (step < totalSteps ? setStep((s) => s + 1) : onFinalize())}
                 disabled={!canProceed}
                 className="flex-1 py-3.5 rounded-xl text-[12px] font-semibold text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                style={{ background: canProceed ? "linear-gradient(135deg, #6366f1, #3b82f6)" : "rgba(255,255,255,0.1)" }}>
+                style={{ background: canProceed ? "linear-gradient(135deg, #6366f1, #3b82f6)" : "rgba(15,23,42,0.1)" }}>
                 {step === totalSteps ? (
                   <><Rocket size={13} /> Launch My Profile</>
                 ) : (
@@ -1445,7 +1445,7 @@ const VettingForm = ({ role, onFinalize }: { role: string; onFinalize: () => voi
           </div>
         </div>
 
-        <p className="text-center text-[10px] text-white/20 mt-4">
+        <p className="text-center text-[10px] text-slate-900/20 mt-4">
           <ShieldCheck size={10} className="inline mr-1 text-green-400" />
           Your data is encrypted and never shared with third parties
         </p>
@@ -1483,14 +1483,14 @@ const LoadingScreen = ({ name }: { name?: string }) => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-5 text-center" style={{ background: "#02040f" }}>
+    <div className="min-h-screen flex flex-col items-center justify-center p-5 text-center" style={{ background: "#ffffff" }}>
       <div className="max-w-xs w-full">
         <div className="flex items-center justify-center gap-2 mb-9">
           <div className="w-9 h-9 rounded-xl flex items-center justify-center"
             style={{ background: "linear-gradient(135deg, #6366f1, #3b82f6)" }}>
             <Terminal size={16} className="text-white" />
           </div>
-          <span className="text-white font-black text-[18px]" style={{ fontFamily: "'Syne', sans-serif" }}>
+          <span className="text-slate-900 font-black text-[18px]" style={{ fontFamily: "'Syne', sans-serif" }}>
             nexus<span style={{ color: "#6366f1" }}>gigs</span>
           </span>
         </div>
@@ -1499,22 +1499,22 @@ const LoadingScreen = ({ name }: { name?: string }) => {
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
           className="w-12 h-12 rounded-full mx-auto mb-7"
-          style={{ border: "2px solid rgba(255,255,255,0.07)", borderTopColor: "#6366f1" }}
+          style={{ border: "2px solid rgba(15,23,42,0.07)", borderTopColor: "#6366f1" }}
         />
 
-        <h2 className="text-[20px] font-black text-white mb-1" style={{ fontFamily: "'Syne', sans-serif" }}>
+        <h2 className="text-[20px] font-black text-slate-900 mb-1" style={{ fontFamily: "'Syne', sans-serif" }}>
           Initializing workspace
         </h2>
-        <p className="text-[12px] text-white/35 mb-8">
-          Welcome, <span className="text-white/60 font-semibold">{name || "Operator"}</span>
+        <p className="text-[12px] text-slate-900/35 mb-8">
+          Welcome, <span className="text-slate-900/60 font-semibold">{name || "Operator"}</span>
         </p>
 
         <div className="mb-5">
-          <div className="h-1 rounded-full overflow-hidden mb-2" style={{ background: "rgba(255,255,255,0.07)" }}>
+          <div className="h-1 rounded-full overflow-hidden mb-2" style={{ background: "rgba(15,23,42,0.07)" }}>
             <div className="h-full rounded-full transition-all"
               style={{ width: `${progress}%`, background: "linear-gradient(90deg, #6366f1, #3b82f6)" }} />
           </div>
-          <div className="flex justify-between text-[10px] font-semibold text-white/25">
+          <div className="flex justify-between text-[10px] font-semibold text-slate-900/25">
             <span>Progress</span>
             <span>{Math.round(progress)}%</span>
           </div>
@@ -1524,16 +1524,16 @@ const LoadingScreen = ({ name }: { name?: string }) => {
           {tasks.map((task, i) => (
             <motion.div key={i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: i <= currentTask ? 1 : 0.2, x: 0 }}
               transition={{ delay: i * 0.2 }}
-              className={`flex items-center gap-2.5 p-2.5 rounded-xl ${i === currentTask ? "border border-white/7" : ""}`}
-              style={i === currentTask ? { background: "rgba(255,255,255,0.04)" } : {}}>
+              className={`flex items-center gap-2.5 p-2.5 rounded-xl ${i === currentTask ? "border border-slate-900/7" : ""}`}
+              style={i === currentTask ? { background: "rgba(15,23,42,0.04)" } : {}}>
               <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
-                i < currentTask ? "text-white" : i === currentTask ? "text-indigo-400" : "text-white/20"
+                i < currentTask ? "text-white" : i === currentTask ? "text-indigo-400" : "text-slate-900/20"
               }`}
                 style={i < currentTask ? { background: "linear-gradient(135deg, #6366f1, #3b82f6)" } : {}}>
                 {i < currentTask ? <Check size={8} /> : task.icon}
               </div>
               <span className={`text-[11px] font-medium ${
-                i === currentTask ? "text-white/60" : i < currentTask ? "text-white/25 line-through" : "text-white/20"
+                i === currentTask ? "text-slate-900/60" : i < currentTask ? "text-slate-900/25 line-through" : "text-slate-900/20"
               }`}>
                 {task.label}
               </span>
@@ -1557,7 +1557,7 @@ const RocketWarp = ({ active }: { active: boolean }) => (
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-999 flex items-center justify-center pointer-events-none"
-        style={{ background: "rgba(2,4,15,0.9)", backdropFilter: "blur(10px)" }}
+        style={{ background: "rgba(15,23,42,0.9)", backdropFilter: "blur(10px)" }}
       >
         <motion.div
           initial={{ y: 400, scale: 0.5, opacity: 1 }}
@@ -1625,7 +1625,7 @@ export default function Home() {
   };
 
   if (!mounted || !isLoaded || step === "checking") {
-    return <div className="min-h-screen" style={{ background: "#02040f" }} />;
+    return <div className="min-h-screen" style={{ background: "#ffffff" }} />;
   }
 
   if (step === "landing") return <LandingPage />;
